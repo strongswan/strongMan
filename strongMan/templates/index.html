@@ -12,28 +12,31 @@
                 <thead>
                 <tr>
                     <th>Profile</th>
-                    <th>Local</th>
                     <th>Remote</th>
                     <th>State</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for connection in object_list %}
+                {% for connection in connections %}
                     <tr>
                         <td>{{ connection.profile }}</td>
-                        <td>{{ connection.local_address }}</td>
-                        <td>{{ connection.remote_address }}</td>
+                        <td>{{ connection.remote }}</td>
                         <td>
-                            <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger"
-                                   {% if connection.state %}checked{% endif %}>
-                            <a href="" id="edit" class="btn pull-right white-background black">
+                            <form action="{% url 'connections:connection_toggle' %}" method="post"
+                                  style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ connection.id }}">
+                                <input type="checkbox" data-toggle="toggle" data-onstyle="success"
+                                       data-offstyle="danger"
+                                       {% if connection.state %}checked{% endif %} onchange="this.form.submit()">
+                            </form>
+                            <a href="{{ connection.link }}" id="edit"
+                               class="btn pull-right white-background black">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
-
                         </td>
                     </tr>
                 {% endfor %}
-
                 </tbody>
             </table>
         </div>

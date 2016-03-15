@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load connections_extras %}
+{% block content %}
+    <h1>Configuration</h1>
+    {% if user.is_authenticated %}
+        <form action="" method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
+                    <div class="controls col-sm-10">
+                            <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
+                                    onchange="this.form.submit()">
+                                {% for key, value in field.field.choices %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        <p class="help-text">{{ field.help_text }} </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </form>
+    {% endif %}
+{% endblock %}

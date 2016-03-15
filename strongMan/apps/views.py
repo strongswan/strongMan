@@ -1,17 +1,25 @@
-from django.views.generic.list import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
-from .connections.models import Connection
+from .connections.models import Connection, Address
 
 
-class ConfigurationList(LoginRequiredMixin, ListView):
-    model = Connection
-    template_name = 'index.html'
+@require_http_methods('GET')
+@login_required
+def overview(request):
+    connections = []
+    for conn in Connection.objects.all():
+        connection = dict(id=conn.id, profile=conn.profile, state=conn.state)
+        address = Address.objects.filter(remote_addresses=conn)
+        connection['remote'] = address[0].value
+        connection['link'] = "/connection/update/"+str(conn.typ)+"/"+str(conn.id)
+        connections.append(connection)
+    context = dict(connections=connections)
+    return render(request, 'index.html', context)
 
 
 @require_http_methods(('GET', 'POST'))
