@@ -1,7 +1,7 @@
 import pprint
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render
-from .models import CertReader
+#from .models import CertReader
 from .forms import UploadFileForm, UploadFile
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
@@ -61,6 +61,7 @@ def add_conn(request):
 
 
 def cert_upload(request):
+    '''
     context = {'uploaded': False,}
     if request.method == 'POST':
         file1 = request.FILES['myfile1']
@@ -71,7 +72,7 @@ def cert_upload(request):
         equal = ident1 == ident2
         context = {'uploaded': True, 'filename1': str(file1), 'filename2': str(file2), 'equal': equal,
                    'value1': print_dict(value1, newline="\n"), 'value2': print_dict(value2, newline="\n")}
-
+    '''
     # Render list page with the documents and the form
     return render(request, 'vici/certificate_equal.html', context)
 
@@ -88,8 +89,8 @@ def get_ident2(bytes, pw=None):
     """
     reader = CertReader.by_bytes(bytes)
     if pw == None:
-        reader.read()
+        reader.detect_type()
     else:
-        reader.read(pw)
+        reader.detect_type(pw)
 
     return (str(reader.identifier()), reader.asn1.native)

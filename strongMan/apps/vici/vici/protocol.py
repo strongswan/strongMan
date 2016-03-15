@@ -136,18 +136,18 @@ class Message(object):
     @classmethod
     def deserialize(cls, stream):
         def decode_named_type(stream):
-            length, = struct.unpack("!B", stream.read(1))
-            return stream.read(length).decode()
+            length, = struct.unpack("!B", stream.detect_type(1))
+            return stream.detect_type(length).decode()
 
         def decode_blob(stream):
-            length, = struct.unpack("!H", stream.read(2))
-            return stream.read(length)
+            length, = struct.unpack("!H", stream.detect_type(2))
+            return stream.detect_type(length)
 
         def decode_list_item(stream):
-            marker, = struct.unpack("!B", stream.read(1))
+            marker, = struct.unpack("!B", stream.detect_type(1))
             while marker == cls.LIST_ITEM:
                 yield decode_blob(stream)
-                marker, = struct.unpack("!B", stream.read(1))
+                marker, = struct.unpack("!B", stream.detect_type(1))
 
             if marker != cls.LIST_END:
                 raise DeserializationException(
@@ -157,7 +157,7 @@ class Message(object):
         section = OrderedDict()
         section_stack = []
         while stream.has_more():
-            element_type, = struct.unpack("!B", stream.read(1))
+            element_type, = struct.unpack("!B", stream.detect_type(1))
             if element_type == cls.SECTION_START:
                 section_name = decode_named_type(stream)
                 new_section = OrderedDict()
