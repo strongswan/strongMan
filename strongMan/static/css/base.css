@@ -1,0 +1,33 @@
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.navbar-nav.navbar-right:last-child {
+    margin-right: 0;
+}
+
+.black-background {
+    background-color: #000000;
+}
+
+.white-background {
+    background-color: white;
+    border-color: black;
+}
+
+.white {
+    color: #ffffff;
+}
+
+.black {
+    color: #000000;
+}
+
+#logout_button{
+    float: right;
+}

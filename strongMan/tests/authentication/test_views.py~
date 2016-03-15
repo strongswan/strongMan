@@ -1,0 +1,16 @@
+from django.test import Client, TestCase
+
+
+class AuthenticationViewsTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+<<<<<<< HEAD
+
+    def test_login_post(self):
+        response = self.client.post('/auth/login/', {'username': 'John', 'password': 'Lennon'})
+        self.assertEquals(response.status_code, 302)
+=======
+        response = self.client.post('/auth/', {'username': 'John', 'password': 'Lennon'})
+        self.assertEquals(response.status_code, 200)
+>>>>>>> seviproto

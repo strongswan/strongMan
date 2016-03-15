@@ -1,0 +1,45 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>strongMan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'img/swanicon.png' %}">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-inverse">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="{% url "index" %}">Overview</a></li>
+            <li class="active"><a href="#">Certificates</a></li>
+            <li class="active"><a href="{% url "about" %}">About</a></li>
+        </ul>
+        {% if user.is_authenticated %}
+            <ul class="nav pull-right">
+                <li class="active">
+                    <p class="navbar-btn" id="logout_button">
+                        <a href="/logout" class="btn  black-background white"><span
+                                class="glyphicon glyphicon-log-out"></span> Log out</a>
+                    </p>
+                </li>
+            </ul>
+        {% endif %}
+    </nav>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} fade in">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>{{ message }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock content %}
+</div>
+</body>
+</html>
