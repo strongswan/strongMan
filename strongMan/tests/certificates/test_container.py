@@ -1,6 +1,7 @@
 from django.test import TestCase
-from strongMan.apps.certificates.CertReaders import ContainerTypes, ContainerDetector, AbstractContainer, X509Container, PKCS12Container, PKCS1Container, PKCS8Container
+from strongMan.apps.certificates.container import ContainerTypes, ContainerDetector, AbstractContainer, X509Container, PKCS12Container, PKCS1Container, PKCS8Container
 import os
+import strongMan.apps.certificates.models as models
 
 
 class TestCert:
@@ -122,16 +123,17 @@ class PCKS1ContainerTest(TestCase):
         bytes = Paths.PKCS1_rsa_ca.read()
         container = PKCS1Container.by_bytes(bytes)
         container.parse()
-        should = "245507371695755976"
-        self.assertEqual(str(container.identifier())[0:18], should)
+        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
+        ident = str(container.identifier())
+        self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.PKCS1_ec.read()
         container = PKCS1Container.by_bytes(bytes)
         container.parse()
-        should = b'\x04\x04y\x1f\xb2\x93\x08\x01\xe5'
+        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
         ident = container.identifier()
-        self.assertEqual(ident[0:9], should)
+        self.assertEqual(ident, should)
 
     def test_decryption(self):
         bytes = Paths.PKCS1_rsa_ca_encrypted.read()
@@ -184,16 +186,17 @@ class PCKS8ContainerTest(TestCase):
         bytes = Paths.PKCS8_rsa_ca.read()
         container = PKCS8Container.by_bytes(bytes)
         container.parse()
-        should = "245507371695755976"
-        self.assertEqual(str(container.identifier())[0:18], should)
+        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
+        ident = str(container.identifier())
+        self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.PKCS8_ec.read()
         container = PKCS8Container.by_bytes(bytes)
         container.parse()
-        should = b'\x04\x04y\x1f\xb2\x93\x08\x01\xe5'
+        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
         ident = container.identifier()
-        self.assertEqual(ident[0:9], should)
+        self.assertEqual(ident, should)
 
     def test_decryption(self):
         bytes = Paths.PKCS8_rsa_ca_encrypted.read()
@@ -224,8 +227,9 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Container.by_bytes(bytes)
         container.parse()
-        should = "276088143272824517"
-        self.assertEqual(str(container.identifier())[0:18], should)
+        should = "0a69d0d82368168a813a9e4aef55f4d4117f95c39c4255a6f6a48f01239bfcc2"
+        ident = str(container.identifier())
+        self.assertEqual(ident, should)
 
     def test_decryption(self):
         bytes = Paths.PKCS12_rsa_encrypted.read()
@@ -237,23 +241,31 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Container.by_bytes(bytes)
         container.parse()
-        cert = container.x509()
-        self.assertIsInstance(cert, X509Container)
+        cert = container.to_public_key()
+        self.assertIsInstance(cert, models.PublicKey)
 
     def test_private_key(self):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Container.by_bytes(bytes)
         container.parse()
-        key = container.pkcs8()
-        self.assertIsInstance(key, PKCS8Container)
+        key = container.to_private_key()
+        self.assertIsInstance(key, models.PrivateKey)
 
     def test_other_x509(self):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Container.by_bytes(bytes)
         container.parse()
-        certs = container.other_x509()
+        certs = container.further_publics()
         for c in certs:
-            self.assertIsInstance(c, X509Container)
+            self.assertIsInstance(c, models.PublicKey)
+
+    def test_identifier_equal(self):
+        bytes = Paths.PKCS12_rsa.read()
+        container = PKCS12Container.by_bytes(bytes)
+        container.parse()
+        private = container.to_private_key()
+        public = container.to_public_key()
+        self.assertEqual(private.identifier, public.identifier)
 
 
 class X509ContainerTest(TestCase):
@@ -291,16 +303,17 @@ class X509ContainerTest(TestCase):
         bytes = Paths.X509_rsa_ca.read()
         container = X509Container.by_bytes(bytes)
         container.parse()
-        should = "245507371695755976"
-        self.assertEqual(str(container.identifier())[0:18], should)
+        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
+        ident = str(container.identifier())
+        self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.X509_ec.read()
         container = X509Container.by_bytes(bytes)
         container.parse()
-        should = b'\x04\x04y\x1f\xb2\x93\x08\x01\xe5'
+        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
         ident = container.identifier()
-        self.assertEqual(ident[0:9], should)
+        self.assertEqual(ident, should)
 
     def test_is_private_key(self):
         bytes = Paths.X509_rsa_ca.read()

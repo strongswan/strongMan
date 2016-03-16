@@ -2,6 +2,7 @@ from oscrypto import keys as k
 from asn1crypto import keys
 from enum import Enum
 from .models import PublicKey, PrivateKey, SubjectInfo
+import hashlib
 
 class ContainerTypes(Enum):
     PKCS1="PKCS1"
@@ -12,7 +13,6 @@ class ContainerTypes(Enum):
 
 
 class ContainerDetector:
-
     @classmethod
     def _is_x509(cls, container_bytes, password=None):
         try:
@@ -131,6 +131,15 @@ class AbstractContainer:
         '''
         raise NotImplementedError()
 
+    def _hash(self, value):
+        import binascii
+        value = value.encode('utf-8')
+        sha = hashlib.sha256()
+        sha.update(value)
+        hash = sha.digest()
+        hash = binascii.hexlify(hash)
+        return str(hash)[2:][:-1]
+
     def algorithm(self):
         '''
         :return: "rsa" or "ec"
@@ -153,9 +162,11 @@ class PKCS1Container(AbstractContainer):
 
     def identifier(self):
         if self.algorithm() == "rsa":
-            return self._pubkey_rsa()
+                ident = str(self._pubkey_rsa())
         elif self.algorithm() == "ec":
-             return self._pubkey_ec()
+             ident = str(self._pubkey_ec())
+        return self._hash(str(ident))
+
 
     def algorithm(self):
         return self.asn1.algorithm
@@ -178,6 +189,7 @@ class PKCS1Container(AbstractContainer):
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
         private.type = self.type
+        private.identifier = self.identifier()
         return private
 
 
@@ -195,9 +207,10 @@ class PKCS8Container(AbstractContainer):
 
     def identifier(self):
         if self.algorithm() == "rsa":
-            return self.asn1.native["private_key"]["modulus"]
+            ident = self.asn1.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
-            return self.asn1.native["private_key"]["public_key"]
+            ident = self.asn1.native["private_key"]["public_key"]
+        return self._hash(str(ident))
 
     def algorithm(self):
         return self.asn1.algorithm
@@ -211,6 +224,7 @@ class PKCS8Container(AbstractContainer):
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
         private.type = self.type
+        private.identifier = self.identifier()
         return private
 
 
@@ -227,11 +241,12 @@ class PKCS12Container(AbstractContainer):
 
     def identifier(self):
         if self.algorithm() == "rsa":
-            return self.privatekey.native["private_key"]["modulus"]
+            ident = self.privatekey.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
-            return self.privatekey.native["private_key"]["public_key"]
+            ident = self.privatekey.native["private_key"]["public_key"]
+        return self._hash(str(ident))
 
-    def x509(self):
+    def to_public_key(self):
         '''
         :return: the main X509 cert in this container
         :rtype X509Container
@@ -239,9 +254,9 @@ class PKCS12Container(AbstractContainer):
         bytes = self.cert.dump()
         container = X509Container.by_bytes(bytes)
         container.parse()
-        return container
+        return container.to_public_key()
 
-    def pkcs8(self):
+    def to_private_key(self):
         '''
         :return: The private key in this container
         :rtype PKCS8Container
@@ -249,9 +264,9 @@ class PKCS12Container(AbstractContainer):
         bytes = self.privatekey.dump()
         container = PKCS8Container.by_bytes(bytes)
         container.parse()
-        return container
+        return container.to_private_key()
 
-    def other_x509(self):
+    def further_publics(self):
         '''
         :return: A list of X509 certs
         :rtype [X509Container]
@@ -261,7 +276,7 @@ class PKCS12Container(AbstractContainer):
             bytes = cer.dump()
             x509 = X509Container.by_bytes(bytes)
             x509.parse()
-            others.append(x509)
+            others.append(x509.to_public_key())
         return others
 
 
@@ -279,9 +294,11 @@ class X509Container(AbstractContainer):
 
     def identifier(self):
         if self.algorithm() == "rsa":
-            return self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]["modulus"]
+            ident = self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]["modulus"]
         elif self.algorithm() == "ec":
-            return self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]
+            ident = self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]
+
+        return self._hash(str(ident))
 
     def is_cert_of(self, container):
         '''
@@ -304,8 +321,12 @@ class X509Container(AbstractContainer):
         public.type = self.type.value
         public.algorithm = self.algorithm()
         public.hash_algorithm = self.asn1.hash_algo
+        public.identifier = self.identifier()
         public.serial_number = self.asn1.serial_number
-        public.is_CA = self.asn1.ca
+        if self.asn1.ca == None or self.asn1.ca == False:
+            public.is_CA = False
+        else:
+            public.is_CA = True
         public.valid_not_after = self.asn1.native["tbs_certificate"]["validity"]["not_after"]
         public.valid_not_before = self.asn1.native["tbs_certificate"]["validity"]["not_before"]
         public.issuer = SubjectInfo()
@@ -324,7 +345,7 @@ class X509Container(AbstractContainer):
         public.subject.organization = self.asn1.subject.native["organization_name"]
         public.subject.unit = self.asn1.subject.native["organizational_unit_name"]
         public.subject.province = self.asn1.subject.native["state_or_province_name"]
-        return  public
+        return public
 
 
 
