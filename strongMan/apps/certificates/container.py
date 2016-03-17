@@ -1,8 +1,9 @@
 from oscrypto import keys as k
 from asn1crypto import keys
 from enum import Enum
-from .models import PublicKey, PrivateKey, SubjectInfo
+from .models import Certificate, PrivateKey, SubjectInfo, Domain
 import hashlib
+import binascii
 
 class ContainerTypes(Enum):
     PKCS1="PKCS1"
@@ -131,8 +132,15 @@ class AbstractContainer:
         '''
         raise NotImplementedError()
 
+    def _sha256(self, publickey_bytes):
+        value = publickey_bytes
+        sha = hashlib.sha256()
+        sha.update(value)
+        hash = sha.digest()
+        hash = binascii.hexlify(hash)
+        return hash.decode('utf-8')
+
     def _hash(self, value):
-        import binascii
         value = value.encode('utf-8')
         sha = hashlib.sha256()
         sha.update(value)
@@ -189,7 +197,7 @@ class PKCS1Container(AbstractContainer):
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
         private.type = self.type
-        private.identifier = self.identifier()
+        private.public_key_hash = self.identifier()
         return private
 
 
@@ -224,7 +232,7 @@ class PKCS8Container(AbstractContainer):
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
         private.type = self.type
-        private.identifier = self.identifier()
+        private.public_key_hash = self.identifier()
         return private
 
 
@@ -316,35 +324,59 @@ class X509Container(AbstractContainer):
         Transforms this X509 certificate to a saveble PublicKey
         :return: models.PublicKey
         '''
-        public = PublicKey()
+        public = Certificate()
         public.der_container = self.der_dump()
         public.type = self.type.value
         public.algorithm = self.algorithm()
         public.hash_algorithm = self.asn1.hash_algo
-        public.identifier = self.identifier()
+        public.public_key_hash = self.identifier()
         public.serial_number = self.asn1.serial_number
         if self.asn1.ca == None or self.asn1.ca == False:
             public.is_CA = False
         else:
             public.is_CA = True
-        public.valid_not_after = self.asn1.native["tbs_certificate"]["validity"]["not_after"]
-        public.valid_not_before = self.asn1.native["tbs_certificate"]["validity"]["not_before"]
-        public.issuer = SubjectInfo()
-        public.issuer.location = self.asn1.issuer.native["locality_name"]
-        public.issuer.cname = self.asn1.issuer.native["common_name"]
-        public.issuer.country = self.asn1.issuer.native["country_name"]
-        public.issuer.email = self.asn1.issuer.native["email_address"]
-        public.issuer.organization = self.asn1.issuer.native["organization_name"]
-        public.issuer.unit = self.asn1.issuer.native["organizational_unit_name"]
-        public.issuer.province = self.asn1.issuer.native["state_or_province_name"]
-        public.subject = SubjectInfo()
-        public.subject.location = self.asn1.subject.native["locality_name"]
-        public.subject.cname = self.asn1.subject.native["common_name"]
-        public.subject.country = self.asn1.subject.native["country_name"]
-        public.subject.email = self.asn1.subject.native["email_address"]
-        public.subject.organization = self.asn1.subject.native["organization_name"]
-        public.subject.unit = self.asn1.subject.native["organizational_unit_name"]
-        public.subject.province = self.asn1.subject.native["state_or_province_name"]
+        try: public.valid_not_after = self.asn1.native["tbs_certificate"]["validity"]["not_after"]
+        except: pass
+        try: public.valid_not_before = self.asn1.native["tbs_certificate"]["validity"]["not_before"]
+        except: pass
+        try: public.issuer = SubjectInfo()
+        except: pass
+        try: public.issuer.location = self.asn1.issuer.native["locality_name"]
+        except: pass
+        try: public.issuer.cname = self.asn1.issuer.native["common_name"]
+        except: pass
+        try: public.issuer.country = self.asn1.issuer.native["country_name"]
+        except: pass
+        try: public.issuer.email = self.asn1.issuer.native["email_address"]
+        except: pass
+        try: public.issuer.organization = self.asn1.issuer.native["organization_name"]
+        except: pass
+        try: public.issuer.unit = self.asn1.issuer.native["organizational_unit_name"]
+        except: pass
+        try: public.issuer.province = self.asn1.issuer.native["state_or_province_name"]
+        except: pass
+        try: public.subject = SubjectInfo()
+        except: pass
+        try: public.subject.location = self.asn1.subject.native["locality_name"]
+        except: pass
+        try: public.subject.cname = self.asn1.subject.native["common_name"]
+        except: pass
+        try: public.subject.country = self.asn1.subject.native["country_name"]
+        except: pass
+        try: public.subject.email = self.asn1.subject.native["email_address"]
+        except: pass
+        try: public.subject.organization = self.asn1.subject.native["organization_name"]
+        except: pass
+        try: public.subject.unit = self.asn1.subject.native["organizational_unit_name"]
+        except: pass
+        try: public.subject.province = self.asn1.subject.native["state_or_province_name"]
+        except: pass
+
+        for valid_domain in self.asn1.valid_domains:
+            d = Domain()
+            d.value = valid_domain
+            public.add_domain(d)
+
         return public
 
 

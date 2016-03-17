@@ -1,7 +1,6 @@
 <div class="strongman x509">
     <script>
         $('#x509_{{ x509.serial_number }}_tabs a').click(function (e) {
-          e.preventDefault()
           $(this).tab('show')
         })
     </script>
@@ -28,10 +27,6 @@
                             <td>{{ x509.issuer.cname }}</td>
                         </tr>
                         <tr>
-                            <td>valid</td>
-                            <td>{{ x509.valid_not_before }}<br/>-<br/>{{ x509.valid_not_after }}</td>
-                        </tr>
-                        <tr>
                             <td>certificate authority</td>
                             {% if x509.is_CA %}
                                 <td>Yes</td>
@@ -47,10 +42,24 @@
                                 <td>No</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>valid (UTC)</td>
+                            <td>{{ x509.valid_not_before }}<br/>-<br/>{{ x509.valid_not_after }}</td>
+                        </tr>
                     </table>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}subject">
                     {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.subject %}
+                    <div style="overflow: scroll;max-height: 200px;">
+                        <table class="table">
+                            <tr>
+                                <td>Valid domains</td>
+                                <td>{% for domain in x509.valid_domains.all %}
+                                    {{ domain.value }} <br/>
+                                {% endfor %}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                   <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}issuer">
                     {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.issuer %}

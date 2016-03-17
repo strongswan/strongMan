@@ -1,5 +1,5 @@
 from django.test import TestCase
-from strongMan.apps.connections.models import Connection, Proposal, PeerAuthentication, Child, Certificate, Address
+from strongMan.apps.connections.models import Connection, Proposal, PeerAuthentication, Child, OldCertificate, Address
 
 
 class ConfigurationsModelTest(TestCase):

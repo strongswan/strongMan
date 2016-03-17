@@ -1,5 +1,5 @@
 from django.db import models
-from strongMan.apps.certificates.models import Certificate
+from strongMan.apps.certificates.models import OldCertificate
 import collections
 
 
