@@ -1,11 +1,16 @@
 from django.db import models
-from strongMan.apps.certificates.models import Certificate
+from strongMan.apps.certificates.models import Domain
 from collections import OrderedDict
+
+
+class Typ(models.Model):
+    name = models.CharField(max_length=200)
 
 
 class Connection(models.Model):
     state = models.BooleanField(default=False)
-    typ = models.IntegerField(default=0)
+    typ = models.ForeignKey(Typ, null=True, blank=True, default=None)
+    domain = models.ForeignKey(Domain, null=True, blank=True, default=None)
     profile = models.CharField(max_length=50)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()
@@ -30,7 +35,8 @@ class Connection(models.Model):
         for local in Authentication.objects.filter(local=self):
             local_auth = OrderedDict()
             local_auth['auth'] = local.auth
-            #peer_auth['certs'] = [cert.value for cert in peer.certs.all()]
+            if self.domain is not None:
+                local_auth['certs'] = [self.domain.certificate.der_container]
             ike_sa[local.name] = local_auth
 
         for remote in Authentication.objects.filter(remote=self):
@@ -38,9 +44,7 @@ class Connection(models.Model):
             remote_id = Address.objects.filter(remote_addresses=self).first()
             remote_auth['id'] = remote_id.value
             remote_auth['auth'] = remote.auth
-            #peer_auth['certs'] = [cert.value for cert in peer.certs.all()]
             ike_sa[remote.name] = remote_auth
-
 
         ike_sa['children'] = children
 
@@ -89,4 +93,4 @@ class Authentication(models.Model):
     name = models.CharField(max_length=50)  #starts with remote-* or local-*
     peer_id = models.CharField(max_length=200)
     auth = models.CharField(max_length=50)
-    #certs = models.ManyToManyField(Certificate)
+

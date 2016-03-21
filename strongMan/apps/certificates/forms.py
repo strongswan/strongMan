@@ -107,7 +107,7 @@ class AddHandler:
             elif type == ContainerTypes.PKCS12:
                 return self._handle_pkcs12()
         except Exception as e:
-            messages.add_message(self.request, messages.ERROR, "Error reading file. Maybe your file is corrupt?")
+            messages.add_message(self.request, messages.ERROR, "Error reading file. Maybe your file is corrupt?\n" + str(e))
             return (self.request, 'certificates/add.html', {"form": self.form})
 
 

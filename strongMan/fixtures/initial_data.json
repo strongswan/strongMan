@@ -1,0 +1,67 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "John",
+      "password": "pbkdf2_sha256$24000$yAC7gEF9i2Si$7KTCgtLgys2dl9irbFXMlRQk8p5wB0wVGfNL4Ckby2g=",
+      "first_name": "John",
+      "last_name": "Lennon"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "Paul",
+      "password": "pbkdf2_sha256$24000$yAC7gEF9i2Si$7KTCgtLgys2dl9irbFXMlRQk8p5wB0wVGfNL4Ckby2g=",
+      "first_name": "Paul",
+      "last_name": "McCartney"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 0,
+    "fields": {
+      "name": "Choose Type"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 1,
+    "fields": {
+      "name": "IKEv2 Certificate"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 2,
+    "fields": {
+      "name": "IKEv2 EAP (Username/Password)"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 3,
+    "fields": {
+      "name": "IKEv2 Certificate + EAP (Username/Password)"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 4,
+    "fields": {
+      "name": "IKEv2 EAP-TLS (Certificate)"
+    }
+  },
+  {
+    "model": "connections.typ",
+    "pk": 5,
+    "fields": {
+      "name": "IKEv2 EAP-TNC (Username/Password)"
+    }
+  }
+]
+
+
+

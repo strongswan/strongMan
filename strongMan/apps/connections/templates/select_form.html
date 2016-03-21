@@ -10,13 +10,19 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
                     <div class="controls col-sm-10">
-                            <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
-                                    onchange="this.form.submit()">
-                                {% for key, value in field.field.choices %}
-                                    <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
+                        <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
+                                onchange="this.form.submit()">
+                            {% for key, value in field.field.choices %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
                         <p class="help-text">{{ field.help_text }} </p>
+                    </div>
+                    <div class="controls col-sm-10 col-sm-offset-2">
+                        <a href="{% url "index" %}" id="back"
+                           class="btn white-background black">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
                     </div>
                 </div>
             {% endfor %}

@@ -6,17 +6,21 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from .connections.models import Connection, Address
+from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 @require_http_methods('GET')
 @login_required
 def overview(request):
+    vici_wrapper = ViciWrapper()
+    active_connections = vici_wrapper.get_connections_names()
+    print(active_connections)
     connections = []
     for conn in Connection.objects.all():
         connection = dict(id=conn.id, profile=conn.profile, state=conn.state)
-        address = Address.objects.filter(remote_addresses=conn)
-        connection['remote'] = address[0].value
-        connection['link'] = "/connection/update/"+str(conn.typ)+"/"+str(conn.id)
+        address = Address.objects.filter(remote_addresses=conn).first()
+        connection['remote'] = address.value
+        connection['link'] = "/connection/update/"+str(conn.typ.id)+"/"+str(conn.id)
         connections.append(connection)
     context = dict(connections=connections)
     return render(request, 'index.html', context)

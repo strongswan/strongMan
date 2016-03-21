@@ -28,6 +28,7 @@ class Paths:
     X509_rsa = TestCert("warrior.crt")
     PKCS12_rsa = TestCert("warrior.pkcs12")
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
+    X509_googlecom = TestCert("google.com_der.crt")
 
 
 class ContainerDetectorTest(TestCase):
@@ -265,7 +266,7 @@ class PCKS12ContainerTest(TestCase):
         container.parse()
         private = container.to_private_key()
         public = container.to_public_key()
-        self.assertEqual(private.identifier, public.identifier)
+        self.assertEqual(private.public_key_hash, public.public_key_hash)
 
 
 class X509ContainerTest(TestCase):
@@ -343,6 +344,16 @@ class X509ContainerTest(TestCase):
         self.assertIsNotNone(public)
         self.assertIsNotNone(public.subject)
         self.assertIsNotNone(public.issuer)
+
+
+class SHA256Test(TestCase):
+    def test_x509_rsa(self):
+        bytes = Paths.X509_googlecom.read()
+        x509 = X509Container.by_bytes(bytes)
+        x509.parse()
+        public = x509.asn1["tbs_certificate"]["subject_public_key_info"]["public_key"]
+        hash = x509._sha256(public.contents)
+        print(hash)
 
 
 

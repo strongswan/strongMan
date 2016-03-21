@@ -35,9 +35,41 @@ class Paths:
     X509_rsa = TestCert("warrior.crt")
     PKCS12_rsa = TestCert("warrior.pkcs12")
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
+    X509_googlecom = TestCert("google.com_der.crt")
+
+class CreateRequest:
+    '''
+    This class is a with object. __enter__ opens a file and __exit__ closes the file.
+    with CreateRequest(page, testcert) as request:
+        Do stuff #!#!#!
+    '''
+    def __init__(self, page, testcert, password=""):
+        self.page = page
+        self.testcert = testcert
+        self.password = password
+        self.file = None
+
+    def _create_request(self, page, context):
+        factory = RequestFactory()
+        request = factory.post(page, context)
+        from django.contrib.messages.storage.fallback import FallbackStorage
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        return request
+
+    def __enter__(self):
+        self.file = self.testcert.open()
+        context = {"password": self.password, "cert": self.file}
+        request = self._create_request(self.password, context)
+        return request
+
+    def __exit__(self, type, value, traceback):
+        self.file.close()
 
 
 class AddHandlerTest(TestCase):
+
     def certificates_count(self):
         return Certificate.objects.all().__len__()
 
@@ -45,40 +77,54 @@ class AddHandlerTest(TestCase):
         return PrivateKey.objects.all().__len__()
 
     def test_x509(self):
-        f = Paths.X509_rsa_ca.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.X509_rsa_ca) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
+            self.assertEqual("certificates/added.html", page)
+            self.assertTrue(context['public'].is_CA)
+            self.assertEqual(1, self.certificates_count())
+            self.assertEqual(0, self.privatekeys_count())
+
+    def add_rw_certificate(self):
+        with CreateRequest("/certificates/add", Paths.X509_rsa) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
+
+    def test_x509_valid_domains(self):
+        self.add_rw_certificate() #Add a sample domain
+
+        with CreateRequest("/certificates/add", Paths.X509_googlecom) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
+
         self.assertEqual("certificates/added.html", page)
-        self.assertTrue(context['public'].is_CA)
-        self.assertEqual(1, self.certificates_count())
+        self.assertTrue(not context['public'].is_CA)
+        self.assertEqual(2, self.certificates_count())
+        self.assertEqual(0, self.privatekeys_count())
+        domains_count = context['public'].valid_domains.all().__len__()
+        self.assertEqual(504, domains_count)
 
     def test_x509_with_pw(self):
-        f = Paths.X509_rsa_ca.open()
-        request = create_request("/certificates/add", {'password': "fasdfa", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.X509_rsa_ca, password="asdfasdf") as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/add.html", page)
         self.assertEqual(0, self.certificates_count())
+        self.assertEqual(0, self.privatekeys_count())
 
     def test_pkcs1_without_certificate(self):
-        f = Paths.PKCS1_ec.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS1_ec) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/add.html", page)
         self.assertEqual(0, self.certificates_count())
+        self.assertEqual(0, self.privatekeys_count())
 
     def test_pkcs1_with_certificate(self):
         self.test_x509() # Add x509
-        f = Paths.PKCS1_rsa_ca.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS1_rsa_ca) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertIsNotNone(context["public"])
@@ -86,11 +132,9 @@ class AddHandlerTest(TestCase):
 
     def test_pkcs8_with_certificate(self):
         self.test_x509() # Add x509
-        f = Paths.PKCS8_rsa_ca.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertIsNotNone(context["public"])
@@ -98,22 +142,18 @@ class AddHandlerTest(TestCase):
 
     def test_pkcs8_with_certificate_encrypted(self):
         self.test_x509() # Add x509
-        f = Paths.PKCS8_rsa_ca_encrypted.open()
-        request = create_request("/certificates/add", {'password': "strongman", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca_encrypted, password="strongman") as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertIsNotNone(context["public"])
         self.assertIsNotNone(context["private"])
 
     def test_pkcs12(self):
-        f = Paths.PKCS12_rsa.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS12_rsa) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertEqual(2, self.certificates_count())
@@ -122,11 +162,9 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["further_publics"])
 
     def test_pkcs12_encrypted(self):
-        f = Paths.PKCS12_rsa_encrypted.open()
-        request = create_request("/certificates/add", {'password': "strongman", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS12_rsa_encrypted, password="strongman") as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertEqual(2, self.certificates_count())
@@ -135,11 +173,9 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["further_publics"])
 
     def test_pkcs12_encrypted_no_pw(self):
-        f = Paths.PKCS12_rsa_encrypted.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS12_rsa_encrypted, password="") as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/add.html", page)
         self.assertEqual(0, self.privatekeys_count())
         self.assertEqual(0, self.certificates_count())
@@ -147,11 +183,9 @@ class AddHandlerTest(TestCase):
     def test_pkcs12_ca_already_imported(self):
         self.test_x509() # Add x509 CA
         self.assertEqual(1, self.certificates_count(), "CA imported.")
-        f = Paths.PKCS12_rsa.open()
-        request = create_request("/certificates/add", {'password': "", "cert": f})
-        handler = AddHandler.by_request(request)
-        (req, page, context) = handler.handle()
-        f.close()
+        with CreateRequest("/certificates/add", Paths.PKCS12_rsa) as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
         self.assertEqual("certificates/added.html", page)
         self.assertEqual(1, self.privatekeys_count())
         self.assertEqual(2, self.certificates_count(), "CA should not be duplicated.")

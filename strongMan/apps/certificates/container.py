@@ -1,8 +1,9 @@
 from oscrypto import keys as k
 from asn1crypto import keys
 from enum import Enum
-from .models import Certificate, PrivateKey, SubjectInfo
+from .models import Certificate, PrivateKey, SubjectInfo, Domain
 import hashlib
+import binascii
 
 class ContainerTypes(Enum):
     PKCS1="PKCS1"
@@ -131,8 +132,15 @@ class AbstractContainer:
         '''
         raise NotImplementedError()
 
+    def _sha256(self, publickey_bytes):
+        value = publickey_bytes
+        sha = hashlib.sha256()
+        sha.update(value)
+        hash = sha.digest()
+        hash = binascii.hexlify(hash)
+        return hash.decode('utf-8')
+
     def _hash(self, value):
-        import binascii
         value = value.encode('utf-8')
         sha = hashlib.sha256()
         sha.update(value)
@@ -363,6 +371,12 @@ class X509Container(AbstractContainer):
         except: pass
         try: public.subject.province = self.asn1.subject.native["state_or_province_name"]
         except: pass
+
+        for valid_domain in self.asn1.valid_domains:
+            d = Domain()
+            d.value = valid_domain
+            public.add_domain(d)
+
         return public
 
 

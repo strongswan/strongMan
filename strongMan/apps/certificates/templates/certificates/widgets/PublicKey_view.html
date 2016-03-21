@@ -50,6 +50,16 @@
                 </div>
                 <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}subject">
                     {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.subject %}
+                    <div style="overflow: scroll;max-height: 200px;">
+                        <table class="table">
+                            <tr>
+                                <td>Valid domains</td>
+                                <td>{% for domain in x509.valid_domains.all %}
+                                    {{ domain.value }} <br/>
+                                {% endfor %}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
                   <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}issuer">
                     {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.issuer %}
