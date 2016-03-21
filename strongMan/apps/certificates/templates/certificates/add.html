@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="page-header">
+                <h1>Upload certificates<small> Upload asn1 container</small></h1>
+            </div>
+        </div>
+        {% if not filename1 %}
+            <div class="row">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form }}
+                    <br/>
+                    <input type="submit" name="submit" value="Upload" />
+                </form>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock content %}
