@@ -17,11 +17,6 @@
                 </ul>
             </p>
         </div>
-        <div>
-            <ul class="nav nav-pills">
-                <li role="presentation"><a href="{% url 'vici:addcon' %}">Add connection</a></li>
-            </ul>
-        </div>
         {%  for key, value in vici_info.items %}
             <div class="row">
                 <div class="panel panel-default" id="{{ key }}">

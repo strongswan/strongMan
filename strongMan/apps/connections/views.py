@@ -1,4 +1,3 @@
-import socket
 from collections import OrderedDict
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
@@ -8,8 +7,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
 from .forms import Ike2CertificateForm, Ike2EapForm, ChooseTypeForm
 from .models import Connection, Address, Secret
-from strongMan.apps.vici import vici
-
+from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 class ChooseTypView(LoginRequiredMixin, FormView):
     template_name = 'select_form.html'
@@ -84,13 +82,11 @@ def toggle_connection(request):
     connection = Connection.objects.get(id=request.POST['id'])
     connection.state = not connection.state
     connection.save()
-    so = socket.socket(socket.AF_UNIX)
-    so.connect("/var/run/charon.vici")
-    s = vici.Session(so)
+    vici_wrapper = ViciWrapper()
     if connection.state is True:
-        s.load_conn(connection.get_vici_ordered_dict())
+        vici_wrapper.load_connection(connection.get_vici_ordered_dict())
         for secret in Secret.objects.filter(connection=connection):
-            s.load_shared(secret.get_vici_ordered_dict())
+            vici_wrapper.load_secret(secret.get_vici_ordered_dict())
     else:
-        s.unload_conn(OrderedDict(name=connection.profile))
+        vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
