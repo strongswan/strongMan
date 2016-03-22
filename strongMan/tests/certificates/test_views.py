@@ -1,16 +1,11 @@
-from django.test import TestCase, RequestFactory, Client
-from strongMan.apps.certificates.forms import AddForm, AddHandler
+from django.test import TestCase, RequestFactory
+from strongMan.apps.certificates.request_handler import AddHandler
 from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
+from django.core.urlresolvers import reverse
+from strongMan.apps.certificates import views
 
-def create_request(page, context):
-        factory = RequestFactory()
-        request = factory.post(page, context)
-        from django.contrib.messages.storage.fallback import FallbackStorage
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        return request
+
 
 class TestCert:
     def __init__(self, path):
@@ -194,6 +189,100 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["further_publics"])
 
 
+
+class DetailsViewTest(TestCase):
+
+    def count(self, model):
+        return model.objects.all().__len__()
+
+    def add_keycontainer(self, test_cert, password=""):
+        with CreateRequest(reverse('certificates:add'), test_cert,password) as request:
+            views.add(request)
+
+    def create_request(self, page, context):
+            factory = RequestFactory()
+            request = factory.post(page, context)
+            from django.contrib.messages.storage.fallback import FallbackStorage
+            setattr(request, 'session', 'session')
+            messages = FallbackStorage(request)
+            setattr(request, '_messages', messages)
+            return request
+
+    def test_add_keycontainer(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.assertEqual(self.count(Certificate), 1)
+
+    def test_main_overview_empty(self):
+        self.assertEqual(self.count(Certificate), 0)
+        request = self.create_request(reverse('certificates:overview'), {})
+        response = views.overview(request)
+        self.assertContains(response, 'id="no_certs_to_show"', 1)
+
+    def test_main_overview_certs(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:overview'), {})
+        response = views.overview(request)
+        self.assertContains(response, 'CN=hsr.ch', 1)
+        self.assertContains(response, 'CN=google.com', 1)
+
+    def test_overview_ca_cert(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:overview_ca'), {})
+        response = views.overview_ca(request)
+        self.assertContains(response, 'CN=hsr.ch', 1)
+        self.assertNotContains(response, 'CN=google.com')
+
+    def test_overview_certs(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:overview_certs'), {})
+        response = views.overview_certs(request)
+        self.assertNotContains(response, 'CN=hsr.ch')
+        self.assertContains(response, 'CN=google.com', 1)
+
+    def test_main_overview_search(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:overview'), {"search_text": "youtube"})
+        response = views.overview(request)
+        self.assertNotContains(response, 'CN=hsr.ch')
+        self.assertContains(response, 'CN=google.com', 1)
+
+    def test_show_cert_details(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}) ,{})
+        response = views.details(request, "1")
+        #print(response.content.decode("utf-8"))
+        self.assertContains(response, 'hsr.ch')
+        self.assertContains(response, 'PKCS1')
+
+    def test_details_remove_privatekey(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"command": "remove_privatekey"})
+        response = views.details(request, "1")
+        self.assertContains(response, 'hsr.ch')
+        self.assertNotContains(response, 'PKCS1')
+
+    def test_details_remove_cert(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_googlecom)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"command": "remove_cert"})
+        response = views.details(request, "1")
+        self.assertEqual(self.count(Certificate), 1)
 
 
 

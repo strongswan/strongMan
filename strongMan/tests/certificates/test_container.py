@@ -124,16 +124,16 @@ class PCKS1ContainerTest(TestCase):
         bytes = Paths.PKCS1_rsa_ca.read()
         container = PKCS1Container.by_bytes(bytes)
         container.parse()
-        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
-        ident = str(container.identifier())
+        should = "FA:CC:60:F4:20:6B:25:C7:A4:AD:1D:FE:37:C4:76:09:73:07:BE:35:E9:50:2B:28:1A:10:6A:30:2C:09:D4:A9"
+        ident = str(container.public_key_hash())
         self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.PKCS1_ec.read()
         container = PKCS1Container.by_bytes(bytes)
         container.parse()
-        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
-        ident = container.identifier()
+        should = "7D:83:F3:D5:9F:B1:CC:36:2B:50:E7:FD:7A:45:A1:60:63:48:FB:58:B7:AA:31:7A:A1:C4:B5:D4:C1:59:82:CE"
+        ident = container.public_key_hash()
         self.assertEqual(ident, should)
 
     def test_decryption(self):
@@ -187,16 +187,16 @@ class PCKS8ContainerTest(TestCase):
         bytes = Paths.PKCS8_rsa_ca.read()
         container = PKCS8Container.by_bytes(bytes)
         container.parse()
-        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
-        ident = str(container.identifier())
+        should = "FA:CC:60:F4:20:6B:25:C7:A4:AD:1D:FE:37:C4:76:09:73:07:BE:35:E9:50:2B:28:1A:10:6A:30:2C:09:D4:A9"
+        ident = str(container.public_key_hash())
         self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.PKCS8_ec.read()
         container = PKCS8Container.by_bytes(bytes)
         container.parse()
-        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
-        ident = container.identifier()
+        should = "7D:83:F3:D5:9F:B1:CC:36:2B:50:E7:FD:7A:45:A1:60:63:48:FB:58:B7:AA:31:7A:A1:C4:B5:D4:C1:59:82:CE"
+        ident = container.public_key_hash()
         self.assertEqual(ident, should)
 
     def test_decryption(self):
@@ -228,8 +228,8 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Container.by_bytes(bytes)
         container.parse()
-        should = "0a69d0d82368168a813a9e4aef55f4d4117f95c39c4255a6f6a48f01239bfcc2"
-        ident = str(container.identifier())
+        should = "0A:69:D0:D8:23:68:16:8A:81:3A:9E:4A:EF:55:F4:D4:11:7F:95:C3:9C:42:55:A6:F6:A4:8F:01:23:9B:FC:C2"
+        ident = str(container.public_key_hash())
         self.assertEqual(ident, should)
 
     def test_decryption(self):
@@ -304,16 +304,16 @@ class X509ContainerTest(TestCase):
         bytes = Paths.X509_rsa_ca.read()
         container = X509Container.by_bytes(bytes)
         container.parse()
-        should = "facc60f4206b25c7a4ad1dfe37c476097307be35e9502b281a106a302c09d4a9"
-        ident = str(container.identifier())
+        should = "FA:CC:60:F4:20:6B:25:C7:A4:AD:1D:FE:37:C4:76:09:73:07:BE:35:E9:50:2B:28:1A:10:6A:30:2C:09:D4:A9"
+        ident = str(container.public_key_hash())
         self.assertEqual(ident, should)
 
     def test_identifier_ec(self):
         bytes = Paths.X509_ec.read()
         container = X509Container.by_bytes(bytes)
         container.parse()
-        should = "7d83f3d59fb1cc362b50e7fd7a45a1606348fb58b7aa317aa1c4b5d4c15982ce"
-        ident = container.identifier()
+        should = "7D:83:F3:D5:9F:B1:CC:36:2B:50:E7:FD:7A:45:A1:60:63:48:FB:58:B7:AA:31:7A:A1:C4:B5:D4:C1:59:82:CE"
+        ident = container.public_key_hash()
         self.assertEqual(ident, should)
 
     def test_is_private_key(self):
@@ -345,15 +345,6 @@ class X509ContainerTest(TestCase):
         self.assertIsNotNone(public.subject)
         self.assertIsNotNone(public.issuer)
 
-
-class SHA256Test(TestCase):
-    def test_x509_rsa(self):
-        bytes = Paths.X509_googlecom.read()
-        x509 = X509Container.by_bytes(bytes)
-        x509.parse()
-        public = x509.asn1["tbs_certificate"]["subject_public_key_info"]["public_key"]
-        hash = x509._sha256(public.contents)
-        print(hash)
 
 
 

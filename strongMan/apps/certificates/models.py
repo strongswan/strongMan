@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 
 class OldCertificate:
@@ -22,19 +24,18 @@ class PrivateKey(KeyContainer):
         count = len(keys)
         return count > 0
 
-    def publickey(self):
-        keys = Certificate.objects.filter(public_key_hash=self.public_key_hash)
-        count = len(keys)
-        assert not count > 1
-        if count == 0:
-            return None
-        else:
-            return keys[0]
+    def certificate_exists(self):
+        certs = Certificate.objects.filter(public_key_hash=self.public_key_hash)
+        exists = len(certs) > 0
+        return exists
 
-    def save_new(self, publickey):
-        self.save()
-        publickey.private_key = self
-        publickey.save()
+    def connect_to_certificates(self):
+        certs = Certificate.objects.filter(public_key_hash=self.public_key_hash)
+        for cert in certs:
+            if cert.private_key is None:
+                cert.private_key = self
+                cert.save()
+
 
 
 class SubjectInfo(models.Model):
@@ -46,21 +47,24 @@ class SubjectInfo(models.Model):
     cname = models.TextField()
     province = models.TextField()
 
+    def __str__(self):
+        return "C=" + self.country + ", L=" + self.location + ", ST=" + self.province + \
+               ", O=" + self.organization + ", OU=" + self.unit + ", CN=" + self.cname
 
 
 class Certificate(KeyContainer):
-
     serial_number = models.TextField()
     hash_algorithm = models.CharField(max_length=20)
     is_CA = models.BooleanField()
     valid_not_after = models.DateTimeField()
     valid_not_before = models.DateTimeField()
-    issuer = models.OneToOneField(SubjectInfo, on_delete=models.CASCADE, related_name="issuer", null=True)
-    subject = models.OneToOneField(SubjectInfo, on_delete=models.CASCADE, related_name="subject", null=True)
-    private_key = models.ForeignKey(PrivateKey, null=True)
+    issuer = models.OneToOneField(SubjectInfo, on_delete=models.SET_NULL, related_name="issuer", null=True)
+    subject = models.OneToOneField(SubjectInfo, on_delete=models.SET_NULL, related_name="subject", null=True)
+    private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
 
 
     def save_new(self):
+        self._set_privatekey_if_exists()
         self.issuer.save()
         self.subject.save()
         '''
@@ -76,8 +80,17 @@ class Certificate(KeyContainer):
             domain.certificate = self
             domain.save()
 
+    def _set_privatekey_if_exists(self):
+        '''
+        Searches for a private key with the same public key
+        :return: PrivateKey or None if nothing was found
+        '''
+        keys = PrivateKey.objects.filter(public_key_hash=self.public_key_hash)
+        if len(keys) == 1:
+            self.private_key = keys[0]
+
     def already_exists(self):
-        keys = Certificate.objects.filter(public_key_hash=self.public_key_hash)
+        keys = Certificate.objects.filter(public_key_hash=self.public_key_hash, serial_number=self.serial_number)
         count = len(keys)
         return count > 0
 
@@ -86,10 +99,28 @@ class Certificate(KeyContainer):
             self.valid_domains_to_add = []
         self.valid_domains_to_add.append(domain)
 
+@receiver(pre_delete, sender=Certificate)
+def certificate_clean_submodels(sender, **kwargs):
+    '''
+    This function gets raised when a certificate gets deleted.
+    It assures that all submodels are going to be deleted correctly.
+    :return: Nothing
+    '''
+    cert = kwargs['instance']
+    cert.subject.delete()
+    cert.issuer.delete()
+    cert.valid_domains.all().delete()
+    if cert.private_key is not None:
+        certs_count_to_privatekey = cert.private_key.certificates.all().__len__()
+        no_more_certs_associated = certs_count_to_privatekey <= 1
+        if no_more_certs_associated:
+            cert.private_key.delete()
+
+
 
 class Domain(models.Model):
     value = models.TextField()
-    certificate = models.ForeignKey(Certificate, null=True, related_name='valid_domains')
+    certificate = models.ForeignKey(Certificate, null=True, related_name='valid_domains', on_delete=models.CASCADE)
 
 
 

@@ -4,6 +4,7 @@ from enum import Enum
 from .models import Certificate, PrivateKey, SubjectInfo, Domain
 import hashlib
 import binascii
+import re as regex
 
 class ContainerTypes(Enum):
     PKCS1="PKCS1"
@@ -125,28 +126,33 @@ class AbstractContainer:
         '''
         raise NotImplementedError()
 
-    def identifier(self):
+    def public_key_hash(self):
         '''
         Return a public key like identifier. The identifier can be compare with other to find the private key / certificate pair
         :return: Identifier
         '''
         raise NotImplementedError()
 
-    def _sha256(self, publickey_bytes):
-        value = publickey_bytes
-        sha = hashlib.sha256()
-        sha.update(value)
-        hash = sha.digest()
-        hash = binascii.hexlify(hash)
-        return hash.decode('utf-8')
-
-    def _hash(self, value):
+    def _sha256(self, value):
+        '''
+        Makes a sha256 hash over a string value. Formats the hash to be readable
+        :param value: input
+        :return: formated hash
+        '''
         value = value.encode('utf-8')
         sha = hashlib.sha256()
         sha.update(value)
-        hash = sha.digest()
-        hash = binascii.hexlify(hash)
-        return str(hash)[2:][:-1]
+        hash_bytes = sha.digest()
+        return self._format_hash(hash_bytes)
+
+    def _format_hash(self, hash_bytes):
+        hash_hex = binascii.hexlify(hash_bytes)
+        hash_upper = hash_hex.decode('utf-8').upper()
+        formated_hash = ""
+        for part in regex.findall('..', hash_upper):
+            formated_hash += part + ":"
+
+        return formated_hash[:-1]
 
     def algorithm(self):
         '''
@@ -168,12 +174,12 @@ class PKCS1Container(AbstractContainer):
     def der_dump(self):
         return self.asn1.dump()
 
-    def identifier(self):
+    def public_key_hash(self):
         if self.algorithm() == "rsa":
-                ident = str(self._pubkey_rsa())
+                ident = self._pubkey_rsa()
         elif self.algorithm() == "ec":
-             ident = str(self._pubkey_ec())
-        return self._hash(str(ident))
+             ident = self._pubkey_ec()
+        return self._sha256(str(ident))
 
 
     def algorithm(self):
@@ -196,8 +202,8 @@ class PKCS1Container(AbstractContainer):
         private = PrivateKey()
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
-        private.type = self.type
-        private.public_key_hash = self.identifier()
+        private.type = self.type.value
+        private.public_key_hash = self.public_key_hash()
         return private
 
 
@@ -213,12 +219,12 @@ class PKCS8Container(AbstractContainer):
     def der_dump(self):
         return self.asn1.dump()
 
-    def identifier(self):
+    def public_key_hash(self):
         if self.algorithm() == "rsa":
             ident = self.asn1.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
             ident = self.asn1.native["private_key"]["public_key"]
-        return self._hash(str(ident))
+        return self._sha256(str(ident))
 
     def algorithm(self):
         return self.asn1.algorithm
@@ -231,8 +237,8 @@ class PKCS8Container(AbstractContainer):
         private = PrivateKey()
         private.algorithm = self.algorithm()
         private.der_container = self.der_dump()
-        private.type = self.type
-        private.public_key_hash = self.identifier()
+        private.type = self.type.value
+        private.public_key_hash = self.public_key_hash()
         return private
 
 
@@ -247,12 +253,12 @@ class PKCS12Container(AbstractContainer):
     def algorithm(self):
         return self.privatekey.algorithm
 
-    def identifier(self):
+    def public_key_hash(self):
         if self.algorithm() == "rsa":
             ident = self.privatekey.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
             ident = self.privatekey.native["private_key"]["public_key"]
-        return self._hash(str(ident))
+        return self._sha256(str(ident))
 
     def to_public_key(self):
         '''
@@ -300,13 +306,13 @@ class X509Container(AbstractContainer):
     def algorithm(self):
         return self.asn1.native["tbs_certificate"]["subject_public_key_info"]["algorithm"]["algorithm"]
 
-    def identifier(self):
+    def public_key_hash(self):
         if self.algorithm() == "rsa":
             ident = self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]["modulus"]
         elif self.algorithm() == "ec":
             ident = self.asn1.native["tbs_certificate"]["subject_public_key_info"]["public_key"]
 
-        return self._hash(str(ident))
+        return self._sha256(str(ident))
 
     def is_cert_of(self, container):
         '''
@@ -315,21 +321,21 @@ class X509Container(AbstractContainer):
         :type container: AbstractContainer
         :return: Boolean
         '''
-        ident = container.identifier()
-        myident = self.identifier()
+        ident = container.public_key_hash()
+        myident = self.public_key_hash()
         return ident == myident
 
     def to_public_key(self):
         '''
-        Transforms this X509 certificate to a saveble PublicKey
-        :return: models.PublicKey
+        Transforms this X509 certificate to a saveble certificate
+        :return: models.Certificate
         '''
         public = Certificate()
         public.der_container = self.der_dump()
         public.type = self.type.value
         public.algorithm = self.algorithm()
         public.hash_algorithm = self.asn1.hash_algo
-        public.public_key_hash = self.identifier()
+        public.public_key_hash = self.public_key_hash()
         public.serial_number = self.asn1.serial_number
         if self.asn1.ca == None or self.asn1.ca == False:
             public.is_CA = False

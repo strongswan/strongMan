@@ -93,4 +93,4 @@ def get_ident2(bytes, pw=None):
     else:
         reader.detect_type(pw)
 
-    return (str(reader.identifier()), reader.asn1.native)
+    return (str(reader.public_key_hash()), reader.asn1.native)
