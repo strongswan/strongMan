@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'update/1/(?P<pk>\d+)/$', views.Ike2CertificateUpdateView.as_view(), name='connection_update_certificate'),
     url(r'update/2/(?P<pk>\d+)/$', views.Ike2EapUpdateView.as_view(), name='connection_update_eap'),
     url(r'update/3/(?P<pk>\d+)/$', views.Ike2EapCertificateUpdateView.as_view(), name='connection_update_eap_certificate'),
+    url(r'delete/(?P<pk>\d+)/$', views.delete_connection, name='connection_delete'),
     url(r'toggle/$', views.toggle_connection, name='connection_toggle'),
 ]

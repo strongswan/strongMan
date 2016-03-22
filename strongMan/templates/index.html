@@ -3,42 +3,6 @@
 {% block content %}
     <h1>Overview</h1>
     {% if user.is_authenticated %}
-        <a href="{% url "connections:connection_create" %}" id="add" class="btn pull-right white-background black">
-            <span class="glyphicon glyphicon-plus"></span>
-        </a>
-        <div></div>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Profile</th>
-                    <th>Remote</th>
-                    <th>State</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for connection in connections %}
-                    <tr>
-                        <td>{{ connection.profile }}</td>
-                        <td>{{ connection.remote }}</td>
-                        <td>
-                            <form action="{% url 'connections:connection_toggle' %}" method="post"
-                                  style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="id" value="{{ connection.id }}">
-                                <input type="checkbox" data-toggle="toggle" data-onstyle="success"
-                                       data-offstyle="danger"
-                                       {% if connection.state %}checked{% endif %} onchange="this.form.submit()">
-                            </form>
-                            <a href="{{ connection.link }}" id="edit"
-                               class="btn pull-right white-background black">
-                                <span class="glyphicon glyphicon-edit"></span>
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% include "connections_overview.html" %}
     {% endif %}
 {% endblock %}

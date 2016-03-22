@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.test import TestCase
 from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, Typ
 
@@ -43,5 +44,13 @@ class ConnectionModelTest(TestCase):
     def test_secret_added(self):
         self.assertEquals(1, Secret.objects.count())
 
-    def test_ty_added(self):
+    def test_typ_added(self):
         self.assertEquals(1, Typ.objects.count())
+
+    def test_connection_dict(self):
+        connection = Connection.objects.first()
+        self.assertTrue(isinstance(connection.get_vici_ordered_dict(), OrderedDict))
+
+    def test_secret_dict(self):
+        secret = Secret.objects.first()
+        self.assertTrue(isinstance(secret.get_vici_ordered_dict(), OrderedDict))

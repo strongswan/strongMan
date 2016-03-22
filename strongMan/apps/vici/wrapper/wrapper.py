@@ -1,23 +1,29 @@
 import socket
-from collections import OrderedDict
+from .exception import ViciSocketException, ViciLoadException
 from strongMan.apps.vici import vici
 
 
 class ViciWrapper:
-
-    def __init__(self):
+    def __init__(self, socket_path="/var/run/charon.vici"):
         self.socket = socket.socket(socket.AF_UNIX)
+        self.socket_path = socket_path
         self.session = vici.Session(self.socket)
         self._connect_socket()
 
     def _connect_socket(self):
-        self.socket.connect("/var/run/charon.vici")
+        try:
+            self.socket.connect(self.socket_path)
+        except Exception as e:
+            raise ViciSocketException("Vici is not reachable!") from e
 
     def load_connection(self, connection):
         '''
         :type connection: dict
         '''
-        self.session.load_conn(connection)
+        try:
+            self.session.load_conn(connection)
+        except Exception as e:
+            raise ViciLoadException("Connection cannot be loaded!") from e
 
     def unload_connection(self, connection_name):
         '''
@@ -29,13 +35,20 @@ class ViciWrapper:
         '''
         :type secret: dict
         '''
-        self.session.load_shared(secret)
+        try:
+            self.session.load_shared(secret)
+        except Exception as e:
+            raise ViciLoadException("Secret cannot be loaded!") from e
 
     def load_certificate(self, certificate):
         '''
         :type certificate: dict
         '''
-        self.session.load_cert(certificate)
+
+        try:
+            self.session.load_cert(certificate)
+        except Exception as e:
+            raise ViciLoadException("Certificate cannot be loaded!") from e
 
     def get_connections_names(self):
         '''
@@ -60,3 +73,15 @@ class ViciWrapper:
         for certificate in self.session.list_certs():
             certificates += certificate
         return certificates
+
+    def is_connection_active(self, connection_name):
+        '''
+        :param connection_name:
+        :type connection_name: str
+        :return: connection active
+        :rtype: bool
+        '''
+        for connection in self.get_connections_names():
+            if connection == connection_name:
+                return True
+        return False

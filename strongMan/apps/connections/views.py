@@ -1,13 +1,16 @@
 from collections import OrderedDict
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
 from .forms import Ike2CertificateForm, Ike2EapForm, ChooseTypeForm, Ike2EapCertificateForm
 from .models import Connection, Address, Secret, Typ
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
 
 class ChooseTypView(LoginRequiredMixin, FormView):
@@ -141,13 +144,37 @@ class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
 @require_http_methods('POST')
 def toggle_connection(request):
     connection = Connection.objects.get(id=request.POST['id'])
-    connection.state = not connection.state
-    connection.save()
-    vici_wrapper = ViciWrapper()
-    if connection.state is True:
-        vici_wrapper.load_connection(connection.get_vici_ordered_dict())
-        for secret in Secret.objects.filter(connection=connection):
-            vici_wrapper.load_secret(secret.get_vici_ordered_dict())
-    else:
-        vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
+    response = dict(id=request.POST['id'], success=False)
+    try:
+        vici_wrapper = ViciWrapper()
+        if vici_wrapper.is_connection_active(connection.profile) is False:
+            vici_wrapper.load_connection(connection.get_vici_ordered_dict())
+            for secret in Secret.objects.filter(connection=connection):
+                vici_wrapper.load_secret(secret.get_vici_ordered_dict())
+                connection.state = True
+        else:
+            vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
+            connection.state = False
+        connection.save()
+        response['success'] = True
+    except ViciSocketException as e:
+        response['message'] = str(e)
+    except ViciLoadException as e:
+        response['message'] = str(e)
+    finally:
+        return JsonResponse(response)
+
+
+@login_required
+def delete_connection(request, pk):
+    connection = Connection.objects.get(id=pk)
+    try:
+        vici_wrapper = ViciWrapper()
+        if vici_wrapper.is_connection_active(connection.profile) is True:
+            vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
+        connection.delete()
+    except ViciSocketException:
+        pass
+    except ViciLoadException as e:
+        messages.warning(request, str(e))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
