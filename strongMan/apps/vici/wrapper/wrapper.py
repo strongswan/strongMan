@@ -1,4 +1,5 @@
 import socket
+from collections import OrderedDict
 from .exception import ViciSocketException, ViciLoadException
 from strongMan.apps.vici import vici
 
@@ -27,9 +28,9 @@ class ViciWrapper:
 
     def unload_connection(self, connection_name):
         '''
-        :type connection_name: dict
+        :type connection_name: str
         '''
-        self.session.unload_conn(connection_name)
+        self.session.unload_conn(OrderedDict(name=connection_name))
 
     def load_secret(self, secret):
         '''

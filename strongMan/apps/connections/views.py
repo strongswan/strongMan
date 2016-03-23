@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
@@ -153,7 +152,7 @@ def toggle_connection(request):
                 vici_wrapper.load_secret(secret.get_vici_ordered_dict())
                 connection.state = True
         else:
-            vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
+            vici_wrapper.unload_connection(connection.profile)
             connection.state = False
         connection.save()
         response['success'] = True
@@ -171,7 +170,7 @@ def delete_connection(request, pk):
     try:
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is True:
-            vici_wrapper.unload_connection(OrderedDict(name=connection.profile))
+            vici_wrapper.unload_connection(connection.profile)
         connection.delete()
     except ViciSocketException:
         pass
