@@ -189,7 +189,6 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["further_publics"])
 
 
-
 class DetailsViewTest(TestCase):
 
     def count(self, model):
