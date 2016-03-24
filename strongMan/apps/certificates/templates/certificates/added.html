@@ -4,7 +4,9 @@
     <div class="container">
         <div class="row">
             <div class="page-header">
-                <h1>Upload certificates<small> you have added a container</small></h1>
+                <h1>Upload certificates
+                    <small> you have added a container</small>
+                </h1>
             </div>
         </div>
 
@@ -22,15 +24,15 @@
         </div>
 
         {% if further_publics %}
-        <div class="row">
-        <h3>Further certificates</h3>
-        {% for fp in further_publics %}
-            <div class="col-sm-6 col-md-4">
-                {% include "certificates/widgets/PublicKey_view.html" with x509=fp %}
-            </div>
-        {% endfor %}
+            <div class="row">
+                <h3>Further certificates</h3>
+                {% for fp in further_publics %}
+                    <div class="col-sm-6 col-md-4">
+                        {% include "certificates/widgets/PublicKey_view.html" with x509=fp %}
+                    </div>
+                {% endfor %}
 
-        </div>
+            </div>
         {% endif %}
 
         <div class="row">

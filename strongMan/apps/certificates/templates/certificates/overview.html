@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-    <div class="container">
+    <div class="container overview">
         <div class="row">
             <div class="page-header">
-                <h1>certificates<small> overview</small></h1>
+                <h1>certificates
+                    <small> overview</small>
+                </h1>
             </div>
         </div>
         <div class="row-fluid">
@@ -13,76 +15,82 @@
                 <a href="{% url 'certificates:overview_ca' %}" class="btn btn-default">CA</a>
                 <a href="{% url 'certificates:overview_certs' %}" class="btn btn-default">Certs</a>
             </div>
-        </div>
-        <div class="pull-right">
-            <span title="Add a new key container">
-                <a href="{% url "certificates:add" %}" type="button" class="btn btn-default btn-lg" aria-label="Left Align">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
-                </a>
-            </span>
+            <div class="pull-right">
+                <span title="Add a new key container">
+                    <a href="{% url "certificates:add" %}" type="button" class="btn btn-default btn-lg"
+                       aria-label="Left Align">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                    </a>
+                </span>
+            </div>
         </div>
 
-        <div class="row">
+
+        <div class="row search">
             <form action="" method="POST" style="display: inline;">
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="input-group">
-                        <input class="form-control" type="text" name="search_text" value="" placeholder="Search for domains">
+                        <input class="form-control" type="text" name="search_text" value=""
+                               placeholder="Search for domains">
                         <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            <button type="submit" class="btn btn-default" type="button"><span
+                                    class="glyphicon glyphicon-search"></span> Search
+                            </button>
                             <a href="" class="btn btn-default">
-                              <span class="glyphicon glyphicon-remove"></span> Clear
+                                <span class="glyphicon glyphicon-remove"></span> Clear
                             </a>
                         </div>
                     </div>
                 </div>
-             </form>
+            </form>
 
 
         </div>
 
         {% if publics %}
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>CName</th>
-                        <th>Subject</th>
-                        <th>has private key</th>
-                        <th>Edit / Remove</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for p in publics %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                             <tr>
-                                <td><b>{{ p.subject.cname }}</b></td>
-                                <td>{{ p.subject }}</td>
-                                <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
-                                <td>
+                                <th>CName</th>
+                                <th class="hidden-sm hidden-xs">Subject</th>
+                                <th>has private key</th>
+                                <th>Edit / Remove</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for p in publics %}
+                                <tr>
+                                    <td><b>{{ p.subject.cname }}</b></td>
+                                    <td class="hidden-sm hidden-xs">{{ p.subject }}</td>
+                                    <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
+                                    <td>
                                     <span title="Edit certificate">
                                         <a href="{% url "certificates:details" p.id %}" class="btn btn-default">
-                                          <span class="glyphicon glyphicon-edit" ></span>
+                                            <span class="glyphicon glyphicon-edit"></span>
                                         </a>
                                     </span>
-                                    <form action="{% url "certificates:details" p.id %}" method="POST" style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="command" value="remove_cert">
-                                        <span  title="Remove certificate">
+                                        <form action="{% url "certificates:details" p.id %}" method="POST"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="command" value="remove_cert">
+                                        <span title="Remove certificate">
                                             <button type="submit" class="btn btn-default">
-                                              <span class="glyphicon glyphicon-remove"></span>
+                                                <span class="glyphicon glyphicon-remove"></span>
                                             </button>
                                         </span>
-                                     </form>
-                                </td>
-                            </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
         {% else %}
             <div class="row" id="no_certs_to_show">
                 <h3>No certificates to show</h3>
