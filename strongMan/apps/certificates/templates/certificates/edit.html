@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-    <div class="container">
+    <div class="container" id="certificate-detail">
         <div class="row">
             <div class="page-header">
                 <h1>certificates
@@ -9,55 +9,54 @@
                 </h1>
             </div>
         </div>
-        {% if certificate %}
-            <div class="col-sm-6 col-md-6">
-                <table>
-                    <tr>
-                        <td>
-                            {% include "certificates/widgets/PublicKey_view.html" with x509=certificate %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">
-                            <form action="" method="POST" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="command" value="remove_cert">
+        <div class="row">
+            {% if certificate %}
+                <div class="col-lg-1"></div>
+                <div class="col-sm-12 col-md-6 col-lg-4 x509-edit">
+                    <div class="row">
+                        {% include "certificates/widgets/PublicKey_view.html" with x509=certificate %}
+                    </div>
+                    <div class="row text-center">
+                        <form action="" method="POST" style="display: inline;">
+                            {% csrf_token %}
                             <span title="Remove certificate">
-                                <button type="submit" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-remove"></span>
+                                <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
+                                        id="remove_cert-btn">
+                                    <span class="glyphicon glyphicon-remove"></span> Remove certificate
                                 </button>
                             </span>
-                            </form>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        {% endif %}
-        {% if private %}
-            <div class="col-sm-6 col-md-4">
-                <table>
-                    <tr>
-                        <td>
-                            {% include "certificates/widgets/PrivateKey_view.html" with private=private %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">
-                            <form action="" method="POST" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="command" value="remove_privatekey">
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            {% if private %}
+                <div class="col-md-1 col-lg-2"></div>
+                <div class="col-sm-12 col-md-5 col-lg-4 private-edit">
+                    <div class="row">
+                        {% include "certificates/widgets/PrivateKey_view.html" with private=private %}
+                    </div>
+                    <div class="row text-center">
+                        <form action="" method="POST" style="display: inline;">
+                            {% csrf_token %}
                                 <span title="Remove private key">
-                                    <button type="submit" class="btn btn-default">
-                                        <span class="glyphicon glyphicon-remove"></span>
+                                    <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
+                                            id="remove_privatekey-btn">
+                                        <span class="glyphicon glyphicon-remove"></span> Remove private key
                                     </button>
                                 </span>
-                            </form>
-                        </td>
-                    </tr>
-                </table>
-
-            </div>
-        {% endif %}
-
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <script>
+            $(".remove-btn")
+                    .mouseenter(function () {
+                        $("#" + this.id).removeClass('btn-default').addClass('btn-danger');
+                    })
+                    .mouseleave(function () {
+                        $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
+                    });
+        </script>
     </div>
 {% endblock content %}

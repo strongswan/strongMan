@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-    <div class="container">
+    <div class="container" id="certificate-add">
         <div class="row">
             <div class="page-header">
                 <h1>Upload certificates
@@ -10,25 +10,37 @@
             </div>
         </div>
         {% if not filename1 %}
-            <div class="row">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row">
-                        <label class="control-label">Select File</label>
-                        <input id="input-1" type="file" class="file" name="cert" data-show-preview="false"
-                               data-show-upload="false" , data-show-remove="false">
-                    </div>
-                    <div class="row">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon3">Password: </span>
-                            <input type="password" placeholder="Optional" name="password" class="form-control"
-                                   aria-describedby="basic-addon3">
+            <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
+                <div class="panel-body"  id="upload-area">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row form-row">
+                            <div class="col-md-3 col-xs-4">
+                                <label class="control-label">Key container:</label>
+                            </div>
+                            <div class="coll-md-9 col-xs-8">
+                                <input id="input-1" type="file" class="file" name="cert" data-show-preview="false"
+                                       data-show-upload="false" , data-show-remove="false">
+                            </div>
+
                         </div>
-                    </div>
-                    <div class="row">
-                        <input class="btn btn-default" type="submit" name="submit" value="Upload"/>
-                    </div>
-                </form>
+                        <div class="row form-row">
+                            <div class="col-md-3 col-xs-4">
+                                <label class="control-label">Password:</label>
+                            </div>
+                            <div class="coll-md-9 col-xs-8">
+                                <input type="password" placeholder="Optional" name="password" class="form-control"
+                                       aria-describedby="basic-addon3"></div>
+                        </div>
+                        <div class="row form-row">
+                            <div class="col-md-11 col-xs-12">
+                                <button type="submit" class="btn btn-default pull-right">
+                                    <span class="glyphicon glyphicon-upload"></span> Upload
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         {% endif %}
 

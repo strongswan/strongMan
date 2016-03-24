@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponseRedirect
 
 from .container import ContainerTypes
-from .forms import CommandForm, AddForm
+from .forms import AddForm
 
 
 class DetailsHandler:
@@ -35,16 +35,11 @@ class DetailsHandler:
         if self.request.method == "GET":
             return self._render_detail()
         elif self.request.method == "POST":
-            form = CommandForm(self.request.POST)
-            if not form.is_valid():
-                messages.add_message(self.request, messages.ERROR, "Invalid command.")
-                return self._render_detail()
-            command = form.cleaned_data['command']
-            if command == "remove_cert":
+            if "remove_cert" in self.request.POST:
                 cname = self._remove_certificate()
                 messages.add_message(self.request, messages.INFO, "Certificate " + cname + " has been removed.")
                 return HttpResponseRedirect(reverse('certificates:overview'))
-            elif command == "remove_privatekey":
+            elif "remove_privatekey" in self.request.POST:
                 self._remove_privatekey()
                 messages.add_message(self.request, messages.INFO, "Private key has been removed.")
                 return self._render_detail()

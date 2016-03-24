@@ -8,6 +8,7 @@ from .request_handler import AddHandler, DetailsHandler
 
 @require_http_methods(["GET", "POST"])
 def overview(request):
+    search_pattern = ""
     if request.method == "GET":
         publics = Certificate.objects.all()
     elif request.method == "POST":
@@ -16,11 +17,13 @@ def overview(request):
             publics = Certificate.objects.all()
         else:
             publics = form.search_for()
-    return render(request, 'certificates/overview.html', {'publics': publics})
+            search_pattern = form.cleaned_data["search_text"]
+    return render(request, 'certificates/overview.html', {'publics': publics, "view": "all", "search_pattern": search_pattern})
 
 
 @require_http_methods(["GET", "POST"])
 def overview_ca(request):
+    search_pattern = ""
     if request.method == "GET":
         publics = Certificate.objects.filter(is_CA=True)
     elif request.method == "POST":
@@ -29,11 +32,13 @@ def overview_ca(request):
             publics = Certificate.objects.filter(is_CA=True)
         else:
             publics = form.search_for(filter_ca=True, should_CA=True)
-    return render(request, 'certificates/overview.html', {'publics': publics})
+            search_pattern = form.cleaned_data["search_text"]
+    return render(request, 'certificates/overview.html', {'publics': publics, "view": "root", "search_pattern": search_pattern})
 
 
 @require_http_methods(["GET", "POST"])
 def overview_certs(request):
+    search_pattern = ""
     if request.method == "GET":
         publics = Certificate.objects.filter(is_CA=False)
     elif request.method == "POST":
@@ -42,7 +47,8 @@ def overview_certs(request):
             publics = Certificate.objects.filter(is_CA=False)
         else:
             publics = form.search_for(filter_ca=True, should_CA=False)
-    return render(request, 'certificates/overview.html', {'publics': publics})
+            search_pattern = form.cleaned_data["search_text"]
+    return render(request, 'certificates/overview.html', {'publics': publics, "view": "entities", "search_pattern": search_pattern})
 
 
 @require_http_methods(["GET", "POST"])

@@ -269,7 +269,7 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.X509_googlecom)
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
-        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"command": "remove_privatekey"})
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"remove_privatekey": "remove_privatekey"})
         response = views.details(request, "1")
         self.assertContains(response, 'hsr.ch')
         self.assertNotContains(response, 'PKCS1')
@@ -279,7 +279,7 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.X509_googlecom)
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
-        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"command": "remove_cert"})
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"remove_cert": "remove_cert"})
         response = views.details(request, "1")
         self.assertEqual(self.count(Certificate), 1)
 
