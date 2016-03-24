@@ -3,7 +3,7 @@ from django.test import Client, TestCase
 
 
 class AuthenticationViewsTests(TestCase):
-    fixtures = ['data.json']
+    fixtures = ['initial_data.json']
 
     def test_fixtures(self):
         user = authenticate(username='John', password='Lennon')

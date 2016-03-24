@@ -1,0 +1,93 @@
+<div class="strongman x509">
+    <script>
+        $('#x509_{{ x509.serial_number }}_tabs a').click(function (e) {
+          $(this).tab('show')
+        })
+    </script>
+
+
+    <div class="thumbnail">
+        <div class="caption">
+            <h3><span class="glyphicon glyphicon-certificate" aria-hidden="false"></span> {{ x509.subject.cname }}</h3>
+            <div>
+              <!-- Nav tabs -->
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#_{{ x509.serial_number }}overview" aria-controls="home" role="tab" data-toggle="tab">Main</a></li>
+                <li role="presentation"><a href="#_{{ x509.serial_number }}subject" aria-controls="profile" role="tab" data-toggle="tab">Subject</a></li>
+                  <li role="presentation"><a href="#_{{ x509.serial_number }}issuer" aria-controls="profile" role="tab" data-toggle="tab">Issuer</a></li>
+                <li role="presentation"><a href="#_{{ x509.serial_number }}other" aria-controls="settings" role="tab" data-toggle="tab">Other</a></li>
+              </ul>
+
+              <!-- Tab panes -->
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="_{{ x509.serial_number }}overview">
+                    <table class="table">
+                        <tr>
+                            <td>issuer</td>
+                            <td>{{ x509.issuer.cname }}</td>
+                        </tr>
+                        <tr>
+                            <td>certificate authority</td>
+                            {% if x509.is_CA %}
+                                <td>Yes</td>
+                            {% else %}
+                                <td>No</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>has private key</td>
+                            {% if x509.private_key %}
+                                <td>Yes</td>
+                            {% else %}
+                                <td>No</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>valid (UTC)</td>
+                            <td>{{ x509.valid_not_before }}<br/>-<br/>{{ x509.valid_not_after }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}subject">
+                    {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.subject %}
+                    <div style="overflow: scroll;max-height: 200px;">
+                        <table class="table">
+                            <tr>
+                                <td>Valid domains</td>
+                                <td>{% for domain in x509.valid_domains.all %}
+                                    {{ domain.value }} <br/>
+                                {% endfor %}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                  <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}issuer">
+                    {% include "certificates/widgets/SubjectInfo_view.html" with info=x509.issuer %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="_{{ x509.serial_number }}other">
+                    <table class="table">
+                        <tr>
+                            <td>type</td>
+                            <td>{{ x509.type }}</td>
+                        </tr>
+                        <tr>
+                            <td>algorithm</td>
+                            <td>{{ x509.algorithm }}</td>
+                        </tr>
+                        <tr>
+                            <td>hash algorithm</td>
+                            <td>{{ x509.hash_algorithm }}</td>
+                        </tr>
+                        <tr>
+                            <td>serial number</td>
+                            <td>{{ x509.serial_number }}</td>
+                        </tr>
+                    </table>
+                </div>
+              </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

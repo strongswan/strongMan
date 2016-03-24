@@ -3,39 +3,6 @@
 {% block content %}
     <h1>Overview</h1>
     {% if user.is_authenticated %}
-        <a href="{% url "connections:connection_create" %}" id="add" class="btn pull-right white-background black">
-            <span class="glyphicon glyphicon-plus"></span>
-        </a>
-        <div></div>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Profile</th>
-                    <th>Local</th>
-                    <th>Remote</th>
-                    <th>State</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for connection in object_list %}
-                    <tr>
-                        <td>{{ connection.profile }}</td>
-                        <td>{{ connection.local_address }}</td>
-                        <td>{{ connection.remote_address }}</td>
-                        <td>
-                            <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger"
-                                   {% if connection.state %}checked{% endif %}>
-                            <a href="" id="edit" class="btn pull-right white-background black">
-                                <span class="glyphicon glyphicon-edit"></span>
-                            </a>
-
-                        </td>
-                    </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
-        </div>
+        {% include "connections_overview.html" %}
     {% endif %}
 {% endblock %}

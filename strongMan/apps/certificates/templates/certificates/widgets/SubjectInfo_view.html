@@ -1,0 +1,42 @@
+<!--
+    location = models.TextField()
+    country = models.TextField()
+    email = models.TextField()
+    organization = models.TextField()
+    unit = models.TextField()
+    cname = models.TextField()
+    province = models.TextField()
+-->
+
+<div class="strongman subjectinfo">
+    <table class="table">
+        <tr>
+            <td>Unit</td>
+            <td>{{ info.unit }}</td>
+        </tr>
+        <tr>
+            <td>Organization</td>
+            <td>{{ info.organization }}</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>{{ info.location }}</td>
+        </tr>
+        <tr>
+            <td>Province</td>
+            <td>{{ info.province }}</td>
+        </tr>
+        <tr>
+            <td>Country</td>
+            <td>{{ info.country }}</td>
+        </tr>
+        <tr>
+            <td>E-mail</td>
+            <td>{{ info.email }}</td>
+        </tr>
+        <tr>
+            <td>Common name</td>
+            <td>{{ info.cname }}</td>
+        </tr>
+    </table>
+</div>

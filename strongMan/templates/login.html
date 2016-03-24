@@ -5,7 +5,7 @@
     <form class="form-horizontal" action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label class="control-label col-sm-2" for="local_address">Password:</label>
+            <label class="control-label col-sm-2" for="local_address">Username:</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" name="username" placeholder="Username" required>
             </div>
