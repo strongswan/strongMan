@@ -54,3 +54,13 @@ class ConnectionModelTest(TestCase):
     def test_secret_dict(self):
         secret = Secret.objects.first()
         self.assertTrue(isinstance(secret.get_vici_ordered_dict(), OrderedDict))
+
+    def test_delete_all_connections(self):
+        connection = Connection.objects.first()
+
+        self.assertEquals(2, Child.objects.count())
+        self.assertEquals(2, Authentication.objects.count())
+
+        connection.delete_all_connected_models()
+        self.assertEquals(0, Authentication.objects.count())
+        self.assertEquals(0, Child.objects.count())

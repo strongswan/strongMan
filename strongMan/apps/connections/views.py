@@ -173,9 +173,11 @@ def delete_connection(request, pk):
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is True:
             vici_wrapper.unload_connection(connection.profile)
-        connection.delete()
-    except ViciSocketException:
-        pass
+    except ViciSocketException as e:
+        messages.warning(request, str(e))
     except ViciLoadException as e:
         messages.warning(request, str(e))
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    finally:
+        connection.delete_all_connected_models()
+        connection.delete()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

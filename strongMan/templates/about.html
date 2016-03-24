@@ -2,5 +2,13 @@
 {% load i18n %}
 {% block content %}
     <h1>About</h1>
-    Page for the about part.
+    Daemon: {{ daemon }} <br>
+    Version: {{ version }} <br>
+    System name: {{ sysname }} <br>
+    Release: {{ release }} <br>
+    Machine: {{ machine }} <br>
+    <h2>Installed plugins</h2>
+    {% for plugin in plugins %}
+        {{ plugin }}
+    {% endfor %}
 {% endblock %}

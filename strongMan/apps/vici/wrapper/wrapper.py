@@ -86,3 +86,24 @@ class ViciWrapper:
             if connection == connection_name:
                 return True
         return False
+
+    def get_version(self):
+        '''
+        :rtype: dict
+        '''
+        try:
+            return self.session.version()
+        except Exception as e:
+            raise ViciLoadException("Version information cannot be loaded!") from e
+
+    def get_status(self):
+        try:
+            return self.session.stats()
+        except Exception as e:
+            raise ViciLoadException("Status information cannot be loaded!") from e
+
+    def get_plugins(self):
+        '''
+        :rtype: dict
+        '''
+        return self.get_status()['plugins']
