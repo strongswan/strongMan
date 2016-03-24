@@ -6,7 +6,7 @@ from strongMan.apps.connections.models import Connection, Proposal, Authenticati
 class ConnectionModelTest(TestCase):
 
     def setUp(self):
-        typ = Typ(name="IKEv2 Certificate")
+        typ = Typ(value="IKEv2 Certificate")
         typ.save()
 
         connection = Connection(profile='rw', auth='pubkey', version=1, typ=typ)

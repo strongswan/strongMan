@@ -9,17 +9,17 @@ class ClientBaseForm(forms.Form):
 
 
 class ChooseTypeForm(forms.Form):
-    typ = forms.ChoiceField(choices=[(typ.id, typ.name) for typ in Typ.objects.all()])
+    typ = forms.ModelChoiceField(queryset=Typ.objects.all(), empty_label=None)
 
 
 class Ike2CertificateForm(ClientBaseForm):
-    certificate = forms.ChoiceField(choices=[(domain.id, domain.value) for domain in Domain.objects.all()])
+    certificate = forms.ModelChoiceField(queryset=Domain.objects.all(),  empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
         typ = Typ.objects.get(id=1)
-        domain = Domain.objects.get(id=self.cleaned_data['certificate'])
+        domain = self.cleaned_data['certificate']
         connection = Connection(profile=profile, auth='pubkey', version=2, typ=typ, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
@@ -30,7 +30,7 @@ class Ike2CertificateForm(ClientBaseForm):
         connection = Connection.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
-        connection.domain = Domain.objects.get(id=self.cleaned_data['certificate'])
+        connection.domain = self.cleaned_data['certificate']
         connection.save()
 
 
@@ -60,7 +60,7 @@ class Ike2EapForm(ClientBaseForm):
 
 
 class Ike2EapCertificateForm(ClientBaseForm):
-    certificate = forms.ChoiceField(choices=[(domain.id, domain.value) for domain in Domain.objects.all()])
+    certificate = forms.ModelChoiceField(queryset=Domain.objects.all(),  empty_label=None)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
 
@@ -70,7 +70,7 @@ class Ike2EapCertificateForm(ClientBaseForm):
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
         typ = Typ.objects.get(id=3)
-        domain = Domain.objects.get(id=self.cleaned_data['certificate'])
+        domain = self.cleaned_data['certificate']
         connection = Connection(profile=profile, auth='pubkey', version=2, typ=typ, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
@@ -83,7 +83,7 @@ class Ike2EapCertificateForm(ClientBaseForm):
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         Secret.objects.filter(connection=connection).update(data=self.cleaned_data['password'])
         connection.profile = self.cleaned_data['profile']
-        connection.domain = Domain.objects.get(id=self.cleaned_data['certificate'])
+        connection.domain = self.cleaned_data['certificate']
         connection.save()
 
 

@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 
 class Typ(models.Model):
-    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
 
 
 class Connection(models.Model):

@@ -14,8 +14,8 @@
                     <div class="controls col-sm-10">
                         {% if field|field_type == "Select" %}
                             <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
-                                {% for key, value in field.field.choices %}
-                                    <option value="{{ key }}">{{ value }}</option>
+                                {% for choise in field.field.queryset %}
+                                    <option value="{{ choise.id }}">{{ choise.value }}</option>
                                 {% endfor %}
                             </select>
                         {% else %}
@@ -28,7 +28,7 @@
                                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                 <span class="sr-only">Error:</span>
                                 {% for error in field.errors %}
-                                {{ error }}
+                                    {{ error }}
                                 {% endfor %}
                             </div>
                         {% endif %}

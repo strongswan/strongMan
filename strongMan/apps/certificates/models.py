@@ -75,10 +75,10 @@ class Certificate(KeyContainer):
             domain.save()
 
     def _set_privatekey_if_exists(self):
-        '''
+        """
         Searches for a private key with the same public key
         :return: PrivateKey or None if nothing was found
-        '''
+        """
         keys = PrivateKey.objects.filter(public_key_hash=self.public_key_hash)
         if len(keys) == 1:
             self.private_key = keys[0]

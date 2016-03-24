@@ -23,42 +23,42 @@
     "model": "connections.typ",
     "pk": 0,
     "fields": {
-      "name": "Choose Type"
+      "value": "Choose Type"
     }
   },
   {
     "model": "connections.typ",
     "pk": 1,
     "fields": {
-      "name": "IKEv2 Certificate"
+      "value": "IKEv2 Certificate"
     }
   },
   {
     "model": "connections.typ",
     "pk": 2,
     "fields": {
-      "name": "IKEv2 EAP (Username/Password)"
+      "value": "IKEv2 EAP (Username/Password)"
     }
   },
   {
     "model": "connections.typ",
     "pk": 3,
     "fields": {
-      "name": "IKEv2 Certificate + EAP (Username/Password)"
+      "value": "IKEv2 Certificate + EAP (Username/Password)"
     }
   },
   {
     "model": "connections.typ",
     "pk": 4,
     "fields": {
-      "name": "IKEv2 EAP-TLS (Certificate)"
+      "value": "IKEv2 EAP-TLS (Certificate)"
     }
   },
   {
     "model": "connections.typ",
     "pk": 5,
     "fields": {
-      "name": "IKEv2 EAP-TNC (Username/Password)"
+      "value": "IKEv2 EAP-TNC (Username/Password)"
     }
   }
 ]

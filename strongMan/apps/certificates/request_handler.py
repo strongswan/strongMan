@@ -1,8 +1,9 @@
-from django.shortcuts import render, HttpResponseRedirect
-from django.core.urlresolvers import reverse
 from django.contrib import messages
-from .forms import CommandForm, AddForm
+from django.core.urlresolvers import reverse
+from django.shortcuts import render, HttpResponseRedirect
+
 from .container import ContainerTypes
+from .forms import CommandForm, AddForm
 
 
 class DetailsHandler:
@@ -14,7 +15,8 @@ class DetailsHandler:
         if self.certificate.private_key is None:
             return render(self.request, 'certificates/edit.html', {"certificate": self.certificate})
         else:
-            return render(self.request, 'certificates/edit.html', {"certificate": self.certificate, 'private': self.certificate.private_key})
+            return render(self.request, 'certificates/edit.html',
+                          {"certificate": self.certificate, 'private': self.certificate.private_key})
 
     def _remove_certificate(self):
         cname = self.certificate.subject.cname
@@ -26,7 +28,7 @@ class DetailsHandler:
         self.certificate.private_key = None
         self.certificate.save()
         privatekey_has_another_certificate = private.certificates.all().__len__() > 1
-        if not privatekey_has_another_certificate :
+        if not privatekey_has_another_certificate:
             private.delete()
 
     def handle(self):
@@ -67,8 +69,9 @@ class AddHandler:
         '''
         self.form = AddForm(self.request.POST, self.request.FILES)
         if not self.form.is_valid():
-            messages.add_message(self.request, messages.ERROR, 'No valid container detected. Maybe your container needs a password?')
-            return (self.request, 'certificates/add.html', {"form": self.form})
+            messages.add_message(self.request, messages.ERROR,
+                                 'No valid container detected. Maybe your container needs a password?')
+            return self.request, 'certificates/add.html', {"form": self.form}
 
         try:
             type = self.form.detect_container_type()
@@ -81,22 +84,25 @@ class AddHandler:
             elif type == ContainerTypes.PKCS12:
                 return self._handle_pkcs12()
         except Exception as e:
-            messages.add_message(self.request, messages.ERROR, "Error reading file. Maybe your file is corrupt?\n" + str(e))
-            return (self.request, 'certificates/add.html', {"form": self.form})
+            messages.add_message(self.request, messages.ERROR,
+                                 "Error reading file. Maybe your file is corrupt?\n" + str(e))
+            return self.request, 'certificates/add.html', {"form": self.form}
 
     def _handle_x509(self):
         x509 = self.form.to_publickey()
         if x509.already_exists():
-            messages.add_message(self.request, messages.WARNING, 'Certificate ' + x509.subject.cname + ' has already existed!')
+            messages.add_message(self.request, messages.WARNING,
+                                 'Certificate ' + x509.subject.cname + ' has already existed!')
         else:
             x509.save_new()
-        return (self.request, 'certificates/added.html', {"public": x509})
+        return self.request, 'certificates/added.html', {"public": x509}
 
     def _handle_privatekey(self):
         private = self.form.to_privatekey()
         if not private.certificate_exists():
-            messages.add_message(self.request, messages.Error, 'No certificate exists for this private key. Upload certificate first!')
-            return (self.request, 'certificates/add.html')
+            messages.add_message(self.request, messages.Error, 'No certificate exists for this private key. '
+                                                               'Upload certificate first!')
+            return self.request, 'certificates/add.html'
 
         if private.already_exists():
             messages.add_message(self.request, messages.WARNING, 'Private key has already existed!')
@@ -104,7 +110,7 @@ class AddHandler:
             private.save()
             private.connect_to_certificates()
         public = private.certificates.all()[0]
-        return (self.request, 'certificates/added.html', {"private": private, "public": public})
+        return self.request, 'certificates/added.html', {"private": private, "public": public}
 
     def _handle_pkcs12(self):
         private = self.form.to_privatekey()
@@ -112,7 +118,8 @@ class AddHandler:
         further_publics = self.form.further_publics()
 
         if public.already_exists():
-            messages.add_message(self.request, messages.WARNING, 'Certificate ' + public.subject.cname + ' has already existed!')
+            messages.add_message(self.request, messages.WARNING,
+                                 'Certificate ' + public.subject.cname + ' has already existed!')
         else:
             public.save_new()
 
@@ -124,9 +131,10 @@ class AddHandler:
 
         for cert in further_publics:
             if cert.already_exists():
-                messages.add_message(self.request, messages.WARNING, 'Certificate ' + cert.subject.cname + ' has already existed!')
+                messages.add_message(self.request, messages.WARNING,
+                                     'Certificate ' + cert.subject.cname + ' has already existed!')
             else:
                 cert.save_new()
 
-        return (self.request, 'certificates/added.html', {"private": private, "public": public, "further_publics": further_publics})
-
+        return self.request, 'certificates/added.html', {"private": private, "public": public,
+                                                         "further_publics": further_publics}

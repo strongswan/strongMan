@@ -1,16 +1,20 @@
-from django.test import TestCase, RequestFactory, Client
-from strongMan.apps.certificates.forms import AddForm, AddHandler
-from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
 
+from django.test import TestCase, RequestFactory
+
+from strongMan.apps.certificates.models import Certificate, PrivateKey
+from strongMan.apps.certificates.request_handler import AddHandler
+
+
 def create_request(page, context):
-        factory = RequestFactory()
-        request = factory.post(page, context)
-        from django.contrib.messages.storage.fallback import FallbackStorage
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        return request
+    factory = RequestFactory()
+    request = factory.post(page, context)
+    from django.contrib.messages.storage.fallback import FallbackStorage
+    setattr(request, 'session', 'session')
+    messages = FallbackStorage(request)
+    setattr(request, '_messages', messages)
+    return request
+
 
 class TestCert:
     def __init__(self, path):
@@ -37,12 +41,14 @@ class Paths:
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
     X509_googlecom = TestCert("google.com_der.crt")
 
+
 class CreateRequest:
     '''
     This class is a with object. __enter__ opens a file and __exit__ closes the file.
     with CreateRequest(page, testcert) as request:
         Do stuff #!#!#!
     '''
+
     def __init__(self, page, testcert, password=""):
         self.page = page
         self.testcert = testcert
@@ -69,7 +75,6 @@ class CreateRequest:
 
 
 class AddHandlerTest(TestCase):
-
     def certificates_count(self):
         return Certificate.objects.all().__len__()
 
@@ -91,7 +96,7 @@ class AddHandlerTest(TestCase):
             (req, page, context) = handler.handle()
 
     def test_x509_valid_domains(self):
-        self.add_rw_certificate() #Add a sample domain
+        self.add_rw_certificate()  # Add a sample domain
 
         with CreateRequest("/certificates/add", Paths.X509_googlecom) as request:
             handler = AddHandler.by_request(request)
@@ -121,7 +126,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(0, self.privatekeys_count())
 
     def test_pkcs1_with_certificate(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS1_rsa_ca) as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -131,7 +136,7 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["private"])
 
     def test_pkcs8_with_certificate(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca) as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -141,7 +146,7 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["private"])
 
     def test_pkcs8_with_certificate_encrypted(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca_encrypted, password="strongman") as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -181,7 +186,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(0, self.certificates_count())
 
     def test_pkcs12_ca_already_imported(self):
-        self.test_x509() # Add x509 CA
+        self.test_x509()  # Add x509 CA
         self.assertEqual(1, self.certificates_count(), "CA imported.")
         with CreateRequest("/certificates/add", Paths.PKCS12_rsa) as request:
             handler = AddHandler.by_request(request)
@@ -192,25 +197,3 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["public"])
         self.assertIsNotNone(context["private"])
         self.assertIsNotNone(context["further_publics"])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -22,7 +22,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="id" value="{{ connection.id }}">
                             <input id="toggle_input{{ connection.id }}" type="checkbox" data-toggle="toggle" data-onstyle="success"
-                                   data-offstyle="danger"
+                                   data-offstyle="default"
                                    {% if connection.state %}checked{% endif %} onclick="this.form.click()">
                         </form>
                         <div id ="alert_{{ connection.id }}" class="btn"></div>

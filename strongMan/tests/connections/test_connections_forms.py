@@ -1,9 +1,15 @@
 from django.test import TestCase, Client
 from strongMan.apps.connections.forms import Ike2CertificateForm, Ike2EapCertificateForm, Ike2EapForm, ChooseTypeForm
+from strongMan.apps.connections.models import Typ
+from strongMan.apps.certificates.models import Domain
 
 
-class ConnectionViewTest(TestCase):
+class ConnectionFormsTest(TestCase):
     fixtures = ['initial_data.json']
+
+    def setUp(self):
+        self.domain = Domain(value="domain")
+        self.domain.save()
 
     def test_ChooseTypeForm(self):
         form_data = {'typ':  1}
@@ -16,7 +22,7 @@ class ConnectionViewTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm(self):
-        form_data = {'gateway': "gateway", 'profile': 'profile', 'certificate': 1}
+        form_data = {'gateway': "gateway", 'profile': 'profile', 'certificate': self.domain.id}
         form = Ike2CertificateForm(data=form_data)
         self.assertTrue(form.is_valid())
 
@@ -26,7 +32,7 @@ class ConnectionViewTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapCertificateForm(self):
-        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile', 'certificate': 1}
+        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile', 'certificate': self.domain.id}
         form = Ike2EapCertificateForm(data=form_data)
         self.assertTrue(form.is_valid())
 
