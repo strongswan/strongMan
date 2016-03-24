@@ -51,6 +51,7 @@ class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
         remote_address = Address.objects.filter(remote_addresses=connection).first()
         initial["profile"] = connection.profile
         initial["gateway"] = remote_address.value
+        initial["certificate"] = connection.domain
         return initial
 
     def get_context_data(self, **kwargs):
@@ -131,6 +132,7 @@ class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
         initial["profile"] = connection.profile
         initial["gateway"] = remote_address.value
         initial["password"] = secret.data
+        initial["certificate"] = connection.domain
         return initial
 
     def get_context_data(self, **kwargs):

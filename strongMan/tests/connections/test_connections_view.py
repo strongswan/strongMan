@@ -61,3 +61,7 @@ class ConnectionViewTest(TestCase):
 
         connection = Connection.objects.first()
         self.assertEquals(connection.profile, 'hans')
+
+    def test_delete_post(self):
+        response = self.client.post('/connection/create/0', {'typ': '2'})
+        self.assertEquals(response.status_code, 302)
