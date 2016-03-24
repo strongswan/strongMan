@@ -1,7 +1,38 @@
 from django import forms
+from django.contrib import messages
+
 from .container import ContainerDetector, ContainerTypes
 from .container import X509Container, PKCS1Container, PKCS8Container, PKCS12Container
-from django.contrib import messages
+from .models import Domain
+
+
+class CertificateSearchForm(forms.Form):
+    search_text = forms.CharField(max_length=200)
+
+    def search_for(self, filter_ca=False, should_CA=False):
+        '''
+        Searches for certificates in valid_domains
+        :param filter_ca: Should result additionaly be filtered by is_CA?
+        :param should_CA: Only affects the result if filter_ca=True
+        :return: [Certificate]
+        '''
+        text = self.cleaned_data['search_text']
+        domains = Domain.objects.filter(value__contains=text)
+        certs = []
+        for domain in domains:
+            cert = domain.certificate
+            if not cert in certs:
+                if filter_ca:
+                    if cert.is_CA == should_CA:
+                        certs.append(cert)
+                else:
+                    certs.append(cert)
+        return certs
+
+
+class CommandForm(forms.Form):
+    command = forms.CharField(max_length=20, required=True)
+
 
 class AddForm(forms.Form):
     cert = forms.FileField(label="Certificate container", required=True)
@@ -93,7 +124,8 @@ class AddHandler:
         '''
         self.form = AddForm(self.request.POST, self.request.FILES)
         if not self.form.is_valid():
-            messages.add_message(self.request, messages.ERROR, 'No valid container detected. Maybe your container needs a password?')
+            messages.add_message(self.request, messages.ERROR,
+                                 'No valid container detected. Maybe your container needs a password?')
             return (self.request, 'certificates/add.html', {"form": self.form})
 
         try:
@@ -107,15 +139,15 @@ class AddHandler:
             elif type == ContainerTypes.PKCS12:
                 return self._handle_pkcs12()
         except Exception as e:
-            messages.add_message(self.request, messages.ERROR, "Error reading file. Maybe your file is corrupt?\n" + str(e))
+            messages.add_message(self.request, messages.ERROR,
+                                 "Error reading file. Maybe your file is corrupt?\n" + str(e))
             return (self.request, 'certificates/add.html', {"form": self.form})
-
-
 
     def _handle_x509(self):
         x509 = self.form.to_publickey()
         if x509.already_exists():
-            messages.add_message(self.request, messages.WARNING, 'Certificate ' + x509.subject.cname + ' has already existed!')
+            messages.add_message(self.request, messages.WARNING,
+                                 'Certificate ' + x509.subject.cname + ' has already existed!')
         else:
             x509.save_new()
         return (self.request, 'certificates/added.html', {"public": x509})
@@ -124,7 +156,8 @@ class AddHandler:
         private = self.form.to_privatekey()
         public = private.publickey()
         if public == None:
-            messages.add_message(self.request, messages.Error, 'No certificate exists for this private key. Upload certificate first!')
+            messages.add_message(self.request, messages.Error,
+                                 'No certificate exists for this private key. Upload certificate first!')
             return (self.request, 'certificates/add.html')
 
         if private.already_exists():
@@ -139,7 +172,8 @@ class AddHandler:
         further_publics = self.form.further_publics()
 
         if public.already_exists():
-            messages.add_message(self.request, messages.WARNING, 'Certificate ' + public.subject.cname + ' has already existed!')
+            messages.add_message(self.request, messages.WARNING,
+                                 'Certificate ' + public.subject.cname + ' has already existed!')
         else:
             public.save_new()
 
@@ -151,11 +185,10 @@ class AddHandler:
 
         for cert in further_publics:
             if cert.already_exists():
-                messages.add_message(self.request, messages.WARNING, 'Certificate ' + cert.subject.cname + ' has already existed!')
+                messages.add_message(self.request, messages.WARNING,
+                                     'Certificate ' + cert.subject.cname + ' has already existed!')
             else:
                 cert.save_new()
 
-        return (self.request, 'certificates/added.html', {"private": private, "public": public, "further_publics": further_publics})
-
-
-
+        return (self.request, 'certificates/added.html',
+                {"private": private, "public": public, "further_publics": further_publics})

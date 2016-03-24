@@ -1,9 +1,10 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from .apps.vici import urls as vici_urls
-from .apps.connections import urls as connections_urls
+
 from .apps import views
 from .apps.certificates import urls as certificates_url
+from .apps.connections import urls as connections_urls
+from .apps.vici import urls as vici_urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

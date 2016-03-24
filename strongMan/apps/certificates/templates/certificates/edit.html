@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="page-header">
+                <h1>certificates
+                    <small> Details</small>
+                </h1>
+            </div>
+        </div>
+        {% if certificate %}
+            <div class="col-sm-6 col-md-6">
+                <table>
+                    <tr>
+                        <td>
+                            {% include "certificates/widgets/PublicKey_view.html" with x509=certificate %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <form action="" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="command" value="remove_cert">
+                            <span title="Remove certificate">
+                                <button type="submit" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            </span>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        {% endif %}
+        {% if private %}
+            <div class="col-sm-6 col-md-4">
+                <table>
+                    <tr>
+                        <td>
+                            {% include "certificates/widgets/PrivateKey_view.html" with private=private %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <form action="" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="command" value="remove_privatekey">
+                                <span title="Remove private key">
+                                    <button type="submit" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </span>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock content %}

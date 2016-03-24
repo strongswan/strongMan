@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.shortcuts import render
+
 from . import models
 
 
@@ -12,4 +13,3 @@ def index(request):
 
     vici_info = session.info()
     return render(request, 'vici/view.html', {"vici_info": vici_info})
-
