@@ -5,6 +5,8 @@ from django.shortcuts import render, HttpResponseRedirect
 from .container import ContainerTypes
 from .forms import AddForm
 
+from oscrypto.errors import AsymmetricKeyError
+
 
 class DetailsHandler:
     def __init__(self, request, certificate_object):
@@ -78,9 +80,13 @@ class AddHandler:
 
             elif type == ContainerTypes.PKCS12:
                 return self._handle_pkcs12()
+        except (ValueError, TypeError, AsymmetricKeyError, OSError) as e:
+            messages.add_message(self.request, messages.ERROR,
+                                 "Error reading file. Maybe your file is corrupt?")
+            return self.request, 'certificates/add.html', {"form": self.form}
         except Exception as e:
             messages.add_message(self.request, messages.ERROR,
-                                 "Error reading file. Maybe your file is corrupt?\n" + str(e))
+                                 "Internal error: " + str(e))
             return self.request, 'certificates/add.html', {"form": self.form}
 
     def _handle_x509(self):
@@ -100,6 +106,7 @@ class AddHandler:
             return self.request, 'certificates/add.html'
 
         if private.already_exists():
+            private = private.get_existing_privatekey()
             messages.add_message(self.request, messages.WARNING, 'Private key has already existed!')
         else:
             private.save()

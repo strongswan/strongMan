@@ -32,6 +32,8 @@ class Paths:
     PKCS12_rsa = TestCert("warrior.pkcs12")
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
     X509_googlecom = TestCert("google.com_der.crt")
+    PKCS1_dsa = TestCert("dsa2.key")
+    X509_dsa = TestCert("dsa.crt")
 
 
 class ContainerDetectorTest(TestCase):
@@ -153,6 +155,12 @@ class PCKS1ContainerTest(TestCase):
         self.assertIsNotNone(public)
         self.assertIsNotNone(public.algorithm)
         self.assertIsNotNone(public.der_container)
+
+    def test_dsa(self):
+        bytes = Paths.PKCS1_dsa.read()
+        x509 = PKCS1Container.by_bytes(bytes)
+        with self.assertRaises(models.CertificateException):
+            x509.parse()
 
 
 class PCKS8ContainerTest(TestCase):
@@ -347,3 +355,9 @@ class X509ContainerTest(TestCase):
         self.assertIsNotNone(public)
         self.assertIsNotNone(public.subject)
         self.assertIsNotNone(public.issuer)
+
+    def test_dsa(self):
+        bytes = Paths.X509_dsa.read()
+        x509 = X509Container.by_bytes(bytes)
+        with self.assertRaises(models.CertificateException):
+            x509.parse()

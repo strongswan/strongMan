@@ -31,6 +31,14 @@ class PrivateKey(KeyContainer):
             if cert.private_key is None:
                 cert.private_key = self
                 cert.save()
+    def get_existing_privatekey(self):
+        '''
+        :returns the private key with the same public key hash
+        '''
+        assert self.already_exists()
+        keys = PrivateKey.objects.filter(public_key_hash=self.public_key_hash)
+        return keys[0]
+
 
 
 class SubjectInfo(models.Model):
@@ -70,9 +78,10 @@ class Certificate(KeyContainer):
         self.subject = self.subject
         self.save()
 
-        for domain in self.valid_domains_to_add:
-            domain.certificate = self
-            domain.save()
+        if hasattr(self, "valid_domains_to_add"):
+            for domain in self.valid_domains_to_add:
+                domain.certificate = self
+                domain.save()
 
     def _set_privatekey_if_exists(self):
         """
@@ -115,3 +124,11 @@ def certificate_clean_submodels(sender, **kwargs):
 class Domain(models.Model):
     value = models.TextField()
     certificate = models.ForeignKey(Certificate, null=True, related_name='valid_domains', on_delete=models.CASCADE)
+
+
+class CertificateException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)

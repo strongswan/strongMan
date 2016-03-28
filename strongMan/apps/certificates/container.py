@@ -6,7 +6,7 @@ from enum import Enum
 from asn1crypto import keys
 from oscrypto import keys as k
 
-from .models import Certificate, PrivateKey, SubjectInfo, Domain
+from .models import Certificate, PrivateKey, SubjectInfo, Domain, CertificateException
 
 
 class ContainerTypes(Enum):
@@ -161,6 +161,12 @@ class AbstractContainer:
 
         return formated_hash[:-1]
 
+    def _raise_if_wrong_algorithm(self):
+        algorithm_lower = self.algorithm().lower()
+        wrong_algorihm = not (algorithm_lower == "rsa" or algorithm_lower == "ec")
+        if wrong_algorihm:
+            raise CertificateException("Detected unsupported algorithm " + str(algorithm_lower))
+
     def algorithm(self):
         '''
         :return: "rsa" or "ec"
@@ -176,6 +182,7 @@ class PKCS1Container(AbstractContainer):
         else:
             self.asn1 = k.parse_private(self.bytes, password=self.password)
         self.asn1.native
+        self._raise_if_wrong_algorithm()
 
     def der_dump(self):
         return self.asn1.dump()
@@ -220,6 +227,7 @@ class PKCS8Container(AbstractContainer):
         else:
             self.asn1 = k.parse_private(self.bytes, password=self.password)
         self.asn1.native
+        self._raise_if_wrong_algorithm()
 
     def der_dump(self):
         return self.asn1.dump()
@@ -255,11 +263,13 @@ class PKCS12Container(AbstractContainer):
             (self.privatekey, self.cert, self.certs) = k.parse_pkcs12(self.bytes)
         else:
             (self.privatekey, self.cert, self.certs) = k.parse_pkcs12(self.bytes, password=self.password)
+        self._raise_if_wrong_algorithm()
 
     def algorithm(self):
         return self.privatekey.algorithm
 
     def public_key_hash(self):
+        algo = self.algorithm()
         if self.algorithm() == "rsa":
             ident = self.privatekey.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
@@ -305,6 +315,7 @@ class X509Container(AbstractContainer):
         assert self.type == ContainerTypes.X509
         self.asn1 = k.parse_certificate(self.bytes)
         self.asn1.native
+        self._raise_if_wrong_algorithm()
 
     def der_dump(self):
         return self.asn1.dump()

@@ -62,7 +62,7 @@ body {
 }
 .certificate-privatekey h3{
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 #certificate-detail .x509-edit {
@@ -74,4 +74,8 @@ body {
     bottom: auto;
     top: 20px;
     margin-bottom: 50px;
+}
+#certificate-added #nav-btn {
+    margin-top: 20px;
+    margin-bottom: 30px;
 }
