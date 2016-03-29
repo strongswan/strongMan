@@ -55,15 +55,17 @@
         <div class="row" id="search">
             <form action="" method="POST" style="display: inline;">
                 {% csrf_token %}
+                <input type="hidden" name="page" value="1">
                 <div class="col-lg-6">
                     <div class="input-group">
                         <input class="form-control" type="text" name="search_text" value="{{ search_pattern }}"
                                placeholder="Filter your certificates by domain names">
                         <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default" type="button"><span
+                            <button type="submit" class="btn btn-default" type="button" name="search"><span
                                     class="glyphicon glyphicon-search"></span> Search
                             </button>
-                            <a href="" class="btn btn-default" {% if search_pattern == "" %}disabled="True"{% endif %}>
+                            <a href="" class="btn btn-default" {% if search_pattern == "" %}disabled="True"{% endif %}
+                               name="clear">
                                 <span class="glyphicon glyphicon-remove"></span> Clear
                             </a>
                         </div>
@@ -93,7 +95,7 @@
                                     <td><b>{{ p.subject.cname }}</b></td>
                                     <td class="hidden-sm hidden-xs">{{ p.subject }}</td>
                                     <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
-                                    <td>
+                                    <td style="width: 10%">
                                         <span title="Edit certificate">
                                             <a href="{% url "certificates:details" p.id %}"
                                                class="btn btn-default edit-btn"
@@ -117,6 +119,35 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+            <div class="my-pagination row">
+                <div class="text-center">
+                    {% if publics.has_previous %}
+                        <form action="" method="POST" class="pagination-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="search_text" value="{{ search_pattern }}">
+                            <input type="hidden" name="page" value="{{ publics.previous_page_number }}">
+                            <button type="submit" class="btn btn-default" name="next">
+                                <span class="glyphicon glyphicon-chevron-left"></span> Previous
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ publics.number }} of {{ publics.paginator.num_pages }}
+                    </span>
+
+                    {% if publics.has_next %}
+                        <form action="" method="POST" class="pagination-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="search_text" value="{{ search_pattern }}">
+                            <input type="hidden" name="page" value="{{ publics.next_page_number }}">
+                            <button type="submit" class="btn btn-default" name="next">
+                                Next <span class="glyphicon glyphicon-chevron-right"></span>
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         {% else %}

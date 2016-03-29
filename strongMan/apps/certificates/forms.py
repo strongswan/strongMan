@@ -1,33 +1,12 @@
 from django import forms
-from django.contrib import messages
 
 from .container import ContainerDetector, ContainerTypes
 from .container import X509Container, PKCS1Container, PKCS8Container, PKCS12Container
-from .models import Domain
 
 
 class CertificateSearchForm(forms.Form):
-    search_text = forms.CharField(max_length=200)
-
-    def search_for(self, filter_ca=False, should_CA=False):
-        '''
-        Searches for certificates in valid_domains
-        :param filter_ca: Should result additionaly be filtered by is_CA?
-        :param should_CA: Only affects the result if filter_ca=True
-        :return: [Certificate]
-        '''
-        text = self.cleaned_data['search_text']
-        domains = Domain.objects.filter(value__contains=text)
-        certs = []
-        for domain in domains:
-            cert = domain.certificate
-            if not cert in certs:
-                if filter_ca:
-                    if cert.is_CA == should_CA:
-                        certs.append(cert)
-                else:
-                    certs.append(cert)
-        return certs
+    search_text = forms.CharField(max_length=200, required=False)
+    page = forms.IntegerField(max_value=99999, min_value=1)
 
 
 class AddForm(forms.Form):
