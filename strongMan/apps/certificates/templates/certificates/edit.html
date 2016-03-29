@@ -1,14 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}Certificates{% endblock title %}
+{% block small-title %}Details{% endblock small-title %}
 {% block content %}
     <div class="container" id="certificate-detail">
-        <div class="row">
-            <div class="page-header">
-                <h1>Certificates
-                    <small> Details</small>
-                </h1>
-            </div>
-        </div>
         <div class="row">
             {% if certificate %}
                 <div class="col-lg-1"></div>

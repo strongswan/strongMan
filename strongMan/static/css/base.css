@@ -12,7 +12,7 @@ body {
 }
 
 .black-background {
-    background-color: #000000;
+    background-color: #333;
 }
 
 .white-background {
@@ -25,7 +25,7 @@ body {
 }
 
 .black {
-    color: #000000;
+    color: #333;
 }
 
 #logout_button{
@@ -79,3 +79,4 @@ body {
     margin-top: 20px;
     margin-bottom: 30px;
 }
+

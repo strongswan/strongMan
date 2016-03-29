@@ -1,23 +1,19 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% comment %}
+    Input:
+    :param publics: list of certificates
+    :type publics: [models.Certifacte]
+    :param view: indicates which filter has been applied
+    :type view: "all" | "root" | "entities"
+    :param search_pattern: the search pattern, that the user has typed in
+    :type view: String
+{% endcomment %}
+{% block title %}Certificates{% endblock title %}
+{% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-    {% comment %}
-        Input:
-        :param publics: list of certificates
-        :type publics: [models.Certifacte]
-        :param view: indicates which filter has been applied
-        :type view: "all" | "root" | "entities"
-        :param search_pattern: the search pattern, that the user has typed in
-        :type view: String
-    {% endcomment %}
+
     <div class="container" id="certificate-overview">
-        <div class="row">
-            <div class="page-header">
-                <h1>Certificates
-                    <small> Overview</small>
-                </h1>
-            </div>
-        </div>
         <div class="row" id="header">
             <div class="col-md-10 col-xs-9 btn-group" role="group" aria-label="...">
 

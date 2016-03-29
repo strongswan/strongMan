@@ -1,14 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}Certificates{% endblock title %}
+{% block small-title %}Upload a key container{% endblock small-title %}
 {% block content %}
     <div class="container" id="certificate-add">
-        <div class="row">
-            <div class="page-header">
-                <h1>Certificates
-                    <small> Upload a key container</small>
-                </h1>
-            </div>
-        </div>
         <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
             <div class="panel-body" id="upload-area">
                 <form method="post" enctype="multipart/form-data">
@@ -45,8 +40,9 @@
                     <div class="col-md-8 col-md-offset-2 col-xs-12" >
                         <div class="bs-callout bs-callout-default">
                             <h4>Supported formats</h4>
-                            <span>containers: X509, PKCS1, PKCS8, PKCS12</span><br/>
-                            <span>algorithms: RSA, ECDSA</span>
+                            <span>Container: X509, PKCS1, PKCS8, PKCS12</span><br/>
+                            <span>Encoding: PEM, DER</span><br/>
+                            <span>Algorithm: RSA, ECDSA</span>
                         </div>
 
                     </div>
