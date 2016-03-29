@@ -4,6 +4,7 @@ from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
 from django.core.urlresolvers import reverse
 from strongMan.apps.certificates import views
+from django.http.response import Http404
 
 
 
@@ -19,6 +20,7 @@ class TestCert:
 
 class Paths:
     X509_rsa_ca = TestCert("ca.crt")
+    X509_rsa_ca2 = TestCert("hsrca_doppelt_gleicher_publickey.crt")
     PKCS1_rsa_ca = TestCert("ca2.key")
     PKCS1_rsa_ca_encrypted = TestCert("ca.key")
     PKCS8_rsa_ca = TestCert("ca2.pkcs8")
@@ -282,6 +284,78 @@ class DetailsViewTest(TestCase):
         request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"remove_cert": "remove_cert"})
         response = views.details(request, "1")
         self.assertEqual(self.count(Certificate), 1)
+
+    def test_add_same_publickey_different_serialnumber(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_rsa_ca2)
+        self.assertEqual(self.count(Certificate), 2)
+        request = self.create_request(reverse('certificates:overview'), {})
+        response = views.overview(request)
+        self.assertContains(response, 'CN=hsr.ch', 2)
+        self.assertContains(response, 'OU=Informatik', 1)
+        self.assertContains(response, 'OU=IT', 1)
+
+    def test_detail_same_publickey_different_serialnumber(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_rsa_ca2)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        self.assertEqual(self.count(PrivateKey), 1)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
+        response = views.details(request, 1)
+        self.assertContains(response, 'hsr.ch')
+        self.assertContains(response, 'IT')
+        self.assertContains(response, 'PKCS1')
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
+        response = views.details(request, 2)
+        self.assertContains(response, 'hsr.ch')
+        self.assertContains(response, 'Informatik')
+        self.assertContains(response, 'PKCS1')
+
+    def test_delete_privatekey_same_publickey_different_serialnumber(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_rsa_ca2)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        self.assertEqual(self.count(PrivateKey), 1)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}),
+                                      {"remove_privatekey": "remove_privatekey"})
+        views.details(request, "1")
+        self.assertEqual(self.count(PrivateKey), 0)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
+        response = views.details(request, 1)
+        self.assertNotContains(response, 'PKCS1')
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
+        response = views.details(request, 2)
+        self.assertNotContains(response, 'PKCS1')
+
+    def test_delete_cert_same_publickey_different_serialnumber(self):
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.add_keycontainer(Paths.X509_rsa_ca2)
+        self.add_keycontainer(Paths.PKCS1_rsa_ca)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}),
+                                      {"remove_cert": "remove_cert"})
+        views.details(request, "1")
+        self.assertEqual(self.count(Certificate), 1)
+        self.assertEqual(self.count(PrivateKey), 1)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
+        with self.assertRaises(Http404):
+            views.details(request, 1)
+
+        request = self.create_request(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
+        response = views.details(request, 2)
+        self.assertContains(response, 'PKCS1')
+        self.assertContains(response, 'hsr.ch')
+
+
+
 
 
 
