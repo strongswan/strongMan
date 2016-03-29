@@ -30,10 +30,6 @@ class CertificateSearchForm(forms.Form):
         return certs
 
 
-class CommandForm(forms.Form):
-    command = forms.CharField(max_length=20, required=True)
-
-
 class AddForm(forms.Form):
     cert = forms.FileField(label="Certificate container", required=True)
     password = forms.CharField(label="Password", max_length=60, required=False)

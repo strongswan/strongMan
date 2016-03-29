@@ -1,15 +1,10 @@
-<div class="strongman x509">
-    <script>
-        $('#x509_{{ x509.serial_number }}_tabs a').click(function (e) {
-            $(this).tab('show')
-        })
-    </script>
-
-
+<div class="certificate-widget">
     <div class="thumbnail">
         <div class="caption">
+        <div class="title">
             <h3 class="text-center"><span class="glyphicon glyphicon-certificate"
                                           aria-hidden="false"></span> {{ x509.subject.cname }}</h3>
+        </div>
             <div>
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
@@ -96,4 +91,9 @@
 
         </div>
     </div>
+    <script>
+        $('#x509_{{ x509.serial_number }}_tabs a').click(function (e) {
+            $(this).tab('show')
+        })
+    </script>
 </div>

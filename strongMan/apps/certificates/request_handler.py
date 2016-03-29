@@ -3,7 +3,9 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponseRedirect
 
 from .container import ContainerTypes
-from .forms import CommandForm, AddForm
+from .forms import AddForm
+
+from oscrypto.errors import AsymmetricKeyError
 
 
 class DetailsHandler:
@@ -35,16 +37,11 @@ class DetailsHandler:
         if self.request.method == "GET":
             return self._render_detail()
         elif self.request.method == "POST":
-            form = CommandForm(self.request.POST)
-            if not form.is_valid():
-                messages.add_message(self.request, messages.ERROR, "Invalid command.")
-                return self._render_detail()
-            command = form.cleaned_data['command']
-            if command == "remove_cert":
+            if "remove_cert" in self.request.POST:
                 cname = self._remove_certificate()
                 messages.add_message(self.request, messages.INFO, "Certificate " + cname + " has been removed.")
                 return HttpResponseRedirect(reverse('certificates:overview'))
-            elif command == "remove_privatekey":
+            elif "remove_privatekey" in self.request.POST:
                 self._remove_privatekey()
                 messages.add_message(self.request, messages.INFO, "Private key has been removed.")
                 return self._render_detail()
@@ -83,9 +80,13 @@ class AddHandler:
 
             elif type == ContainerTypes.PKCS12:
                 return self._handle_pkcs12()
+        except (ValueError, TypeError, AsymmetricKeyError, OSError) as e:
+            messages.add_message(self.request, messages.ERROR,
+                                 "Error reading file. Maybe your file is corrupt?")
+            return self.request, 'certificates/add.html', {"form": self.form}
         except Exception as e:
             messages.add_message(self.request, messages.ERROR,
-                                 "Error reading file. Maybe your file is corrupt?\n" + str(e))
+                                 "Internal error: " + str(e))
             return self.request, 'certificates/add.html', {"form": self.form}
 
     def _handle_x509(self):
@@ -105,6 +106,7 @@ class AddHandler:
             return self.request, 'certificates/add.html'
 
         if private.already_exists():
+            private = private.get_existing_privatekey()
             messages.add_message(self.request, messages.WARNING, 'Private key has already existed!')
         else:
             private.save()

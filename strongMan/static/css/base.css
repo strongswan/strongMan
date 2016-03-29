@@ -12,7 +12,7 @@ body {
 }
 
 .black-background {
-    background-color: #000000;
+    background-color: #333;
 }
 
 .white-background {
@@ -25,9 +25,58 @@ body {
 }
 
 .black {
-    color: #000000;
+    color: #333;
 }
 
 #logout_button{
     float: right;
 }
+
+#certificate-overview > #header {
+    margin-bottom: 20px;
+}
+
+#certificate-overview > #search {
+    margin-bottom: 10px;
+    margin-top: 30px;
+}
+#certificate-overview > #header > #add-btn {
+    padding-right: 15px;
+}
+#certificate-add .form-row {
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+#certificate-add #upload-area {
+    padding-top: 25px;
+    padding-bottom: 15px;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+#certificate-add #upload-panel {
+    margin-top: 20px;
+}
+.certificate-widget h3{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.certificate-privatekey h3{
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+#certificate-detail .x509-edit {
+    bottom: auto;
+    top: 20px;
+    margin-bottom: 50px;
+}
+#certificate-detail .private-edit{
+    bottom: auto;
+    top: 20px;
+    margin-bottom: 50px;
+}
+#certificate-added #nav-btn {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
