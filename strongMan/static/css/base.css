@@ -32,6 +32,9 @@ body {
     background-color: #DE9B33;
     border-color: #AA7539;
 }
+.inline-form{
+    display: inline-block
+}
 
 #logout_button{
     float: right;

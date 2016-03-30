@@ -15,6 +15,16 @@ class KeyContainer(models.Model):
 
 
 class PrivateKey(KeyContainer):
+
+    @classmethod
+    def by_pkcs1_or_8_container(cls, reader):
+        key = cls()
+        key.algorithm = reader.algorithm()
+        key.der_container = reader.der_dump()
+        key.type = reader.type.value
+        key.public_key_hash = reader.public_key_hash()
+        return key
+
     def already_exists(self):
         keys = PrivateKey.objects.filter(public_key_hash=self.public_key_hash)
         count = len(keys)
@@ -64,6 +74,55 @@ class Certificate(KeyContainer):
     issuer = models.OneToOneField(SubjectInfo, on_delete=models.SET_NULL, related_name="issuer", null=True)
     subject = models.OneToOneField(SubjectInfo, on_delete=models.SET_NULL, related_name="subject", null=True)
     private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
+
+    def _read_subjectinfo(self, dict):
+        subject = SubjectInfo()
+        subject.location = self._try_to_get_value(dict, ["locality_name"], default="")
+        subject.cname = self._try_to_get_value(dict, ["common_name"], default="")
+        subject.country = self._try_to_get_value(dict, ["country_name"], default="")
+        subject.email = self._try_to_get_value(dict, ["email_address"], default="")
+        subject.organization = self._try_to_get_value(dict, ["organization_name"], default="")
+        subject.unit = self._try_to_get_value(dict, ["organizational_unit_name"], default="")
+        subject.province = self._try_to_get_value(dict, ["state_or_province_name"], default="")
+        return subject
+
+
+    def _try_to_get_value(self, dict, key_path=[], default=None):
+        try:
+            temp_dict = dict
+            for key in key_path:
+                temp_dict = temp_dict[key]
+
+            return temp_dict
+        except:
+            return default
+
+    @classmethod
+    def by_x509container(cls, reader):
+        public = cls()
+        public.der_container = reader.der_dump()
+        public.type = reader.type.value
+        public.algorithm = reader.algorithm()
+        public.hash_algorithm = reader.asn1.hash_algo
+        public.public_key_hash = reader.public_key_hash()
+        public.serial_number = reader.asn1.serial_number
+        if reader.asn1.ca == None or reader.asn1.ca == False:
+            public.is_CA = False
+        else:
+            public.is_CA = True
+        public.valid_not_after = public._try_to_get_value(reader.asn1.native,
+                                                        ["tbs_certificate", "validity", "not_after"])
+        public.valid_not_before = public._try_to_get_value(reader.asn1.native,
+                                                         ["tbs_certificate", "validity", "not_before"])
+        public.issuer = public._read_subjectinfo(reader.asn1.issuer.native)
+        public.subject = public._read_subjectinfo(reader.asn1.subject.native)
+
+        for valid_domain in reader.asn1.valid_domains:
+            d = Domain()
+            d.value = valid_domain
+            public.add_domain(d)
+
+        return public
 
     def save_new(self):
         self._set_privatekey_if_exists()

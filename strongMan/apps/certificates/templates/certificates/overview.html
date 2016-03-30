@@ -97,15 +97,7 @@
                                     <td class="hidden-xs">{{ p.subject }}</td>
                                     <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
                                     <td class="editremove-cell">
-                                        <span title="Edit certificate">
-                                            <a href="{% url "certificates:details" p.id %}"
-                                               class="btn btn-default edit-btn"
-                                               id="editbtn-{{ p.id }}">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                            </a>
-                                        </span>
-                                        <form action="{% url "certificates:details" p.id %}" method="POST"
-                                              style="display: inline;">
+                                        <form action="{% url "certificates:details" p.id %}" method="POST" class="inline-form"">
                                             {% csrf_token %}
                                         <span title="Remove certificate">
                                             <button type="submit" class="btn btn-default remove-btn"
@@ -114,6 +106,13 @@
                                             </button>
                                         </span>
                                         </form>
+                                        <span title="Edit certificate">
+                                            <a href="{% url "certificates:details" p.id %}"
+                                               class="btn btn-primary edit-btn"
+                                               id="editbtn-{{ p.id }}">
+                                                <span class="glyphicon glyphicon-edit"></span>
+                                            </a>
+                                        </span>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -163,13 +162,6 @@
                     })
                     .mouseleave(function () {
                         $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
-                    });
-            $(".edit-btn")
-                    .mouseenter(function () {
-                        $("#" + this.id).removeClass('btn-default').addClass('btn-primary');
-                    })
-                    .mouseleave(function () {
-                        $(".edit-btn").removeClass('btn-primary').addClass('btn-default');
                     });
         </script>
     </div>

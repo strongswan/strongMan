@@ -59,7 +59,7 @@ def logout(request):
     auth_logout(request)
     return render(request, 'login.html')
 
-
+@login_required
 @require_http_methods('GET')
 def about(request):
     context = OrderedDict()

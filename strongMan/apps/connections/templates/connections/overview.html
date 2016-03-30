@@ -13,7 +13,7 @@
                 <th>Profile</th>
                 <th>Remote</th>
                 <th>State</th>
-                <th><span class="pull-right">Edit / Remove</span></th>
+                <th><span class="pull-right">Remove / Edit</span></th>
             </tr>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@
                         </span>
                         <span title="Edit connection">
                         <a href="{{ connection.edit }}" id="edit-{{ connection.id }}"
-                           class="btn btn-default white-background black edit-btn">
+                           class="btn btn-primary edit-btn">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                         </span>
@@ -63,13 +63,7 @@
                         .mouseleave(function () {
                             $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
                         });
-                $(".edit-btn")
-                        .mouseenter(function () {
-                            $("#" + this.id).removeClass('btn-default').addClass('btn-primary');
-                        })
-                        .mouseleave(function () {
-                            $(".edit-btn").removeClass('btn-primary').addClass('btn-default');
-                        });
+
             </script>
             </tbody>
         </table>
