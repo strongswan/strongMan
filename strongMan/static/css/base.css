@@ -79,4 +79,8 @@ body {
     margin-top: 20px;
     margin-bottom: 30px;
 }
+#certificate-overview .pagination-form {
+    display: inline-block;
+}
+
 

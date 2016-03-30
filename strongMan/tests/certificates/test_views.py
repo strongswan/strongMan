@@ -250,7 +250,7 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.X509_rsa_ca)
         self.add_keycontainer(Paths.X509_googlecom)
         self.assertEqual(self.count(Certificate), 2)
-        request = self.create_request(reverse('certificates:overview'), {"search_text": "youtube"})
+        request = self.create_request(reverse('certificates:overview'), {"search_text": "youtube", "page": 1})
         response = views.overview(request)
         self.assertNotContains(response, 'CN=hsr.ch')
         self.assertContains(response, 'CN=google.com', 1)
