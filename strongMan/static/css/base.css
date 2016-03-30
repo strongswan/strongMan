@@ -27,6 +27,11 @@ body {
 .black {
     color: #333;
 }
+.btn-orange{
+    color: #fff;
+    background-color: #DE9B33;
+    border-color: #AA7539;
+}
 
 #logout_button{
     float: right;
@@ -82,5 +87,21 @@ body {
 #certificate-overview .pagination-form {
     display: inline-block;
 }
+#certificate-overview .editremove-cell{
+    width: 120px;
+}
+#connection-overview #add {
+    margin-bottom: 10px;
+}
 
+#connection-select-typ #wizard-nav{
+    margin-bottom: 30px;
+}
+#connection-configuration{
+    margin-top: 30px;
+}
+.title-area hr{
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
 

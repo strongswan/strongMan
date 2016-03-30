@@ -47,15 +47,19 @@
             </ul>
         </div>
     </nav>
-    <div class="row">
-        <div class="page-header">
+<div class="row">
+        <div class="col-xs-12 title-area">
             <h1>{% block title %}{% endblock title %}
                 <small> {% block small-title %}{% endblock small-title %}</small>
             </h1>
+            <hr>
+
         </div>
+
     </div>
     {% if messages %}
         <div class="row">
+        <div class="col-xs-12">
             {% for message in messages %}
                 <div class="alert alert-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %} fade in">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -63,9 +67,12 @@
                 </div>
             {% endfor %}
         </div>
+        </div>
     {% endif %}
     <div class="row">
-        {% block content %}{% endblock content %}
+        <div class="col-xs-12">
+            {% block content %}{% endblock content %}
+        </div>
     </div>
 </div>
 </body>

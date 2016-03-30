@@ -362,11 +362,4 @@ class X509ContainerTest(TestCase):
         with self.assertRaises(models.CertificateException):
             x509.parse()
 
-    def test_oscrypto_bug_load_admin_cert(self):
-        from oscrypto.asymmetric import load_certificate
-        cert = load_certificate('/home/osboxes/Downloads/admin.ch.crt')
-        '''
-        cert.asn1.native <-- Raises Exception
-        https://github.com/wbond/asn1crypto/issues/13
-        '''
 

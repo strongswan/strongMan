@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load connections_extras %}
+{% block title %}Connection{% endblock title %}
+{% block small-title %}{{ title }}{% endblock small-title %}
+{% block content %}
+    <div class="row">
+        <div id="connection-configuration">
+            <div class="col-sm-offset-2 col-sm-8">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
+                            <div class="controls col-sm-10">
+                                {% if field|field_type == "Select" %}
+                                    <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
+                                        {% for choise in field.field.queryset %}
+                                            <option value="{{ choise.id }}" {% if field.value == choise.id %}
+                                                    selected{% endif %}>{{ choise.value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <input type="{{ field|field_type|slice:":-5" }}" class="form-control"
+                                           name="{{ field.name }}"
+                                           value="{{ field.value }}">
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        <span class="sr-only">Error:</span>
+                                        {% for error in field.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <p class="help-text">{{ field.help_text }} </p>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <div class="pull-right">
+                            <a href="{{ request.META.HTTP_REFERER }}" id="back"
+                               class="btn white-background black">
+                                <span class="glyphicon glyphicon-chevron-left"></span> Back
+                            </a>
+                            <button type="submit" name="save" id="configuration"
+                                    class="btn black-background white"><span
+                                    class="glyphicon glyphicon-floppy-disk"></span> Save
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

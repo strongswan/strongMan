@@ -13,9 +13,9 @@
 {% block small-title %}Overview{% endblock small-title %}
 {% block content %}
 
-    <div class="container" id="certificate-overview">
+    <div id="certificate-overview">
         <div class="row" id="header">
-            <div class="col-md-10 col-xs-9 btn-group" role="group" aria-label="...">
+            <div class="col-md-10 col-xs-9 btn-group" role="group">
 
                 <a href="{% url "certificates:overview" %}" {% if view == "all" %}disabled="True" {% endif %}
                    class="btn btn-default">
@@ -43,11 +43,12 @@
             </div>
             <div class="pull-right" id="add-btn">
                 <span title="Add a new key container">
-                    <a href="{% url "certificates:add" %}" type="button" class="btn btn-primary btn-lg"
+                    <a href="{% url "certificates:add" %}" type="button" class="btn btn-orange btn-lg"
                        aria-label="Left Align">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
                     </a>
                 </span>
+
             </div>
         </div>
 
@@ -93,9 +94,9 @@
                             {% for p in publics %}
                                 <tr>
                                     <td><b>{{ p.subject.cname }}</b></td>
-                                    <td class="hidden-sm hidden-xs">{{ p.subject }}</td>
+                                    <td class="hidden-xs">{{ p.subject }}</td>
                                     <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
-                                    <td style="width: 10%">
+                                    <td class="editremove-cell">
                                         <span title="Edit certificate">
                                             <a href="{% url "certificates:details" p.id %}"
                                                class="btn btn-default edit-btn"
