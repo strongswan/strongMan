@@ -10,7 +10,7 @@ python:
 
 before_install:
   - docker build -t strongman docker/
-  - docker run strongman /bin/sh -c "cd /StrongMan/; python manage.py test --settings=strongMan.settings.local"
+  - docker run strongman /bin/sh -c "cd /StrongMan/; ipsec start; python manage.py test --settings=strongMan.settings.local"
 
 
 script: python manage.py test --settings=strongMan.settings.local
