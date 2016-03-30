@@ -93,3 +93,4 @@ target/
 *.mtc1
 *.out
 *.synctex.gz
+*.sqlite3

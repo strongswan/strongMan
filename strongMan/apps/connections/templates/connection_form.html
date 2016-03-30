@@ -15,7 +15,7 @@
                         {% if field|field_type == "Select" %}
                             <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
                                 {% for choise in field.field.queryset %}
-                                    <option value="{{ choise.id }}">{{ choise.value }}</option>
+                                    <option value="{{ choise.id }}" {% if field.value == choise.id %} selected{% endif %}>{{ choise.value }}</option>
                                 {% endfor %}
                             </select>
                         {% else %}

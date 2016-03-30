@@ -51,6 +51,7 @@ class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
         remote_address = Address.objects.filter(remote_addresses=connection).first()
         initial["profile"] = connection.profile
         initial["gateway"] = remote_address.value
+        initial["certificate"] = connection.domain
         return initial
 
     def get_context_data(self, **kwargs):
@@ -131,6 +132,7 @@ class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
         initial["profile"] = connection.profile
         initial["gateway"] = remote_address.value
         initial["password"] = secret.data
+        initial["certificate"] = connection.domain
         return initial
 
     def get_context_data(self, **kwargs):
@@ -171,9 +173,11 @@ def delete_connection(request, pk):
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is True:
             vici_wrapper.unload_connection(connection.profile)
-        connection.delete()
-    except ViciSocketException:
-        pass
+    except ViciSocketException as e:
+        messages.warning(request, str(e))
     except ViciLoadException as e:
         messages.warning(request, str(e))
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    finally:
+        connection.delete_all_connected_models()
+        connection.delete()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

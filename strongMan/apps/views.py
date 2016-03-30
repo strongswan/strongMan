@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -61,4 +62,14 @@ def logout(request):
 
 @require_http_methods('GET')
 def about(request):
-    return render(request, 'about.html')
+    context = OrderedDict()
+    try:
+        vici_wrapper = ViciWrapper()
+        context = vici_wrapper.get_version()
+        context['plugins'] = vici_wrapper.get_plugins()
+    except ViciSocketException as e:
+        messages.warning(request, str(e))
+    except ViciLoadException as e:
+        messages.warning(request, str(e))
+
+    return render(request, 'about.html', context)

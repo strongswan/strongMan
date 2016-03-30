@@ -52,6 +52,20 @@ class Connection(models.Model):
         connection[self.profile] = ike_sa
         return connection
 
+    def delete_all_connected_models(self):
+        Secret.objects.filter(connection=self).delete()
+        for child in Child.objects.filter(connection=self):
+            Proposal.objects.filter(child=child).delete()
+            Address.objects.filter(local_ts=child).delete()
+            Address.objects.filter(remote_ts=child).delete()
+            child.delete()
+        Proposal.objects.filter(connection=self).delete()
+        Address.objects.filter(local_addresses=self).delete()
+        Address.objects.filter(remote_addresses=self).delete()
+        Address.objects.filter(vips=self).delete()
+        Authentication.objects.filter(local=self).delete()
+        Authentication.objects.filter(remote=self).delete()
+
 
 class Child(models.Model):
     name = models.CharField(max_length=50)

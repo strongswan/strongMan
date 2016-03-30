@@ -1,6 +1,5 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from strongMan.apps.connections.forms import Ike2CertificateForm, Ike2EapCertificateForm, Ike2EapForm, ChooseTypeForm
-from strongMan.apps.connections.models import Typ
 from strongMan.apps.certificates.models import Domain
 
 
