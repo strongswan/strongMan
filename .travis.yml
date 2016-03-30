@@ -7,13 +7,11 @@ language: python
 python:
   - "3.4"
   - "3.5"
-
-before_install:
+install:
   - docker build -t strongman docker/
-  - docker run strongman /bin/sh -c "cd /StrongMan/; ipsec start; python manage.py test --settings=strongMan.settings.local"
 
-
-script: python manage.py test --settings=strongMan.settings.local
+script:
+  - docker run --privileged strongman /bin/sh -c "cd /StrongMan/; ipsec start; python manage.py test --settings=strongMan.settings.local"
 
 
 
