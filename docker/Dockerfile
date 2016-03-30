@@ -14,11 +14,7 @@ RUN mkdir /opt/strongSwan \
 && git clone https://github.com/Sebubu/StrongMan.git \
 && cd StrongMan \
 && pip install --upgrade pip \
-&& pip install -r requirements.txt \
-&& pip install oscrypto \
-&& pip install asn1crypto \
-&& python manage.py test --settings=strongMan.settings.local 
-
+&& pip install -r requirements.txt
 
 
 WORKDIR /

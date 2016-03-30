@@ -1,3 +1,5 @@
+asn1crypto==0.15.1
 Django==1.9.2
-gunicorn==19.4.5
+django-formtools==1.0
+oscrypto==0.14.2
 pyasn1==0.1.8
