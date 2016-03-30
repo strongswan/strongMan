@@ -1,0 +1,71 @@
+<div id="connection-overview">
+    <div id="add-btn">
+    <span title="Add a new connection">
+        <a href="{% url "connections:connection_create" %}" id="add" class="btn btn-orange btn-lg pull-right">
+            <span class="glyphicon glyphicon-plus"></span> Add
+        </a>
+    </span>
+    </div>
+    <div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Profile</th>
+                <th>Remote</th>
+                <th>State</th>
+                <th><span class="pull-right">Remove / Edit</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for connection in connections %}
+                <tr>
+                    <td>{{ connection.profile }}</td>
+                    <td>{{ connection.remote }}</td>
+                    <td>
+                    <span title="Turn connection on / off">
+                        <div class="btn-toolbar">
+                            <form id="toggle_connection" action="{% url 'connections:connection_toggle' %}"
+                                  style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ connection.id }}">
+                                <input id="toggle_input{{ connection.id }}" type="checkbox" data-toggle="toggle"
+                                       data-onstyle="success"
+                                       data-offstyle="default"
+                                       {% if connection.state %}checked{% endif %} onclick="this.form.click()">
+                            </form>
+                            <div id="alert_{{ connection.id }}" class="btn"></div>
+                        </div>
+                    </span>
+                    </td>
+                    <td>
+                        <div class="pull-right">
+                        <span title="Remove connection">
+                        <a href="{{ connection.delete }}" id="delete-{{ connection.id }}"
+                           class="btn btn-default white-background black remove-btn">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                        </span>
+                        <span title="Edit connection">
+                        <a href="{{ connection.edit }}" id="edit-{{ connection.id }}"
+                           class="btn btn-primary edit-btn">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                        </span>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            <script>
+                $(".remove-btn")
+                        .mouseenter(function () {
+                            $("#" + this.id).removeClass('btn-default').addClass('btn-danger');
+                        })
+                        .mouseleave(function () {
+                            $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
+                        });
+
+            </script>
+            </tbody>
+        </table>
+    </div>
+</div>
