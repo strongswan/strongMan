@@ -97,6 +97,12 @@ body {
     margin-bottom: 10px;
 }
 
+#certificate-overview td a {
+   display: block;
+   padding: 2px;
+}
+
+
 #connection-select-typ #wizard-nav{
     margin-bottom: 30px;
 }

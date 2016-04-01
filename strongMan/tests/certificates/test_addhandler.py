@@ -3,7 +3,7 @@ import os
 from django.test import TestCase, RequestFactory
 
 from strongMan.apps.certificates.models import Certificate, PrivateKey
-from strongMan.apps.certificates.request_handler import AddHandler
+from strongMan.apps.certificates.request_handler.request_handler import AddHandler
 
 
 def create_request(page, context):
@@ -107,7 +107,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(2, self.certificates_count())
         self.assertEqual(0, self.privatekeys_count())
         domains_count = context['public'].valid_domains.all().__len__()
-        self.assertEqual(504, domains_count)
+        self.assertEqual(505, domains_count)
 
     def test_x509_with_pw(self):
         with CreateRequest("/certificates/add", Paths.X509_rsa_ca, password="asdfasdf") as request:

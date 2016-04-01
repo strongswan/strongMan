@@ -3,6 +3,7 @@
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Details{% endblock small-title %}
 {% block content %}
+    {{ readonly }}
     <div class="container" id="certificate-detail">
         <div class="row">
             {% if certificate %}
@@ -11,6 +12,7 @@
                     <div class="row">
                         {% include "certificates/widgets/PublicKey_view.html" with x509=certificate %}
                     </div>
+                    {% if certificate.source != "V" %}
                     <div class="row text-center">
                         <form action="" method="POST" style="display: inline;">
                             {% csrf_token %}
@@ -22,6 +24,7 @@
                             </span>
                         </form>
                     </div>
+                    {% endif %}
                 </div>
             {% endif %}
             {% if private %}

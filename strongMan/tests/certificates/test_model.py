@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
-from strongMan.apps.certificates.models import Certificate, PrivateKey, Domain, SubjectInfo
-from strongMan.apps.certificates.request_handler import AddHandler
+from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory
+from strongMan.apps.certificates.request_handler.request_handler import AddHandler
+from strongMan.apps.certificates.container_reader import X509Reader
 import os
 
 
@@ -51,6 +52,11 @@ class TestCert:
             (req, page, context) = handler.handle()
             assert "certificates/added.html" == page
 
+    def read(self):
+        absolute_path = self.current_dir + "/certs/" + self.path
+        with open(absolute_path, 'rb') as f:
+            return f.read()
+
 
 class Paths:
     X509_rsa_ca = TestCert("ca.crt")
@@ -76,8 +82,8 @@ class ModelTest(TestCase):
     def test_add_to_db(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Domain), 2)
-        self.assertEquals(count(SubjectInfo), 4)
+        self.assertEqual(count(Identity), 4)
+        self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_privatekey(self):
@@ -86,8 +92,8 @@ class ModelTest(TestCase):
         PrivateKey.objects.all().delete()
         self.assertEquals(count(PrivateKey), 0)
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Domain), 2)
-        self.assertEquals(count(SubjectInfo), 4)
+        self.assertEqual(count(Identity), 4)
+        self.assertEquals(count(DistinguishedName), 4)
 
         for certificate in Certificate.objects.all():
             self.assertIsNone(certificate.private_key, "Private keys should be none")
@@ -95,25 +101,25 @@ class ModelTest(TestCase):
     def test_delete_domain(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Domain), 2)
-        self.assertEquals(count(SubjectInfo), 4)
+        self.assertEqual(count(Identity), 4)
+        self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
-        Domain.objects.all().delete()
-        self.assertEqual(count(Domain), 0)
+        Identity.objects.all().delete()
+        self.assertEqual(count(Identity), 0)
         self.assertEquals(count(Certificate), 2, "Certificate should not be deleted")
-        self.assertEquals(count(SubjectInfo), 4)
+        self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_subjectinfo(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Domain), 2)
-        self.assertEquals(count(SubjectInfo), 4)
+        self.assertEqual(count(Identity), 4)
+        self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
-        SubjectInfo.objects.all().delete()
-        self.assertEquals(count(SubjectInfo), 0)
+        DistinguishedName.objects.all().delete()
+        self.assertEquals(count(DistinguishedName), 0)
         self.assertEquals(count(Certificate), 2, "Certificate should not be deleted")
-        self.assertEqual(count(Domain), 2)
+        self.assertEqual(count(Identity), 4)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_without_privatekey(self):
@@ -122,8 +128,8 @@ class ModelTest(TestCase):
         self.assertEquals(ca_list.__len__(), 1)
         ca_list[0].delete()
         self.assertEquals(count(Certificate), 1)
-        self.assertEquals(count(SubjectInfo), 2)
-        self.assertEqual(count(Domain), 1)
+        self.assertEquals(count(DistinguishedName), 2)
+        self.assertEqual(count(Identity), 2)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_with_privatekey(self):
@@ -132,9 +138,33 @@ class ModelTest(TestCase):
         self.assertEquals(ca_list.__len__(), 1)
         ca_list[0].delete()
         self.assertEquals(count(Certificate), 1)
-        self.assertEquals(count(SubjectInfo), 2)
-        self.assertEqual(count(Domain), 1)
+        self.assertEquals(count(DistinguishedName), 2)
+        self.assertEqual(count(Identity), 2)
         self.assertEquals(count(PrivateKey), 0)
 
+    def test_CertificateFactory(self):
+        x509 = X509Reader.by_bytes(Paths.X509_rsa_ca.read())
+        x509.parse()
+        certificate = CertificateFactory.by_X509Container(x509)
+
+        self.assertIsInstance(certificate, Certificate)
+        self.assertIsInstance(certificate.subject, DistinguishedName)
+        self.assertIsInstance(certificate.issuer, DistinguishedName)
+        self.assertNotEqual(certificate.public_key_hash, "")
 
 
+
+
+    def test_IdentityTypes(self):
+        import inspect
+        from enum import Enum
+
+        class ChoiceEnum(Enum):
+            test1=1
+            test2=2
+            @classmethod
+            def choices(cls):
+                return [(x.value, x.name) for x in cls]
+
+        choices = ChoiceEnum.choices()
+        print(str(choices))

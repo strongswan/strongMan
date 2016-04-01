@@ -1,76 +1,11 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponseRedirect
-
-from.models import Certificate, Domain
-from .container import ContainerTypes
-from .forms import AddForm, CertificateSearchForm
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from oscrypto.errors import AsymmetricKeyError
 
-class OverviewHandler:
-    def __init__(self, request, page_tag):
-        self.request = request
-        self.page_tag = page_tag
-        self.ENTRIES_PER_PAGE = 10
+from strongMan.apps.certificates.container_reader import ContainerTypes
+from strongMan.apps.certificates.forms import AddForm
 
-    def _all_certificates(self, filter_ca=False, should_ca=False):
-        if not filter_ca:
-            return Certificate.objects.all()
-        else:
-            return Certificate.objects.filter(is_CA=should_ca)
-
-    def _search_for(self, search_pattern, filter_ca=False, should_ca=False):
-        '''
-        Searches for certificates in valid_domains
-        :param search_pattern: Search text to filter for
-        :param filter_ca: Should result additionaly be filtered by is_CA?
-        :param should_CA: Only affects the result if filter_ca=True
-        :return: [Certificate]
-        '''
-        if search_pattern == "":
-            return self._all_certificates(filter_ca=filter_ca, should_ca=should_ca)
-        domains = Domain.objects.filter(value__contains=search_pattern)
-        certs = []
-        for domain in domains:
-            cert = domain.certificate
-            if not cert in certs:
-                if filter_ca:
-                    if cert.is_CA == should_ca:
-                        certs.append(cert)
-                else:
-                    certs.append(cert)
-        return certs
-
-    def _paginate(self, certificate_list, page=1):
-        paginator = Paginator(certificate_list, self.ENTRIES_PER_PAGE)
-        try:
-            x509_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            x509_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            x509_list = paginator.page(paginator.num_pages)
-        return x509_list
-
-    def handle(self, filter_ca=False, should_ca=False):
-        search_pattern = ""
-        page = 1
-        if self.request.method == "GET":
-            publics = self._all_certificates(filter_ca=filter_ca, should_ca=should_ca)
-        else:
-            form = CertificateSearchForm(self.request.POST)
-            if not form.is_valid():
-                publics = self._all_certificates(filter_ca=filter_ca, should_ca=should_ca)
-            else:
-                search_pattern = form.cleaned_data["search_text"]
-                publics = self._search_for(search_pattern=search_pattern, filter_ca=filter_ca, should_ca=should_ca)
-                page = form.cleaned_data["page"]
-        x509_list = self._paginate(publics, page=page)
-        return render(self.request, 'certificates/overview.html',
-                      {'publics': x509_list, "view": self.page_tag, "search_pattern": search_pattern})
 
 class DetailsHandler:
     def __init__(self, request, certificate_object):
@@ -93,7 +28,7 @@ class DetailsHandler:
         private = self.certificate.private_key
         self.certificate.private_key = None
         self.certificate.save()
-        privatekey_has_another_certificate = private.certificates.all().__len__() > 1
+        privatekey_has_another_certificate = private.certificates.all().__len__() > 0
         if not privatekey_has_another_certificate:
             private.delete()
 

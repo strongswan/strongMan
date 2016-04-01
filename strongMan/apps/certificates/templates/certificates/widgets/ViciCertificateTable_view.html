@@ -1,0 +1,28 @@
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th class="hidden-sm hidden-xs">Subject</th>
+        <th>has private key</th>
+        <th>Remove</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for p in certificates %}
+        <tr>
+            <td><a href="{% url "certificates:details" p.id %}"><b>{{ p.subject.cname }}</b></a></td>
+            <td class="hidden-xs">{{ p.subject }}</td>
+                <td>{% if p.has_private_key %}Yes{% else %}No{% endif %}</td>
+            <td class="editremove-cell">
+                <span title="Remove certificate">
+                    <button type="submit" class="btn btn-default remove-btn"
+
+                            disabled="True">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </span>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

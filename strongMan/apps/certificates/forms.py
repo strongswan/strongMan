@@ -1,8 +1,8 @@
 from django import forms
 
-from .container import ContainerDetector, ContainerTypes
-from .container import X509Container, PKCS1Container, PKCS8Container, PKCS12Container
-
+from .container_reader import ContainerDetector, ContainerTypes
+from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader
+from .models import Certificate, PrivateKey, CertificateFactory
 
 class CertificateSearchForm(forms.Form):
     search_text = forms.CharField(max_length=200, required=False)
@@ -42,12 +42,13 @@ class AddForm(forms.Form):
         password = self._read_password()
         cert_bytes = self._cert_bytes()
         if type == ContainerTypes.X509:
-            container = X509Container.by_bytes(cert_bytes, password=password)
+            container = X509Reader.by_bytes(cert_bytes, password=password)
+            container.parse()
         elif type == ContainerTypes.PKCS12:
-            container = PKCS12Container.by_bytes(cert_bytes, password=password)
-        container.parse()
-        publickey = container.to_public_key()
-        return publickey
+            container = PKCS12Reader.by_bytes(cert_bytes, password=password)
+            container.parse()
+            container = container.public_key()
+        return CertificateFactory.by_X509Container(container)
 
     def to_privatekey(self):
         type = self.detect_container_type()
@@ -55,25 +56,34 @@ class AddForm(forms.Form):
         password = self._read_password()
         cert_bytes = self._cert_bytes()
         if type == ContainerTypes.PKCS1:
-            container = PKCS1Container.by_bytes(cert_bytes, password=password)
+            container = PKCS1Reader.by_bytes(cert_bytes, password=password)
+            container.parse()
         elif type == ContainerTypes.PKCS8:
-            container = PKCS8Container.by_bytes(cert_bytes, password=password)
+            container = PKCS8Reader.by_bytes(cert_bytes, password=password)
+            container.parse()
         elif type == ContainerTypes.PKCS12:
-            container = PKCS12Container.by_bytes(cert_bytes, password=password)
+            container = PKCS12Reader.by_bytes(cert_bytes, password=password)
+            container.parse()
+            container = container.private_key()
 
-        container.parse()
-        privatekey = container.to_private_key()
+
+        privatekey = PrivateKey.by_pkcs1_or_8_container(container)
         return privatekey
 
     def further_publics(self):
         assert self.detect_container_type() == ContainerTypes.PKCS12
         password = self._read_password()
         cert_bytes = self._cert_bytes()
-        container = PKCS12Container.by_bytes(cert_bytes, password=password)
+        container = PKCS12Reader.by_bytes(cert_bytes, password=password)
 
         container.parse()
         publics = container.further_publics()
-        return publics
+        certificates = []
+        for public in publics:
+            cert = CertificateFactory.by_X509Container(public)
+            certificates.append(cert)
+
+        return certificates
 
     def _cert_bytes(self):
         if self.cert_bytes == None:

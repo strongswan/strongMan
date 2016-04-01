@@ -1,5 +1,5 @@
 from django.test import TestCase, RequestFactory, Client
-from strongMan.apps.certificates.request_handler import AddHandler
+from strongMan.apps.certificates.request_handler.request_handler import AddHandler
 from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
 from django.core.urlresolvers import reverse
@@ -99,7 +99,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(2, self.certificates_count())
         self.assertEqual(0, self.privatekeys_count())
         domains_count = context['public'].valid_domains.all().__len__()
-        self.assertEqual(504, domains_count)
+        self.assertEqual(505, domains_count)
 
     def test_x509_with_pw(self):
         with CreateRequest("/certificates/add", Paths.X509_rsa_ca, password="asdfasdf") as request:
@@ -317,13 +317,13 @@ class DetailsViewTest(TestCase):
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
                                       {"remove_privatekey": "remove_privatekey"})
-        self.assertEqual(self.count(PrivateKey), 0)
+        self.assertEqual(self.count(PrivateKey), 1)
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
         self.assertNotContains(response, 'PKCS1')
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
-        self.assertNotContains(response, 'PKCS1')
+        self.assertContains(response, 'PKCS1')
 
     def test_delete_cert_same_publickey_different_serialnumber(self):
         self.add_keycontainer(Paths.X509_rsa_ca)
