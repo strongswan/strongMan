@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from enum import Enum
 from .container_reader import X509Reader
@@ -25,12 +25,13 @@ class KeyContainer(models.Model):
 class PrivateKey(KeyContainer):
 
     @classmethod
-    def by_pkcs1_or_8_container(cls, reader):
+    def by_pkcs1_or_8_reader(cls, reader):
         key = cls()
         key.algorithm = reader.algorithm()
         key.der_container = reader.der_dump()
         key.type = reader.type.value
         key.public_key_hash = reader.public_key_hash()
+        key.save()
         return key
 
     def already_exists(self):
@@ -39,12 +40,12 @@ class PrivateKey(KeyContainer):
         return count > 0
 
     def certificate_exists(self):
-        certs = Certificate.objects.filter(public_key_hash=self.public_key_hash)
+        certs = UserCertificate.objects.filter(public_key_hash=self.public_key_hash)
         exists = len(certs) > 0
         return exists
 
     def connect_to_certificates(self):
-        certs = Certificate.objects.filter(public_key_hash=self.public_key_hash)
+        certs = UserCertificate.objects.filter(public_key_hash=self.public_key_hash)
         for cert in certs:
             if cert.private_key is None:
                 cert.private_key = self
@@ -73,10 +74,6 @@ class DistinguishedName(models.Model):
         return "C=" + self.country + ", L=" + self.location + ", ST=" + self.province + \
                ", O=" + self.organization + ", OU=" + self.unit + ", CN=" + self.cname
 
-class CertificateSource(DjangoEnum):
-    VICI="V"
-    USER="U"
-
 class Certificate(KeyContainer):
     serial_number = models.TextField()
     hash_algorithm = models.CharField(max_length=20)
@@ -85,28 +82,31 @@ class Certificate(KeyContainer):
     valid_not_before = models.DateTimeField()
     issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="issuer", null=True)
     subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="subject", null=True)
-    source = models.CharField(max_length=1, choices=CertificateSource.choices(), default=CertificateSource.USER.value)
 
-    def save_new(self):
-        self._set_privatekey_if_exists()
-        self.issuer.save()
-        self.subject.save()
-        '''
-         These two lines aren't useless!
-         This sets the connection between the SubjectInfo and the PublicKey
-         You can only do this after the subjectinfo is saved!
-        '''
-        self.issuer = self.issuer
-        self.subject = self.subject
-        self.save()
-
-        if hasattr(self, "valid_domains_to_add"):
-            for domain in self.valid_domains_to_add:
-                domain.certificate = self
-                domain.save()
+    def add_domain(self, domain):
+        if not hasattr(self, "valid_domains_to_add"):
+            self.valid_domains_to_add = []
+        self.valid_domains_to_add.append(domain)
 
 
-    def _set_privatekey_if_exists(self):
+
+@receiver(pre_delete, sender=Certificate)
+def certificate_clean_submodels(sender, **kwargs):
+    '''
+    This function gets raised when a certificate gets deleted.
+    It assures that all submodels are going to be deleted correctly.
+    :return: Nothing
+    '''
+    cert = kwargs['instance']
+    cert.subject.delete()
+    cert.issuer.delete()
+    cert.valid_domains.all().delete()
+
+
+class UserCertificate(Certificate):
+    private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
+
+    def set_privatekey_if_exists(self):
         """
         Searches for a private key with the same public key
         :return: PrivateKey or None if nothing was found
@@ -116,19 +116,28 @@ class Certificate(KeyContainer):
             self.private_key = keys[0]
 
     def already_exists(self):
-        keys = Certificate.objects.filter(public_key_hash=self.public_key_hash, serial_number=self.serial_number, source=CertificateSource.USER.value)
+        keys = UserCertificate.objects.filter(public_key_hash=self.public_key_hash, serial_number=self.serial_number)
         count = len(keys)
         return count > 0
 
-    def add_domain(self, domain):
-        if not hasattr(self, "valid_domains_to_add"):
-            self.valid_domains_to_add = []
-        self.valid_domains_to_add.append(domain)
+    def remove_privatekey(self):
+        privatekey = self.private_key
+        self.private_key = None
+        self.save()
+        if privatekey.certificates.all().__len__() == 0:
+            privatekey.delete()
 
-
-class UserCertificate(Certificate):
-    private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
-
+@receiver(pre_delete, sender=UserCertificate)
+def usercertificate_clean_submodels(sender, **kwargs):
+    cert = kwargs['instance']
+    if cert.private_key is not None:
+        key = cert.private_key
+        cert.private_key = None
+        cert.save()
+        certs_count_to_privatekey = key.certificates.count()
+        no_more_certs_associated = certs_count_to_privatekey == 0
+        if no_more_certs_associated:
+            key.delete()
 
 class ViciCertificate(Certificate):
     has_private_key = models.BooleanField(default=False)
@@ -148,6 +157,7 @@ class CertificateFactory:
         subject.organization = cls._try_to_get_value(dict, ["organization_name"], default="")
         subject.unit = cls._try_to_get_value(dict, ["organizational_unit_name"], default="")
         subject.province = cls._try_to_get_value(dict, ["state_or_province_name"], default="")
+        subject.save()
         return subject
 
     @classmethod
@@ -163,61 +173,63 @@ class CertificateFactory:
 
 
     @classmethod
-    def by_X509Container(cls, reader, certificate_class=Certificate):
+    def _by_X509Container(cls, reader, certificate_class=UserCertificate):
         public = certificate_class()
-        public.der_container = reader.der_dump()
-        public.type = reader.type.value
-        public.algorithm = reader.algorithm()
-        public.hash_algorithm = reader.asn1.hash_algo
-        public.public_key_hash = reader.public_key_hash()
-        public.serial_number = reader.asn1.serial_number
-        if reader.asn1.ca == None or reader.asn1.ca == False:
-            public.is_CA = False
-        else:
-            public.is_CA = True
-        public.valid_not_after = cls._try_to_get_value(reader.asn1.native,
-                                                          ["tbs_certificate", "validity", "not_after"])
-        public.valid_not_before = cls._try_to_get_value(reader.asn1.native,
-                                                           ["tbs_certificate", "validity", "not_before"])
-        public.issuer = cls.distinguishedName_factory(reader.asn1.issuer)
-        public.subject = cls.distinguishedName_factory(reader.asn1.subject)
+        try:
+            public.der_container = reader.der_dump()
+            public.type = reader.type.value
+            public.algorithm = reader.algorithm()
+            public.hash_algorithm = reader.asn1.hash_algo
+            public.public_key_hash = reader.public_key_hash()
+            public.serial_number = reader.asn1.serial_number
+            if reader.asn1.ca == None or reader.asn1.ca == False:
+                public.is_CA = False
+            else:
+                public.is_CA = True
+            public.valid_not_after = cls._try_to_get_value(reader.asn1.native,
+                                                              ["tbs_certificate", "validity", "not_after"])
+            public.valid_not_before = cls._try_to_get_value(reader.asn1.native,
+                                                               ["tbs_certificate", "validity", "not_before"])
+            public.save()
+            public.issuer = cls.distinguishedName_factory(reader.asn1.issuer)
+            public.subject = cls.distinguishedName_factory(reader.asn1.subject)
 
-        for valid_domain in reader.asn1.valid_domains:
-            d = Identity.factory(valid_domain)
-            public.add_domain(d)
+            for valid_domain in reader.asn1.valid_domains:
+                d = Identity.factory(valid_domain)
+                d.certificate = public
+                d.save()
 
-        dn = Identity.factory(public.subject.blob, type=IdentityTypes.DISTINGUISHEDNAME)
-        public.add_domain(dn)
+            dn = Identity.factory(public.subject.blob, type=IdentityTypes.DISTINGUISHEDNAME)
+            dn.certificate = public
+            dn.save()
 
-        return public
+            public.save()
+            return public
+        except Exception as e:
+            if not public.issuer == None:
+                public.issuer.delete()
+            if not public.subject == None:
+                public.subject.delete()
+            public.valid_domains.delete()
+            public.delete()
+            raise e
+
 
     @classmethod
-    def by_vici_cert(cls, cert_dict):
+    def user_certificate_by_x509reader(cls, reader):
+        return cls._by_X509Container(reader, certificate_class=UserCertificate)
+
+    @classmethod
+    def vicicertificate_by_dict(cls, cert_dict):
         assert cert_dict['type'] == b'X509'
         reader = X509Reader.by_bytes(cert_dict['data'])
         reader.parse()
-        vicicert = cls.by_X509Container(reader)
-        vicicert.source = CertificateSource.VICI.value
+        vicicert = cls._by_X509Container(reader, certificate_class=ViciCertificate)
         vicicert.has_private_key = 'has_privkey' in cert_dict and cert_dict['has_privkey'] == b'yes'
         return vicicert
 
 
-@receiver(pre_delete, sender=Certificate)
-def certificate_clean_submodels(sender, **kwargs):
-    '''
-    This function gets raised when a certificate gets deleted.
-    It assures that all submodels are going to be deleted correctly.
-    :return: Nothing
-    '''
-    cert = kwargs['instance']
-    cert.subject.delete()
-    cert.issuer.delete()
-    cert.valid_domains.all().delete()
-    if cert.private_key is not None:
-        certs_count_to_privatekey = cert.private_key.certificates.all().__len__()
-        no_more_certs_associated = certs_count_to_privatekey <= 1
-        if no_more_certs_associated:
-            cert.private_key.delete()
+
 
 
 class IdentityTypes(DjangoEnum):

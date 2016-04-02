@@ -1,9 +1,9 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
 
-from strongMan.apps.certificates.forms import CertificateSearchForm
-from strongMan.apps.certificates.models import Identity, CertificateFactory, Certificate, CertificateSource
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from ..forms import CertificateSearchForm
+from .. import models
+from ..services import ViciCertificateManager
 
 
 class AbstractOverviewHandler:
@@ -36,7 +36,7 @@ class AbstractOverviewHandler:
         return x509_list
 
     def _search_for(self, all_certs, search_text):
-        domains = Identity.objects.filter(subjectaltname__contains=search_text)
+        domains = models.Identity.objects.filter(subjectaltname__contains=search_text)
         cert_ids = []
         for domain in domains:
             cert_ids.append(domain.certificate.id)
@@ -66,22 +66,8 @@ class ViciOverviewHandler(AbstractOverviewHandler):
         return "vici"
 
     def all_certificates(self):
-        self._read_certs_from_vici()
-        return Certificate.objects.filter(source=CertificateSource.VICI.value)
-
-    def _read_certs_from_vici(self):
-        Certificate.objects.filter(source=CertificateSource.VICI.value).delete()
-        wrapper = ViciWrapper()
-        vici_certs = wrapper.get_certificates()
-        for dict in vici_certs:
-            self._vicidict_to_db(dict)
-
-    def _vicidict_to_db(self, dict):
-        cert = CertificateFactory.by_vici_cert(dict)
-        cert.is_vici_certificate = True
-        cert.save_new()
-        cert.private_key = None
-        cert.save()
+        ViciCertificateManager.reload_certs()
+        return models.ViciCertificate.objects.all()
 
 
 class EntityOverviewHandler(AbstractOverviewHandler):
@@ -89,7 +75,7 @@ class EntityOverviewHandler(AbstractOverviewHandler):
         return "entities"
 
     def all_certificates(self):
-        return Certificate.objects.filter(source=CertificateSource.USER.value).filter(is_CA=False)
+        return models.UserCertificate.objects.filter(is_CA=False)
 
 
 class MainOverviewHandler(AbstractOverviewHandler):
@@ -97,7 +83,7 @@ class MainOverviewHandler(AbstractOverviewHandler):
         return "all"
 
     def all_certificates(self):
-        return Certificate.objects.filter(source=CertificateSource.USER.value)
+        return models.UserCertificate.objects.all()
 
 
 class RootOverviewHandler(AbstractOverviewHandler):
@@ -105,4 +91,4 @@ class RootOverviewHandler(AbstractOverviewHandler):
         return "root"
 
     def all_certificates(self):
-        return Certificate.objects.filter(source=CertificateSource.USER.value).filter(is_CA=True)
+        return models.UserCertificate.objects.filter(is_CA=True)

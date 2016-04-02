@@ -109,6 +109,7 @@ class AbstractContainerReader:
         self.bytes = None
         self.type = None
         self.password = None
+        self.asn1 = None
 
     @classmethod
     def by_bytes(cls, bytes, password=None):
@@ -117,6 +118,9 @@ class AbstractContainerReader:
         container.type = ContainerDetector.detect_type(bytes, password=password)
         container.password = password
         return container
+
+    def is_parsed(self):
+        return not self.asn1 == None
 
     def parse(self):
         '''
@@ -284,6 +288,7 @@ class PKCS12Reader(AbstractContainerReader):
 
 
 class X509Reader(AbstractContainerReader):
+
     def parse(self):
         assert self.type == ContainerTypes.X509
         self.asn1 = k.parse_certificate(self.bytes)
@@ -323,4 +328,10 @@ class X509Reader(AbstractContainerReader):
             return temp_dict
         except:
             return default
+
+    def serial_number(self):
+        return self.asn1.serial_number
+
+    def cname(self):
+        return self.asn1.subject.native["common_name"]
 
