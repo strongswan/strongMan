@@ -6,7 +6,6 @@ from enum import Enum
 from asn1crypto import keys
 from oscrypto import keys as k
 
-from .models import Certificate, PrivateKey, SubjectInfo, Domain, CertificateException
 
 
 class ContainerTypes(Enum):
@@ -105,11 +104,12 @@ class ContainerDetector:
             return ContainerTypes.Undefined
 
 
-class AbstractContainer:
+class AbstractContainerReader:
     def __init__(self):
         self.bytes = None
         self.type = None
         self.password = None
+        self.asn1 = None
 
     @classmethod
     def by_bytes(cls, bytes, password=None):
@@ -118,6 +118,9 @@ class AbstractContainer:
         container.type = ContainerDetector.detect_type(bytes, password=password)
         container.password = password
         return container
+
+    def is_parsed(self):
+        return not self.asn1 == None
 
     def parse(self):
         '''
@@ -165,7 +168,7 @@ class AbstractContainer:
         algorithm_lower = self.algorithm().lower()
         wrong_algorihm = not (algorithm_lower == "rsa" or algorithm_lower == "ec")
         if wrong_algorihm:
-            raise CertificateException("Detected unsupported algorithm " + str(algorithm_lower))
+            raise Exception("Detected unsupported algorithm " + str(algorithm_lower))
 
     def algorithm(self):
         '''
@@ -174,7 +177,7 @@ class AbstractContainer:
         raise NotImplementedError()
 
 
-class PKCS1Container(AbstractContainer):
+class PKCS1Reader(AbstractContainerReader):
     def parse(self):
         assert self.type == ContainerTypes.PKCS1
         if self.password == None:
@@ -205,21 +208,8 @@ class PKCS1Container(AbstractContainer):
         private = keys.ECPrivateKey.load(self.asn1.native["private_key"])
         return private.native["public_key"]
 
-    def to_private_key(self):
-        '''
-        Transforms this container to a savable PrivateKey
-        :return: models.PrivateKey
-        '''
-        private = PrivateKey()
-        private.algorithm = self.algorithm()
-        private.der_container = self.der_dump()
 
-        private.type = self.type.value
-        private.public_key_hash = self.public_key_hash()
-        return private
-
-
-class PKCS8Container(AbstractContainer):
+class PKCS8Reader(AbstractContainerReader):
     def parse(self):
         assert self.type == ContainerTypes.PKCS8
         if self.password == None:
@@ -243,20 +233,8 @@ class PKCS8Container(AbstractContainer):
     def algorithm(self):
         return self.asn1.algorithm
 
-    def to_private_key(self):
-        '''
-        Transforms this container to a savable PrivateKey
-        :return: models.PrivateKey
-        '''
-        private = PrivateKey()
-        private.algorithm = self.algorithm()
-        private.der_container = self.der_dump()
-        private.type = self.type.value
-        private.public_key_hash = self.public_key_hash()
-        return private
 
-
-class PKCS12Container(AbstractContainer):
+class PKCS12Reader(AbstractContainerReader):
     def parse(self):
         assert self.type == ContainerTypes.PKCS12
         if self.password == None:
@@ -269,32 +247,31 @@ class PKCS12Container(AbstractContainer):
         return self.privatekey.algorithm
 
     def public_key_hash(self):
-        algo = self.algorithm()
         if self.algorithm() == "rsa":
             ident = self.privatekey.native["private_key"]["modulus"]
         elif self.algorithm() == "ec":
             ident = self.privatekey.native["private_key"]["public_key"]
         return self._sha256(str(ident))
 
-    def to_public_key(self):
+    def public_key(self):
         '''
         :return: the main X509 cert in this container
         :rtype X509Container
         '''
         bytes = self.cert.dump()
-        container = X509Container.by_bytes(bytes)
+        container = X509Reader.by_bytes(bytes)
         container.parse()
-        return container.to_public_key()
+        return container
 
-    def to_private_key(self):
+    def private_key(self):
         '''
         :return: The private key in this container
         :rtype PKCS8Container
         '''
         bytes = self.privatekey.dump()
-        container = PKCS8Container.by_bytes(bytes)
+        container = PKCS8Reader.by_bytes(bytes)
         container.parse()
-        return container.to_private_key()
+        return container
 
     def further_publics(self):
         '''
@@ -304,13 +281,14 @@ class PKCS12Container(AbstractContainer):
         others = []
         for cer in self.certs:
             bytes = cer.dump()
-            x509 = X509Container.by_bytes(bytes)
+            x509 = X509Reader.by_bytes(bytes)
             x509.parse()
-            others.append(x509.to_public_key())
+            others.append(x509)
         return others
 
 
-class X509Container(AbstractContainer):
+class X509Reader(AbstractContainerReader):
+
     def parse(self):
         assert self.type == ContainerTypes.X509
         self.asn1 = k.parse_certificate(self.bytes)
@@ -334,7 +312,7 @@ class X509Container(AbstractContainer):
         '''
         Compares the public keys of the container and this
         :param container: a private key container
-        :type container: AbstractContainer
+        :type container: AbstractContainerReader
         :return: Boolean
         '''
         ident = container.public_key_hash()
@@ -351,41 +329,9 @@ class X509Container(AbstractContainer):
         except:
             return default
 
-    def _read_subjectinfo(self, dict):
-        subject = SubjectInfo()
-        subject.location = self._try_to_get_value(dict, ["locality_name"], default="")
-        subject.cname = self._try_to_get_value(dict, ["common_name"], default="")
-        subject.country = self._try_to_get_value(dict, ["country_name"], default="")
-        subject.email = self._try_to_get_value(dict, ["email_address"], default="")
-        subject.organization = self._try_to_get_value(dict, ["organization_name"], default="")
-        subject.unit = self._try_to_get_value(dict, ["organizational_unit_name"], default="")
-        subject.province = self._try_to_get_value(dict, ["state_or_province_name"], default="")
-        return subject
+    def serial_number(self):
+        return self.asn1.serial_number
 
-    def to_public_key(self):
-        '''
-        Transforms this X509 certificate to a saveble certificate
-        :return: models.Certificate
-        '''
-        public = Certificate()
-        public.der_container = self.der_dump()
-        public.type = self.type.value
-        public.algorithm = self.algorithm()
-        public.hash_algorithm = self.asn1.hash_algo
-        public.public_key_hash = self.public_key_hash()
-        public.serial_number = self.asn1.serial_number
-        if self.asn1.ca == None or self.asn1.ca == False:
-            public.is_CA = False
-        else:
-            public.is_CA = True
-        public.valid_not_after = self._try_to_get_value(self.asn1.native, ["tbs_certificate", "validity", "not_after"])
-        public.valid_not_before = self._try_to_get_value(self.asn1.native, ["tbs_certificate", "validity", "not_before"])
-        public.issuer = self._read_subjectinfo(self.asn1.issuer.native)
-        public.subject = self._read_subjectinfo(self.asn1.subject.native)
+    def cname(self):
+        return self.asn1.subject.native["common_name"]
 
-        for valid_domain in self.asn1.valid_domains:
-            d = Domain()
-            d.value = valid_domain
-            public.add_domain(d)
-
-        return public

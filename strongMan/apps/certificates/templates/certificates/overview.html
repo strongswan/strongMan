@@ -7,15 +7,16 @@
     :param view: indicates which filter has been applied
     :type view: "all" | "root" | "entities"
     :param search_pattern: the search pattern, that the user has typed in
-    :type view: String
+    :type search_pattern: String
+    :param readonly: Indicates if the view is readonly
+    :type readonly: boolean
 {% endcomment %}
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-
-    <div class="container" id="certificate-overview">
+    <div id="certificate-overview">
         <div class="row" id="header">
-            <div class="col-md-10 col-xs-9 btn-group" role="group" aria-label="...">
+            <div class="col-md-10 col-xs-9 btn-group" role="group">
 
                 <a href="{% url "certificates:overview" %}" {% if view == "all" %}disabled="True" {% endif %}
                    class="btn btn-default">
@@ -39,15 +40,22 @@
                             Entities
                         </span>
                 </a>
+                <a href="{% url 'certificates:overview_vici' %}" {% if view == "vici" %}disabled="True" {% endif %}
+                   class="btn btn-default">
+                        <span title="Shows the certificates provided by the vici interface">
+                            Vici
+                        </span>
+                </a>
 
             </div>
             <div class="pull-right" id="add-btn">
                 <span title="Add a new key container">
-                    <a href="{% url "certificates:add" %}" type="button" class="btn btn-primary btn-lg"
+                    <a href="{% url "certificates:add" %}" type="button" class="btn btn-orange btn-lg"
                        aria-label="Left Align">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
                     </a>
                 </span>
+
             </div>
         </div>
 
@@ -80,44 +88,11 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th class="hidden-sm hidden-xs">Subject</th>
-                                <th>has private key</th>
-                                <th>Edit / Remove</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for p in publics %}
-                                <tr>
-                                    <td><b>{{ p.subject.cname }}</b></td>
-                                    <td class="hidden-sm hidden-xs">{{ p.subject }}</td>
-                                    <td>{% if p.private_key %}Yes{% else %}No{% endif %}</td>
-                                    <td style="width: 10%">
-                                        <span title="Edit certificate">
-                                            <a href="{% url "certificates:details" p.id %}"
-                                               class="btn btn-default edit-btn"
-                                               id="editbtn-{{ p.id }}">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                            </a>
-                                        </span>
-                                        <form action="{% url "certificates:details" p.id %}" method="POST"
-                                              style="display: inline;">
-                                            {% csrf_token %}
-                                        <span title="Remove certificate">
-                                            <button type="submit" class="btn btn-default remove-btn"
-                                                    id="removebtn-{{ p.id }}" name="remove_cert">
-                                                <span class="glyphicon glyphicon-remove"></span>
-                                            </button>
-                                        </span>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if view == "vici" %}
+                            {% include "certificates/widgets/ViciCertificateTable_view.html" with certificates=publics %}
+                        {% else %}
+                            {% include "certificates/widgets/CertificateModelTable_view.html" with certificates=publics %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -162,13 +137,6 @@
                     })
                     .mouseleave(function () {
                         $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
-                    });
-            $(".edit-btn")
-                    .mouseenter(function () {
-                        $("#" + this.id).removeClass('btn-default').addClass('btn-primary');
-                    })
-                    .mouseleave(function () {
-                        $(".edit-btn").removeClass('btn-primary').addClass('btn-default');
                     });
         </script>
     </div>

@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}Connection{% endblock title %}
+{% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-    <h1>Overview</h1>
     {% if user.is_authenticated %}
-        {% include "connections_overview.html" %}
+        {% include "connections/overview.html" %}
     {% endif %}
 {% endblock %}

@@ -72,7 +72,7 @@ class ViciWrapper:
         '''
         certificates = []
         for certificate in self.session.list_certs():
-            certificates += certificate
+            certificates.append(certificate)
         return certificates
 
     def is_connection_active(self, connection_name):

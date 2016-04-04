@@ -13,7 +13,7 @@ from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadE
 
 
 class ChooseTypView(LoginRequiredMixin, FormView):
-    template_name = 'select_form.html'
+    template_name = 'connections/select_typ.html'
     form_class = ChooseTypeForm
 
     def form_valid(self, form):
@@ -22,7 +22,7 @@ class ChooseTypView(LoginRequiredMixin, FormView):
 
 
 class Ike2CertificateCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2CertificateForm
     success_url = reverse_lazy("index")
 
@@ -37,7 +37,7 @@ class Ike2CertificateCreateView(LoginRequiredMixin, FormView):
 
 
 class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2CertificateForm
     success_url = reverse_lazy("index")
 
@@ -61,7 +61,7 @@ class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
 
 
 class Ike2EapCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2EapForm
     success_url = reverse_lazy("index")
 
@@ -76,7 +76,7 @@ class Ike2EapCreateView(LoginRequiredMixin, FormView):
 
 
 class Ike2EapUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2EapForm
     success_url = reverse_lazy("index")
 
@@ -101,7 +101,7 @@ class Ike2EapUpdateView(LoginRequiredMixin, FormView):
 
 
 class Ike2EapCertificateCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2EapCertificateForm
     success_url = reverse_lazy("index")
 
@@ -116,7 +116,7 @@ class Ike2EapCertificateCreateView(LoginRequiredMixin, FormView):
 
 
 class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connection_form.html'
+    template_name = 'connections/connection_configuration.html'
     form_class = Ike2EapCertificateForm
     success_url = reverse_lazy("index")
 

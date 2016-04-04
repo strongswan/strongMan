@@ -1,28 +1,37 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block title %}Login{% endblock title %}
 {% block content %}
-    <h2>Login</h2>
-    <form class="form-horizontal" action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="local_address">Username:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="username" placeholder="Username" required>
+    <div class="col-xs-2"></div>
+    <div class="col-xs-8">
+    <div>
+        <form class="form-horizontal" action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="local_address">Username:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="local_address">Password:</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="local_address">Password:</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-
+            <div class="pull-right">
                 <button type="submit" id="login" class="btn black-background white"><span
                         class="glyphicon glyphicon-log-in"></span> Log in
                 </button>
+
             </div>
+        </form>
         </div>
-    </form>
+        <div class="well well-lg" style="margin-top:100px;">
+            <h4>Developer info</h4>
+            <p>User: John<br/>
+                Password: Lennon</p>
+            <p>python3.5 manage.py loaddata initial_data.json --settings=strongMan.settings.local</p>
+        </div>
+    </div>
 {% endblock content %}
