@@ -1,9 +1,11 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
+from django.contrib import messages
 
 from ..forms import CertificateSearchForm
 from .. import models
 from ..services import ViciCertificateManager
+from ...vici.wrapper.exception import ViciSocketException
 
 
 class AbstractOverviewHandler:
@@ -21,6 +23,9 @@ class AbstractOverviewHandler:
         raise NotImplementedError()
 
     def all_certificates(self):
+        '''
+        Returns all possible certificates. Can raise a OvervieHandlerException
+        '''
         raise NotImplementedError()
 
     def _paginate(self, certificate_list, page=1):
@@ -43,20 +48,27 @@ class AbstractOverviewHandler:
         return all_certs.filter(id__in=cert_ids)
 
     def handle(self):
-        search_pattern = ""
-        page = 1
+        try:
+            all_certs = self.all_certificates()
+        except OverviewHandlerException as e:
+            messages.add_message(self.request, messages.WARNING, str(e))
+            return self._render()
+
         if self.request.method == "GET":
-            result = self.all_certificates()
-        else:
-            form = CertificateSearchForm(self.request.POST)
-            if not form.is_valid():
-                result = self.all_certificates()
-            else:
-                search_pattern = form.cleaned_data["search_text"]
-                all_certs = self.all_certificates()
-                result = self._search_for(all_certs, search_pattern)
-                page = form.cleaned_data["page"]
-        x509_list = self._paginate(result, page=page)
+            return self._render(all_certs)
+
+        form = CertificateSearchForm(self.request.POST)
+        if not form.is_valid():
+            return self._render(all_certs)
+
+        search_pattern = form.cleaned_data["search_text"]
+        search_result = self._search_for(all_certs,search_pattern)
+        page = form.cleaned_data["page"]
+        return self._render(search_result, page, search_pattern)
+
+
+    def _render(self, certificates=[], page=1, search_pattern=""):
+        x509_list = self._paginate(certificates, page=page)
         return render(self.request, 'certificates/overview.html',
                       {'publics': x509_list, "view": self.page_tag(), "search_pattern": search_pattern})
 
@@ -66,7 +78,10 @@ class ViciOverviewHandler(AbstractOverviewHandler):
         return "vici"
 
     def all_certificates(self):
-        ViciCertificateManager.reload_certs()
+        try:
+            ViciCertificateManager.reload_certs()
+        except ViciSocketException as e:
+            raise OverviewHandlerException("Can't load data from vici") from e
         return models.ViciCertificate.objects.all()
 
 
@@ -92,3 +107,6 @@ class RootOverviewHandler(AbstractOverviewHandler):
 
     def all_certificates(self):
         return models.UserCertificate.objects.filter(is_CA=True)
+
+class OverviewHandlerException(Exception):
+    pass

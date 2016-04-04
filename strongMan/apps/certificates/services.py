@@ -2,7 +2,6 @@ from strongMan.apps.certificates import models
 from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader
 
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-
 class AbstractCertificateManager:
     @classmethod
     def _check_if_parsed(cls, reader):
@@ -89,6 +88,7 @@ class ViciCertificateManager(AbstractCertificateManager):
         vici_certs = wrapper.get_certificates()
         for dict in vici_certs:
             cls._add_x509(dict)
+
 
     @classmethod
     def _add_x509(cls, vici_dict):
