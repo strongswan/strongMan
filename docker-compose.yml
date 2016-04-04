@@ -1,0 +1,17 @@
+roadwarrior:
+  build: ./docker/roadwarrior/
+  links:
+   - "gateway:gateway"
+  privileged: true
+  ports:
+   - "500:500"
+   - "4500:4500"
+
+gateway:
+  command: "ipsec start --nofork"
+  build: ./docker/gateway/
+  privileged: true
+  ports:
+   - "500:500"
+   - "4500:4500"
+

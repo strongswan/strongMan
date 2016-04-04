@@ -7,12 +7,24 @@ language: python
 python:
   - "3.4"
   - "3.5"
-install:
-  - docker build -t strongman docker/
+
+env:
+  DOCKER_COMPOSE_VERSION: 1.4.0
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose build
 
 script:
-  - docker run --privileged strongman /bin/sh -c "cd /StrongMan/; ipsec start; python manage.py test --settings=strongMan.settings.local"
+  - docker-compose up -d gateway
+  - sleep 10
+  - docker-compose run roadwarrior /bin/sh -c "cd /StrongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test --settings=strongMan.settings.local"
 
 
+notifications:
+  email: false
 
 
