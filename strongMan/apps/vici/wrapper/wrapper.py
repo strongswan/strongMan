@@ -107,3 +107,4 @@ class ViciWrapper:
         :rtype: dict
         '''
         return self.get_status()['plugins']
+
