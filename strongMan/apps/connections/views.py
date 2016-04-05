@@ -149,9 +149,9 @@ def toggle_connection(request):
     try:
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is False:
-            vici_wrapper.load_connection(connection.get_vici_ordered_dict())
+            vici_wrapper.load_connection(connection.dict())
             for secret in Secret.objects.filter(connection=connection):
-                vici_wrapper.load_secret(secret.get_vici_ordered_dict())
+                vici_wrapper.load_secret(secret.dict())
                 connection.state = True
         else:
             vici_wrapper.unload_connection(connection.profile)

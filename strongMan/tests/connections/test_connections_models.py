@@ -49,11 +49,11 @@ class ConnectionModelTest(TestCase):
 
     def test_connection_dict(self):
         connection = Connection.objects.first()
-        self.assertTrue(isinstance(connection.get_vici_ordered_dict(), OrderedDict))
+        self.assertTrue(isinstance(connection.dict(), OrderedDict))
 
     def test_secret_dict(self):
         secret = Secret.objects.first()
-        self.assertTrue(isinstance(secret.get_vici_ordered_dict(), OrderedDict))
+        self.assertTrue(isinstance(secret.dict(), OrderedDict))
 
     def test_delete_all_connections(self):
         connection = Connection.objects.first()
