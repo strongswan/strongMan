@@ -3,13 +3,18 @@ from .models import Connection, Address, Authentication, Secret
 from strongMan.apps.certificates.models import Identity
 
 
+class ConnectionForm(forms.Form):
+    profile = forms.CharField(max_length=50, initial="")
+    gateway = forms.CharField(max_length=50, initial="")
+
+
 class ClientBaseForm(forms.Form):
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
 
 
 class ChooseTypeForm(forms.Form):
-    typ = forms.ModelChoiceField(Connection.get_types())
+    typ = forms.ChoiceField(choices=Connection.get_types())
 
 
 class Ike2CertificateForm(ClientBaseForm):

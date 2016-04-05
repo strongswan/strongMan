@@ -20,8 +20,9 @@
                             <div class="controls col-sm-10">
                                 <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}"
                                         onchange="this.form.submit()">
-                                    {% for choise in field.field.queryset %}
-                                        <option value="{{ choise.id }}">{{ choise.value }}</option>
+                                    <option>Choose type</option>
+                                    {% for key, value in field.field.choices %}
+                                        <option value={{ key }}>{{ value }}</option>
                                     {% endfor %}
                                 </select>
                                 <p class="help-text">{{ field.help_text }} </p>

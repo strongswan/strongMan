@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection
 from strongMan.apps.certificates.models import Identity, Certificate
 from strongMan.apps.connections import views
-from django import forms
 
 
 class ConnectionViewTest(TestCase):

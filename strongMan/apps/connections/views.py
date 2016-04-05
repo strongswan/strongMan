@@ -17,6 +17,11 @@ class ChooseTypView(LoginRequiredMixin, FormView):
     form_class = ChooseTypeForm
 
     def form_valid(self, form):
+        module = __import__(".forms")
+        form_class = getattr(module, self.request.POST['typ'])
+        init_form = form_class()
+        print("Form" + init_form)
+        print("Typ: " + self.request.POST['typ'])
         self.success_url = "/connection/create/" + self.request.POST['typ']
         return super(ChooseTypView, self).form_valid(form)
 

@@ -1,3 +1,4 @@
+from django.forms import Form
 from django.db import models
 from strongMan.apps.certificates.models import Identity
 from collections import OrderedDict
@@ -44,34 +45,43 @@ class Connection(models.Model):
     def type_name(self):
         raise NotImplementedError
 
+    def get_form(self):
+        raise NotImplementedError
+
     @classmethod
     def get_types(cls):
-        types = []
         subclasses = [subclass() for subclass in cls.__subclasses__()]
-        for subclass in subclasses:
-            types.append(subclass.type_name(subclass))
-        return types
+        return tuple(subclass.type_name(subclass) for subclass in subclasses)
 
 
 class IKEv2Certificate(Connection):
 
+    def get_form(self):
+        return Form(data={'profile':  self.profile, 'gateway': self.gateway})
+
     @staticmethod
     def type_name(self):
-        return "IKEv2 Certificate"
+        return type(self).__name__, "IKEv2 Certificate"
 
 
 class IKEv2EAP(Connection):
 
+    def get_form(self):
+        return Form(data={'profile':  self.profile, 'gateway': self.gateway})
+
     @staticmethod
     def type_name(self):
-        return "IKEv2 EAP (Username/Password)"
+        return type(self).__name__, "IKEv2 EAP (Username/Password)"
 
 
 class IKEv2CertificateEAP(Connection):
 
+    def get_form(self):
+        return Form(data={'profile':  self.profile, 'gateway': self.gateway})
+
     @staticmethod
     def type_name(self):
-        return "IKEv2 Certificate + EAP (Username/Password)"
+        return type(self).__name__, "IKEv2 Certificate + EAP (Username/Password)"
 
 
 class Child(models.Model):
