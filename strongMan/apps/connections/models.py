@@ -3,13 +3,8 @@ from strongMan.apps.certificates.models import Identity
 from collections import OrderedDict
 
 
-class Typ(models.Model):
-    value = models.CharField(max_length=200)
-
-
 class Connection(models.Model):
     state = models.BooleanField(default=False)
-    typ = models.ForeignKey(Typ, null=True, blank=True, default=None)
     domain = models.ForeignKey(Identity, null=True, blank=True, default=None)
     profile = models.CharField(max_length=50)
     auth = models.CharField(max_length=50)
@@ -46,11 +41,37 @@ class Connection(models.Model):
         Authentication.objects.filter(local=self).delete()
         Authentication.objects.filter(remote=self).delete()
 
-    class Meta:
-        abstract = True
+    def type_name(self):
+        raise NotImplementedError
 
-class Ikev2CertificateEAP(Connection):
-    pass
+    @classmethod
+    def get_types(cls):
+        types = []
+        subclasses = [subclass() for subclass in cls.__subclasses__()]
+        for subclass in subclasses:
+            types.append(subclass.type_name(subclass))
+        return types
+
+
+class IKEv2Certificate(Connection):
+
+    @staticmethod
+    def type_name(self):
+        return "IKEv2 Certificate"
+
+
+class IKEv2EAP(Connection):
+
+    @staticmethod
+    def type_name(self):
+        return "IKEv2 EAP (Username/Password)"
+
+
+class IKEv2CertificateEAP(Connection):
+
+    @staticmethod
+    def type_name(self):
+        return "IKEv2 Certificate + EAP (Username/Password)"
 
 
 class Child(models.Model):

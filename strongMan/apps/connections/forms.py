@@ -1,5 +1,5 @@
 from django import forms
-from .models import Connection, Address, Authentication, Secret, Typ
+from .models import Connection, Address, Authentication, Secret
 from strongMan.apps.certificates.models import Identity
 
 
@@ -9,7 +9,7 @@ class ClientBaseForm(forms.Form):
 
 
 class ChooseTypeForm(forms.Form):
-    typ = forms.ModelChoiceField(queryset=Typ.objects.all(), empty_label=None)
+    typ = forms.ModelChoiceField(Connection.get_types())
 
 
 class Ike2CertificateForm(ClientBaseForm):
@@ -18,9 +18,8 @@ class Ike2CertificateForm(ClientBaseForm):
     def create_connection(self):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
-        typ = Typ.objects.get(id=1)
         domain = self.cleaned_data['certificate']
-        connection = Connection(profile=profile, auth='pubkey', version=2, typ=typ, domain=domain)
+        connection = Connection(profile=profile, auth='pubkey', version=2, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
@@ -43,8 +42,7 @@ class Ike2EapForm(ClientBaseForm):
         gateway = self.cleaned_data['gateway']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        typ = Typ.objects.get(id=2)
-        connection = Connection(profile=profile, auth='pubkey', version=2, typ=typ)
+        connection = Connection(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
@@ -69,9 +67,8 @@ class Ike2EapCertificateForm(ClientBaseForm):
         gateway = self.cleaned_data['gateway']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        typ = Typ.objects.get(id=3)
         domain = self.cleaned_data['certificate']
-        connection = Connection(profile=profile, auth='pubkey', version=2, typ=typ, domain=domain)
+        connection = Connection(profile=profile, auth='pubkey', version=2, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()

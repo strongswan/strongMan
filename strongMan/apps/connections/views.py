@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
 from .forms import Ike2CertificateForm, Ike2EapForm, ChooseTypeForm, Ike2EapCertificateForm
-from .models import Connection, Address, Secret, Typ
+from .models import Connection, Address, Secret
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
@@ -28,7 +28,6 @@ class Ike2CertificateCreateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(Ike2CertificateCreateView, self).get_context_data(**kwargs)
-        context['title'] = Typ.objects.get(id=1).value
         return context
 
     def form_valid(self, form):
@@ -56,7 +55,6 @@ class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(Ike2CertificateUpdateView, self).get_context_data(**kwargs)
-        context['title'] = Typ.objects.get(id=1).value
         return context
 
 
@@ -67,7 +65,6 @@ class Ike2EapCreateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(Ike2EapCreateView, self).get_context_data(**kwargs)
-        context['title'] = Typ.objects.get(id=2).value
         return context
 
     def form_valid(self, form):
@@ -96,7 +93,6 @@ class Ike2EapUpdateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
             context = super(Ike2EapUpdateView, self).get_context_data(**kwargs)
-            context['title'] = Typ.objects.get(id=2).value
             return context
 
 
@@ -107,7 +103,6 @@ class Ike2EapCertificateCreateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(Ike2EapCertificateCreateView, self).get_context_data(**kwargs)
-        context['title'] = Typ.objects.get(id=3).value
         return context
 
     def form_valid(self, form):
@@ -137,7 +132,6 @@ class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(Ike2EapCertificateUpdateView, self).get_context_data(**kwargs)
-        context['title'] = Typ.objects.get(id=3).value
         return context
 
 
