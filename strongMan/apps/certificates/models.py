@@ -1,15 +1,18 @@
-from django.db import models
-from django.db.models.signals import pre_delete, pre_save
-from django.dispatch import receiver
 from enum import Enum
+
+from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+
 from .container_reader import X509Reader
 
 
 class DjangoEnum(Enum):
     @classmethod
     def choices(cls):
-        #This method converts a Python enum to Django Choises used in the database models
+        # This method converts a Python enum to Django Choises used in the database models
         return [(x.value, x.name) for x in cls]
+
 
 class KeyContainer(models.Model):
     id = models.AutoField(primary_key=True)
@@ -21,11 +24,18 @@ class KeyContainer(models.Model):
     class Meta:
         abstract = True
 
-
-class PrivateKey(KeyContainer):
+    @classmethod
+    def by_bytes(cls, container_bytes, password=None):
+        raise NotImplementedError()
 
     @classmethod
-    def by_pkcs1_or_8_reader(cls, reader):
+    def by_reader(cls, reader):
+        raise NotImplementedError()
+
+
+class PrivateKey(KeyContainer):
+    @classmethod
+    def by_reader(cls, reader):
         key = cls()
         key.algorithm = reader.algorithm()
         key.der_container = reader.der_dump()
@@ -50,6 +60,7 @@ class PrivateKey(KeyContainer):
             if cert.private_key is None:
                 cert.private_key = self
                 cert.save()
+
     def get_existing_privatekey(self):
         '''
         :returns the private key with the same public key hash
@@ -57,7 +68,6 @@ class PrivateKey(KeyContainer):
         assert self.already_exists()
         keys = PrivateKey.objects.filter(public_key_hash=self.public_key_hash)
         return keys[0]
-
 
 
 class DistinguishedName(models.Model):
@@ -74,6 +84,7 @@ class DistinguishedName(models.Model):
         return "C=" + self.country + ", L=" + self.location + ", ST=" + self.province + \
                ", O=" + self.organization + ", OU=" + self.unit + ", CN=" + self.cname
 
+
 class Certificate(KeyContainer):
     serial_number = models.TextField()
     hash_algorithm = models.CharField(max_length=20)
@@ -83,10 +94,9 @@ class Certificate(KeyContainer):
     issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="issuer", null=True)
     subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="subject", null=True)
 
-    def add_domain(self, domain):
-        if not hasattr(self, "valid_domains_to_add"):
-            self.valid_domains_to_add = []
-        self.valid_domains_to_add.append(domain)
+    def all_identities(self):
+        return AbstractIdentity.all_identities(cert_id=self.id)
+
 
 
 
@@ -100,7 +110,7 @@ def certificate_clean_submodels(sender, **kwargs):
     cert = kwargs['instance']
     cert.subject.delete()
     cert.issuer.delete()
-    cert.valid_domains.all().delete()
+    #cert.valid_domains.all().delete()
 
 
 class UserCertificate(Certificate):
@@ -127,6 +137,7 @@ class UserCertificate(Certificate):
         if privatekey.certificates.all().__len__() == 0:
             privatekey.delete()
 
+
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):
     cert = kwargs['instance']
@@ -138,6 +149,7 @@ def usercertificate_clean_submodels(sender, **kwargs):
         no_more_certs_associated = certs_count_to_privatekey == 0
         if no_more_certs_associated:
             key.delete()
+
 
 class ViciCertificate(Certificate):
     has_private_key = models.BooleanField(default=False)
@@ -171,7 +183,6 @@ class CertificateFactory:
         except:
             return default
 
-
     @classmethod
     def _by_X509Container(cls, reader, certificate_class=UserCertificate):
         public = certificate_class()
@@ -187,21 +198,19 @@ class CertificateFactory:
             else:
                 public.is_CA = True
             public.valid_not_after = cls._try_to_get_value(reader.asn1.native,
-                                                              ["tbs_certificate", "validity", "not_after"])
+                                                           ["tbs_certificate", "validity", "not_after"])
             public.valid_not_before = cls._try_to_get_value(reader.asn1.native,
-                                                               ["tbs_certificate", "validity", "not_before"])
+                                                            ["tbs_certificate", "validity", "not_before"])
             public.save()
             public.issuer = cls.distinguishedName_factory(reader.asn1.issuer)
             public.subject = cls.distinguishedName_factory(reader.asn1.subject)
+            try:
+                for san in cls.extract_subject_alt_names(reader):
+                    TextIdentity.by_san(san, public)
+            except CertificateException as e:
+                pass #No subject_alt_name extension found
 
-            for valid_domain in reader.asn1.valid_domains:
-                d = Identity.factory(valid_domain)
-                d.certificate = public
-                d.save()
-
-            dn = Identity.factory(public.subject.blob, type=IdentityTypes.DISTINGUISHEDNAME)
-            dn.certificate = public
-            dn.save()
+            DnIdentity.by_cert(public)
 
             public.save()
             return public
@@ -210,10 +219,19 @@ class CertificateFactory:
                 public.issuer.delete()
             if not public.subject == None:
                 public.subject.delete()
-            public.valid_domains.delete()
+            public.identities.delete()
             public.delete()
             raise e
 
+    @classmethod
+    def extract_subject_alt_names(cls, x509reader):
+        extensions = x509reader.asn1["tbs_certificate"]["extensions"]
+        for extension in extensions:
+            name = extension.native["extn_id"]
+            if name == "subject_alt_name":
+                values = extension.native["extn_value"]
+                return values
+        raise CertificateException("No subjet_alt_name extension found.")
 
     @classmethod
     def user_certificate_by_x509reader(cls, reader):
@@ -226,38 +244,87 @@ class CertificateFactory:
         reader.parse()
         vicicert = cls._by_X509Container(reader, certificate_class=ViciCertificate)
         vicicert.has_private_key = 'has_privkey' in cert_dict and cert_dict['has_privkey'] == b'yes'
+        vicicert.save()
         return vicicert
 
 
+class AbstractIdentity(models.Model):
+    '''
+    https://wiki.strongswan.org/projects/strongswan/wiki/IdentityParsing
+    '''
+    certificate = models.ForeignKey(Certificate, null=True, related_name='identities', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(super(AbstractIdentity, self))
 
-
-class IdentityTypes(DjangoEnum):
-    SUBJECTALTNAME = 0
-    DISTINGUISHEDNAME = 1
+    def value(self):
+        raise NotImplementedError()
 
     @classmethod
-    def choices(cls):
-        return [(x.value, x.name) for x in cls]
+    def get_all_subclasses(cls):
+        all_subclasses = []
+
+        for subclass in cls.__subclasses__():
+            all_subclasses.append(subclass)
+            all_subclasses.extend(subclass.get_all_subclasses())
+
+        return all_subclasses
+    @classmethod
+    def all_identities(cls, cert_id=None):
+        ids = []
+        if cert_id is None:
+            possible_idents = AbstractIdentity.objects.all()
+        else:
+            possible_idents = AbstractIdentity.objects.filter(certificate_id=cert_id)
+        for ident in possible_idents:
+            ids.append(ident.id)
+        all_idents = []
+        for subclass in AbstractIdentity.get_all_subclasses():
+            idents = list(subclass.objects.filter(pk__in=ids))
+            all_idents += idents
+
+        return all_idents
+
+
+class TextIdentity(AbstractIdentity):
+    text = models.TextField(null=False)
+    def __str__(self):
+        return self.text
+
+    def value(self):
+        return self.text
+
+    @classmethod
+    def by_san(cls, subjectAltName, certificate):
+        ident = cls()
+        ident.text = subjectAltName
+        ident.certificate = certificate
+        ident.save()
+        return ident
+
+class DnIdentity(AbstractIdentity):
+    '''
+    https://tools.ietf.org/html/rfc5280#section-4.2.1.6
+    '''
+
+    def __str__(self):
+        return str(self.certificate.subject)
+
+    def value(self):
+        return self.certificate.subject
+
+
+    @classmethod
+    def by_cert(cls, certificate):
+        ident = cls()
+        ident.certificate = certificate
+        ident.save()
+        return ident
+
 
 
 class Identity(models.Model):
-    subjectaltname = models.TextField(null=True)
-    distinguishedname = models.BinaryField(null=True)
-    type = models.IntegerField(choices=IdentityTypes.choices())
-    certificate = models.ForeignKey(Certificate, null=True, related_name='valid_domains', on_delete=models.CASCADE)
-
-    @classmethod
-    def factory(cls, value, type=IdentityTypes.SUBJECTALTNAME):
-        identity = cls()
-        identity.type = type.value
-        if type == IdentityTypes.SUBJECTALTNAME:
-            identity.subjectaltname = value
-        elif type == IdentityTypes.DISTINGUISHEDNAME:
-            identity.distinguishedname = value
-        else:
-            assert False
-        return identity
+    pass
 
 
 class CertificateException(Exception):

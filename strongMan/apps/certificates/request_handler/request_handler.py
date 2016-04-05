@@ -51,10 +51,10 @@ class DetailsHandler:
             return None
 
     def _is_vicicert(self):
-        return not self._vicicert == None
+        return not self._vicicert is None
 
     def _is_usercert(self):
-        return not self._usercert == None
+        return not self._usercert is None
 
 
 
@@ -84,14 +84,23 @@ class AddHandler:
                                  'No valid container detected. Maybe your container needs a password?')
             return self.request, 'certificates/add.html', {"form": self.form}
 
+
         try:
-            type = self.form.container_type()
-            if type == ContainerTypes.X509:
-                return self._handle_x509()
-            elif type == ContainerTypes.PKCS1 or type == ContainerTypes.PKCS8:
-                return self._handle_privatekey()
-            elif type == ContainerTypes.PKCS12:
-                return self._handle_pkcs12()
+            result = UserCertificateManager.add_keycontainer(self.form._cert_bytes(), self.form._read_password())
+            for e in result.exceptions:
+                messages.add_message(self.request, messages.WARNING, str(e))
+            if not result.success:
+                return self._render_upload_page()
+
+            if result.certificate is not None and result.privatekey is None:
+                result.privatekey = result.certificate.private_key
+            if result.certificate is None and result.privatekey is not None:
+                result.certificate = result.privatekey.certificates.all()[0]
+
+
+            return self.request, 'certificates/added.html', {"private": result.privatekey, "public": result.certificate,
+                                                             "further_publics": result.further_certificates}
+
         except (ValueError, TypeError, AsymmetricKeyError, OSError) as e:
             messages.add_message(self.request, messages.ERROR,
                                  "Error reading file. Maybe your file is corrupt?")
@@ -100,58 +109,3 @@ class AddHandler:
             messages.add_message(self.request, messages.ERROR,
                                  "Internal error: " + str(e))
             return self.request, 'certificates/add.html', {"form": self.form}
-
-    def _handle_x509(self):
-        x509reader = self.form.container_reader()
-        try:
-            cert = UserCertificateManager.add_x509(x509reader)
-            if cert.private_key == None:
-                return self.request, 'certificates/added.html', {"public": cert}
-            else:
-                return self.request, 'certificates/added.html', {"private": cert.private_key, "public": cert}
-        except CertificateManagerException as e:
-            messages.add_message(self.request, messages.ERROR, str(e))
-            return self._render_upload_page()
-
-    def _handle_privatekey(self):
-        privatekey_reader = self.form.container_reader()
-        try:
-            privatekey = UserCertificateManager.add_pkcs1_or_8(privatekey_reader)
-            public = privatekey.certificates.all()[0]
-            return self.request, 'certificates/added.html', {"private": privatekey, "public": public}
-        except CertificateManagerException as e:
-            messages.add_message(self.request, messages.ERROR, str(e))
-            return self._render_upload_page()
-
-    def _handle_pkcs12(self):
-        pkcs12reader = self.form.container_reader()
-        cert = None
-        privatekey = None
-        further_certs = []
-
-        x509reader = pkcs12reader.public_key()
-        try:
-            cert = UserCertificateManager.add_x509(x509reader)
-        except CertificateManagerException as e:
-            messages.add_message(self.request, messages.ERROR, str(e))
-
-        private_reader = pkcs12reader.private_key()
-        try:
-            privatekey = UserCertificateManager.add_pkcs1_or_8(private_reader)
-        except CertificateManagerException as e:
-            messages.add_message(self.request, messages.ERROR, str(e))
-
-        further_x509reader = pkcs12reader.further_publics()
-        for x509read in further_x509reader:
-            try:
-                further = UserCertificateManager.add_x509(x509read)
-                further_certs.append(further)
-            except CertificateManagerException as e:
-                messages.add_message(self.request, messages.ERROR, str(e))
-
-        nothing_added = cert == None and privatekey == None and len(further_certs) == 0
-        if nothing_added:
-            return self._render_upload_page()
-
-        return self.request, 'certificates/added.html', {"private": privatekey, "public": cert,
-                                                         "further_publics": further_certs}

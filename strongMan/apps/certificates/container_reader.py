@@ -17,70 +17,6 @@ class ContainerTypes(Enum):
 
 
 class ContainerDetector:
-    @classmethod
-    def _is_x509(cls, container_bytes, password=None):
-        try:
-            if password == None:
-                cert = k.parse_certificate(container_bytes)
-            else:
-                cert = k.parse_certificate(container_bytes, password=password)
-
-            cert.native
-            return True
-        except Exception as e:
-            return False
-
-    @classmethod
-    def _is_pkcs1(cls, container_bytes, password=None):
-        if cls._is_pkcs8(bytes, password=password): return False
-        try:
-            if password == None:
-                cert = k.parse_private(container_bytes)
-            else:
-                cert = k.parse_private(container_bytes, password=password)
-
-            cert.native
-            return True
-        except Exception as e:
-            return False
-
-    @classmethod
-    def _is_pkcs8(cls, container_bytes, password=None):
-        cert = None
-        try:
-            if password == None:
-                cert = k.parse_private(container_bytes)
-            else:
-                cert = k.parse_private(container_bytes, password=password)
-
-            cert.native
-        except Exception as e:
-            return False
-
-        try:
-            if cert.native["private_key"]["modulus"] is not None:
-                return True
-        except:
-            pass
-
-        try:
-            if cert.native["private_key"]["public_key"] is not None:
-                return True
-        except:
-            pass
-
-        return False
-
-    @classmethod
-    def _is_pkcs12(cls, container_bytes, password=None):
-        try:
-            if password == None:
-                k.parse_pkcs12(container_bytes)
-            else:
-                k.parse_pkcs12(container_bytes, password=password)
-            return True
-        except Exception as e:
-            return False
 
     @classmethod
     def detect_type(cls, container_bytes, password=None):
@@ -92,16 +28,29 @@ class ContainerDetector:
         :return: Type of the container
         :rtype ContainerTypes
         '''
-        if cls._is_pkcs12(container_bytes, password=password):
+        if PKCS12Reader.is_type(container_bytes, password=password):
             return ContainerTypes.PKCS12
-        elif cls._is_pkcs8(container_bytes, password=password):
+        elif PKCS8Reader.is_type(container_bytes, password=password):
             return ContainerTypes.PKCS8
-        elif cls._is_pkcs1(container_bytes, password=password):
+        elif PKCS1Reader.is_type(container_bytes, password=password):
             return ContainerTypes.PKCS1
-        elif cls._is_x509(container_bytes, password=password):
+        elif X509Reader.is_type(container_bytes, password=password):
             return ContainerTypes.X509
         else:
             return ContainerTypes.Undefined
+
+    @classmethod
+    def factory(cls, container_bytes, password=None):
+        type = cls.detect_type(container_bytes,password)
+        if type == ContainerTypes.PKCS1:
+            return PKCS1Reader.by_bytes(container_bytes, password)
+        if type == ContainerTypes.PKCS8:
+            return PKCS8Reader.by_bytes(container_bytes, password)
+        if type == ContainerTypes.PKCS12:
+            return PKCS12Reader.by_bytes(container_bytes, password)
+        if type == ContainerTypes.X509:
+            return X509Reader.by_bytes(container_bytes, password)
+        raise ContainerReaderException("Can't detect a supported ASN1 type.")
 
 
 class AbstractContainerReader:
@@ -110,6 +59,7 @@ class AbstractContainerReader:
         self.type = None
         self.password = None
         self.asn1 = None
+        self._is_parsed = False
 
     @classmethod
     def by_bytes(cls, bytes, password=None):
@@ -120,7 +70,7 @@ class AbstractContainerReader:
         return container
 
     def is_parsed(self):
-        return not self.asn1 == None
+        return self._is_parsed
 
     def parse(self):
         '''
@@ -140,6 +90,14 @@ class AbstractContainerReader:
         '''
         Return a public key like identifier. The identifier can be compare with other to find the private key / certificate pair
         :return: Identifier
+        '''
+        raise NotImplementedError()
+
+    @classmethod
+    def is_type(cls, container_bytes, password=None):
+        '''
+        Detects if the bytes have this ASN1 structure
+        :return: Boolean
         '''
         raise NotImplementedError()
 
@@ -178,6 +136,20 @@ class AbstractContainerReader:
 
 
 class PKCS1Reader(AbstractContainerReader):
+    @classmethod
+    def is_type(cls, container_bytes, password=None):
+        if PKCS8Reader.is_type(bytes, password=password): return False
+        try:
+            if password == None:
+                cert = k.parse_private(container_bytes)
+            else:
+                cert = k.parse_private(container_bytes, password=password)
+
+            cert.native
+            return True
+        except Exception as e:
+            return False
+
     def parse(self):
         assert self.type == ContainerTypes.PKCS1
         if self.password == None:
@@ -186,6 +158,7 @@ class PKCS1Reader(AbstractContainerReader):
             self.asn1 = k.parse_private(self.bytes, password=self.password)
         self.asn1.native
         self._raise_if_wrong_algorithm()
+        self._is_parsed = True
 
     def der_dump(self):
         return self.asn1.dump()
@@ -210,6 +183,33 @@ class PKCS1Reader(AbstractContainerReader):
 
 
 class PKCS8Reader(AbstractContainerReader):
+    @classmethod
+    def is_type(cls, container_bytes, password=None):
+        cert = None
+        try:
+            if password == None:
+                cert = k.parse_private(container_bytes)
+            else:
+                cert = k.parse_private(container_bytes, password=password)
+
+            cert.native
+        except Exception as e:
+            return False
+
+        try:
+            if cert.native["private_key"]["modulus"] is not None:
+                return True
+        except:
+            pass
+
+        try:
+            if cert.native["private_key"]["public_key"] is not None:
+                return True
+        except:
+            pass
+
+        return False
+
     def parse(self):
         assert self.type == ContainerTypes.PKCS8
         if self.password == None:
@@ -218,6 +218,7 @@ class PKCS8Reader(AbstractContainerReader):
             self.asn1 = k.parse_private(self.bytes, password=self.password)
         self.asn1.native
         self._raise_if_wrong_algorithm()
+        self._is_parsed = True
 
     def der_dump(self):
         return self.asn1.dump()
@@ -235,6 +236,17 @@ class PKCS8Reader(AbstractContainerReader):
 
 
 class PKCS12Reader(AbstractContainerReader):
+    @classmethod
+    def is_type(cls, container_bytes, password=None):
+        try:
+            if password == None:
+                k.parse_pkcs12(container_bytes)
+            else:
+                k.parse_pkcs12(container_bytes, password=password)
+            return True
+        except Exception as e:
+            return False
+
     def parse(self):
         assert self.type == ContainerTypes.PKCS12
         if self.password == None:
@@ -242,6 +254,7 @@ class PKCS12Reader(AbstractContainerReader):
         else:
             (self.privatekey, self.cert, self.certs) = k.parse_pkcs12(self.bytes, password=self.password)
         self._raise_if_wrong_algorithm()
+        self._is_parsed = True
 
     def algorithm(self):
         return self.privatekey.algorithm
@@ -288,12 +301,25 @@ class PKCS12Reader(AbstractContainerReader):
 
 
 class X509Reader(AbstractContainerReader):
+    @classmethod
+    def is_type(cls, container_bytes, password=None):
+        try:
+            if password == None:
+                cert = k.parse_certificate(container_bytes)
+            else:
+                cert = k.parse_certificate(container_bytes, password=password)
+
+            cert.native
+            return True
+        except Exception as e:
+            return False
 
     def parse(self):
         assert self.type == ContainerTypes.X509
         self.asn1 = k.parse_certificate(self.bytes)
         self.asn1.native
         self._raise_if_wrong_algorithm()
+        self._is_parsed = True
 
     def der_dump(self):
         return self.asn1.dump()
@@ -335,3 +361,5 @@ class X509Reader(AbstractContainerReader):
     def cname(self):
         return self.asn1.subject.native["common_name"]
 
+class ContainerReaderException(Exception):
+    pass

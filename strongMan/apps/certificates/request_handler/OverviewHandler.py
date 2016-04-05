@@ -6,6 +6,7 @@ from ..forms import CertificateSearchForm
 from .. import models
 from ..services import ViciCertificateManager
 from ...vici.wrapper.exception import ViciSocketException
+import string
 
 
 class AbstractOverviewHandler:
@@ -41,10 +42,11 @@ class AbstractOverviewHandler:
         return x509_list
 
     def _search_for(self, all_certs, search_text):
-        domains = models.Identity.objects.filter(subjectaltname__contains=search_text)
+        identities = models.AbstractIdentity.all_identities()
         cert_ids = []
-        for domain in domains:
-            cert_ids.append(domain.certificate.id)
+        for ident in identities:
+            if search_text in str(ident).lower():
+                cert_ids.append(ident.certificate.id)
         return all_certs.filter(id__in=cert_ids)
 
     def handle(self):
@@ -66,7 +68,6 @@ class AbstractOverviewHandler:
         page = form.cleaned_data["page"]
         return self._render(search_result, page, search_pattern)
 
-
     def _render(self, certificates=[], page=1, search_pattern=""):
         x509_list = self._paginate(certificates, page=page)
         return render(self.request, 'certificates/overview.html',
@@ -81,7 +82,7 @@ class ViciOverviewHandler(AbstractOverviewHandler):
         try:
             ViciCertificateManager.reload_certs()
         except ViciSocketException as e:
-            raise OverviewHandlerException("Can't load data from vici") from e
+            raise OverviewHandlerException("Vici is not reachable!") from e
         return models.ViciCertificate.objects.all()
 
 

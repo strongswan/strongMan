@@ -1,5 +1,5 @@
 from django.test import TestCase, RequestFactory
-from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory, UserCertificate, ViciCertificate
+from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory, UserCertificate, ViciCertificate, TextIdentity, DnIdentity, AbstractIdentity
 from strongMan.apps.certificates.request_handler.request_handler import AddHandler
 from strongMan.apps.certificates.container_reader import X509Reader
 import os
@@ -81,10 +81,18 @@ def count(model):
 
 
 class UserCertificateTest(TestCase):
+
+    def test_add_identites(self):
+        Paths.X509_googlecom.add_to_db()
+        cert = UserCertificate.objects.get(id=1)
+        self.assertEqual(len(cert.all_identities()),505)
+        self.assertEqual(count(TextIdentity), 504)
+        self.assertEqual(count(DnIdentity), 1)
+
     def test_add_to_db(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Identity), 4)
+        self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
 
@@ -94,7 +102,7 @@ class UserCertificateTest(TestCase):
         PrivateKey.objects.all().delete()
         self.assertEquals(count(PrivateKey), 0)
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Identity), 4)
+        self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
 
         for certificate in UserCertificate.objects.all():
@@ -103,10 +111,10 @@ class UserCertificateTest(TestCase):
     def test_delete_domain(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Identity), 4)
+        self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
-        Identity.objects.all().delete()
+        AbstractIdentity.objects.all().delete()
         self.assertEqual(count(Identity), 0)
         self.assertEquals(count(Certificate), 2, "Certificate should not be deleted")
         self.assertEquals(count(DistinguishedName), 4)
@@ -115,13 +123,13 @@ class UserCertificateTest(TestCase):
     def test_delete_subjectinfo(self):
         Paths.PKCS12_rsa.add_to_db()
         self.assertEquals(count(Certificate), 2)
-        self.assertEqual(count(Identity), 4)
+        self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
         DistinguishedName.objects.all().delete()
         self.assertEquals(count(DistinguishedName), 0)
         self.assertEquals(count(Certificate), 2, "Certificate should not be deleted")
-        self.assertEqual(count(Identity), 4)
+        self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_without_privatekey(self):
@@ -131,7 +139,7 @@ class UserCertificateTest(TestCase):
         ca_list[0].delete()
         self.assertEquals(count(Certificate), 1)
         self.assertEquals(count(DistinguishedName), 2)
-        self.assertEqual(count(Identity), 2)
+        self.assertEqual(count(AbstractIdentity), 1)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_with_privatekey(self):
@@ -141,7 +149,7 @@ class UserCertificateTest(TestCase):
         ca_list[0].delete()
         self.assertEquals(count(Certificate), 1)
         self.assertEquals(count(DistinguishedName), 2)
-        self.assertEqual(count(Identity), 2)
+        self.assertEqual(count(AbstractIdentity), 1)
         self.assertEquals(count(PrivateKey), 0)
 
     def test_CertificateFactory(self):
