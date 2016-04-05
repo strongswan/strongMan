@@ -98,8 +98,6 @@ class Certificate(KeyContainer):
         return AbstractIdentity.all_identities(cert_id=self.id)
 
 
-
-
 @receiver(pre_delete, sender=Certificate)
 def certificate_clean_submodels(sender, **kwargs):
     '''
@@ -110,7 +108,7 @@ def certificate_clean_submodels(sender, **kwargs):
     cert = kwargs['instance']
     cert.subject.delete()
     cert.issuer.delete()
-    #cert.valid_domains.all().delete()
+    # cert.valid_domains.all().delete()
 
 
 class UserCertificate(Certificate):
@@ -208,7 +206,7 @@ class CertificateFactory:
                 for san in cls.extract_subject_alt_names(reader):
                     TextIdentity.by_san(san, public)
             except CertificateException as e:
-                pass #No subject_alt_name extension found
+                pass  # No subject_alt_name extension found
 
             DnIdentity.by_cert(public)
 
@@ -269,15 +267,13 @@ class AbstractIdentity(models.Model):
             all_subclasses.extend(subclass.get_all_subclasses())
 
         return all_subclasses
+
     @classmethod
     def all_identities(cls, cert_id=None):
-        ids = []
         if cert_id is None:
-            possible_idents = AbstractIdentity.objects.all()
+            ids = [identity.id for identity in AbstractIdentity.objects.all()]
         else:
-            possible_idents = AbstractIdentity.objects.filter(certificate_id=cert_id)
-        for ident in possible_idents:
-            ids.append(ident.id)
+            ids = [identity.id for identity in AbstractIdentity.objects.filter(certificate_id=cert_id)]
         all_idents = []
         for subclass in AbstractIdentity.get_all_subclasses():
             idents = list(subclass.objects.filter(pk__in=ids))
@@ -288,6 +284,7 @@ class AbstractIdentity(models.Model):
 
 class TextIdentity(AbstractIdentity):
     text = models.TextField(null=False)
+
     def __str__(self):
         return self.text
 
@@ -302,6 +299,7 @@ class TextIdentity(AbstractIdentity):
         ident.save()
         return ident
 
+
 class DnIdentity(AbstractIdentity):
     '''
     https://tools.ietf.org/html/rfc5280#section-4.2.1.6
@@ -313,14 +311,12 @@ class DnIdentity(AbstractIdentity):
     def value(self):
         return self.certificate.subject
 
-
     @classmethod
     def by_cert(cls, certificate):
         ident = cls()
         ident.certificate = certificate
         ident.save()
         return ident
-
 
 
 class Identity(models.Model):

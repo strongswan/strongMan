@@ -1,9 +1,12 @@
-from django.test import TestCase, RequestFactory
-from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory, UserCertificate, ViciCertificate, TextIdentity, DnIdentity, AbstractIdentity
-from strongMan.apps.certificates.request_handler.request_handler import AddHandler
-from strongMan.apps.certificates.container_reader import X509Reader
 import os
 import pickle
+
+from django.test import TestCase, RequestFactory
+
+from strongMan.apps.certificates.container_reader import X509Reader
+from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory, \
+    UserCertificate, ViciCertificate, TextIdentity, DnIdentity, AbstractIdentity
+from strongMan.apps.certificates.request_handler.request_handler import AddHandler
 
 
 class CreateRequest:
@@ -12,6 +15,7 @@ class CreateRequest:
     with CreateRequest(page, testcert) as request:
         Do stuff #!#!#!
     '''
+
     def __init__(self, page, testcert, password=""):
         self.page = page
         self.testcert = testcert
@@ -35,7 +39,6 @@ class CreateRequest:
 
     def __exit__(self, type, value, traceback):
         self.file.close()
-
 
 
 class TestCert:
@@ -81,11 +84,10 @@ def count(model):
 
 
 class UserCertificateTest(TestCase):
-
     def test_add_identites(self):
         Paths.X509_googlecom.add_to_db()
         cert = UserCertificate.objects.get(id=1)
-        self.assertEqual(len(cert.all_identities()),505)
+        self.assertEqual(len(cert.all_identities()), 505)
         self.assertEqual(count(TextIdentity), 504)
         self.assertEqual(count(DnIdentity), 1)
 

@@ -1,12 +1,11 @@
+from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
-from django.contrib import messages
 
-from ..forms import CertificateSearchForm
 from .. import models
+from ..forms import CertificateSearchForm
 from ..services import ViciCertificateManager
 from ...vici.wrapper.exception import ViciSocketException
-import string
 
 
 class AbstractOverviewHandler:
@@ -64,7 +63,7 @@ class AbstractOverviewHandler:
             return self._render(all_certs)
 
         search_pattern = form.cleaned_data["search_text"]
-        search_result = self._search_for(all_certs,search_pattern)
+        search_result = self._search_for(all_certs, search_pattern)
         page = form.cleaned_data["page"]
         return self._render(search_result, page, search_pattern)
 
@@ -108,6 +107,7 @@ class RootOverviewHandler(AbstractOverviewHandler):
 
     def all_certificates(self):
         return models.UserCertificate.objects.filter(is_CA=True)
+
 
 class OverviewHandlerException(Exception):
     pass
