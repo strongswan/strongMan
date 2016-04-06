@@ -7,7 +7,7 @@
     <div class="row">
         <div id="connection-configuration">
             <div class="col-sm-offset-2 col-sm-8">
-                <form action="{% url 'connections:connection_create' %}" method="post" >
+                <form action="{% if request.path|slice:":-12" == "/" %}{% url 'connections:connection_create' %}{% endif %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="form_name" value={{ form_name }}>
                     {% for field in form %}

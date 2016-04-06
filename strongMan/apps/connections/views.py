@@ -26,16 +26,23 @@ class ChooseTypView(LoginRequiredMixin, FormView):
 
 
 @login_required
-@require_http_methods('POST')
 def create(request):
-    form_name = request.POST['form_name']
-    form_class = getattr(forms, form_name)
-    form = form_class(request.POST)
-    if form.is_valid():
-        form.create_connection()
-        return redirect('/')
-    else:
-        return render(request, 'connections/connection_configuration.html', {'form': form, 'title': get_title(form)})
+    if request.method == 'GET':
+        form_name = request.POST['typ']
+        form_class = getattr(forms, form_name)
+        form = form_class()
+        return render(request, 'connections/connection_configuration.html',
+                      {'form': form_class(), 'form_name': form_name, 'title': get_title(form)})
+
+    elif request.method == 'POST':
+        form_name = request.POST['form_name']
+        form_class = getattr(forms, form_name)
+        form = form_class(request.POST)
+        if form.is_valid():
+            form.create_connection()
+            return redirect('/')
+        else:
+            return render(request, 'connections/connection_configuration.html', {'form': form, 'title': get_title(form)})
 
 
 @login_required

@@ -9,7 +9,7 @@ class ConnectionForm(forms.Form):
 
     def fill(self, connection):
         self.fields['profile'].initial = connection.profile
-
+        self.fields['gateway'].initial = connection.remote_addresses.first().value
 
     def create_connection(self):
         raise NotImplementedError
@@ -25,7 +25,8 @@ class ConnectionForm(forms.Form):
 
     @classmethod
     def get_types(cls):
-        return tuple(subclass().type_name(subclass) for subclass in cls.__subclasses__())
+        subclasses = [subclass() for subclass in cls.__subclasses__()]
+        return tuple(subclass.type_name(subclass) for subclass in subclasses)
 
     @classmethod
     def get_models(cls):
