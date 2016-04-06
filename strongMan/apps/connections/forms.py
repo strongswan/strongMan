@@ -52,7 +52,7 @@ class Ike2CertificateForm(ConnectionForm):
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', peer_id=profile, auth='pubkey', local=connection).save()
+        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)

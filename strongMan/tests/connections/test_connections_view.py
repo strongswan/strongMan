@@ -23,68 +23,68 @@ class ConnectionViewTest(TestCase):
         self.factory = RequestFactory()
 
     def test_select_post(self):
-        response = self.client.post('/connection/create/0', {'typ': '2'})
-        self.assertEquals(response.status_code, 302)
+        response = self.client.post('/connections/create/', {'typ': 'Ike2CertificateForm', 'form_name': 'Ike2CertificateForm'})
+        self.assertEquals(response.status_code, 200)
 
     def test_Ike2CertificateCreate_post(self):
-        url = '/connection/create/1'
+        url = '/connections/create/'
         domain = Identity.objects.first()
 
-        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id})
+        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id, 'form_name': 'Ike2CertificateForm'})
 
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2CertificateCreate_update(self):
-        url_create = '/connection/create/1'
+        url_create = '/connections/create/'
         domain = Identity.objects.first()
 
-        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id})
+        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id, 'form_name': 'Ike2CertificateForm'})
 
         connection_created = Connection.objects.first()
         self.assertEquals(connection_created.profile, 'profile')
 
-        url_update = '/connection/update/1/' + str(connection_created.id) + '/'
-        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'certificate': domain.id})
+        url_update = '/connections/' + str(connection_created.id) + '/'
+        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'certificate': domain.id, 'form_name': 'Ike2CertificateForm'})
 
         connection = Connection.objects.first()
         self.assertEquals(connection.profile, 'hans')
 
     def test_Ike2EapCreate_post(self):
-        url = '/connection/create/2'
-        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password"})
+        url = '/connections/create/'
+        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'form_name': 'Ike2EapForm'})
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2EapUpdate_post(self):
-        url_create = '/connection/create/2'
-        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password"})
+        url_create = '/connections/create/'
+        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'form_name': 'Ike2EapForm'})
         connection_created = Connection.objects.first()
         self.assertEquals(connection_created.profile, 'profile')
 
-        url_update = '/connection/update/2/' + str(connection_created.id) + '/'
-        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'username': "username", 'password': "password"})
+        url_update = '/connections/' + str(connection_created.id) + '/'
+        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'username': "username", 'password': "password", 'form_name': 'Ike2EapForm'})
 
         connection = Connection.objects.first()
         self.assertEquals(connection.profile, 'hans')
 
     def test_Ike2EapCertificateCreate_post(self):
-        url = '/connection/create/3'
+        url = '/connections/create/'
         domain = Identity.objects.first()
 
-        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id})
+        self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id, 'form_name': 'Ike2EapCertificateForm'})
 
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2EapCertificateCreate_update(self):
-        url_create = '/connection/create/3'
+        url_create = '/connections/create/'
         domain = Identity.objects.first()
 
-        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id})
+        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id, 'form_name': 'Ike2EapCertificateForm'})
 
         connection_created = Connection.objects.first()
         self.assertEquals(connection_created.profile, 'profile')
 
-        url_update = '/connection/update/3/' + str(connection_created.id) + '/'
-        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'username': "username", 'password': "password", 'certificate': domain.id})
+        url_update = '/connections/' + str(connection_created.id) + '/'
+        self.client.post(url_update, {'gateway': "gateway", 'profile': 'hans', 'username': "username", 'password': "password", 'certificate': domain.id, 'form_name': 'Ike2EapCertificateForm'})
 
         connection = Connection.objects.first()
         self.assertEquals(connection.profile, 'hans')
@@ -101,7 +101,7 @@ class ConnectionViewTest(TestCase):
     def test_toggle_connection_post(self):
         connection = Connection(profile='rw', auth='pubkey', version=1)
         connection.save()
-        response = self.client.post('/connection/toggle/', {'id':connection.id})
+        response = self.client.post('/connections/toggle/', {'id':connection.id})
         self.assertEquals(200, response.status_code)
 
 

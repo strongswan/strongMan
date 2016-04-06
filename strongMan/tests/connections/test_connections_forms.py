@@ -11,7 +11,7 @@ class ConnectionFormsTest(TestCase):
         self.domain.save()
 
     def test_ChooseTypeForm(self):
-        form_data = {'typ':  1}
+        form_data = {'typ':  "Ike2CertificateForm"}
         form = ChooseTypeForm(data=form_data)
         self.assertTrue(form.is_valid())
 
