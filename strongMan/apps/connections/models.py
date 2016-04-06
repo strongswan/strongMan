@@ -42,16 +42,8 @@ class Connection(models.Model):
         Authentication.objects.filter(local=self).delete()
         Authentication.objects.filter(remote=self).delete()
 
-    def type_name(self):
-        raise NotImplementedError
-
     def get_form(self):
         raise NotImplementedError
-
-    @classmethod
-    def get_types(cls):
-        subclasses = [subclass() for subclass in cls.__subclasses__()]
-        return tuple(subclass.type_name(subclass) for subclass in subclasses)
 
 
 class IKEv2Certificate(Connection):
@@ -59,9 +51,6 @@ class IKEv2Certificate(Connection):
     def get_form(self):
         return Form(data={'profile':  self.profile, 'gateway': self.gateway})
 
-    @staticmethod
-    def type_name(self):
-        return type(self).__name__, "IKEv2 Certificate"
 
 
 class IKEv2EAP(Connection):
@@ -69,19 +58,11 @@ class IKEv2EAP(Connection):
     def get_form(self):
         return Form(data={'profile':  self.profile, 'gateway': self.gateway})
 
-    @staticmethod
-    def type_name(self):
-        return type(self).__name__, "IKEv2 EAP (Username/Password)"
-
 
 class IKEv2CertificateEAP(Connection):
 
     def get_form(self):
         return Form(data={'profile':  self.profile, 'gateway': self.gateway})
-
-    @staticmethod
-    def type_name(self):
-        return type(self).__name__, "IKEv2 Certificate + EAP (Username/Password)"
 
 
 class Child(models.Model):

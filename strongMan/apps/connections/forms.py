@@ -7,17 +7,30 @@ class ConnectionForm(forms.Form):
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
 
+    def create_connection(self):
+        raise NotImplementedError
 
-class ClientBaseForm(forms.Form):
-    profile = forms.CharField(max_length=50, initial="")
-    gateway = forms.CharField(max_length=50, initial="")
+    def update_connection(self):
+        raise NotImplementedError
+
+    def type_name(self):
+        raise NotImplementedError
+
+    @classmethod
+    def get_types(cls):
+        subclasses = [subclass() for subclass in cls.__subclasses__()]
+        return tuple(subclass.type_name(subclass) for subclass in subclasses)
 
 
 class ChooseTypeForm(forms.Form):
-    typ = forms.ChoiceField(choices=Connection.get_types())
+    typ = forms.ChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTypeForm, self).__init__(*args, **kwargs)
+        self.fields['typ'].choices = ConnectionForm.get_types()
 
 
-class Ike2CertificateForm(ClientBaseForm):
+class Ike2CertificateForm(ConnectionForm):
     certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
 
     def create_connection(self):
@@ -37,8 +50,12 @@ class Ike2CertificateForm(ClientBaseForm):
         connection.domain = self.cleaned_data['certificate']
         connection.save()
 
+    @staticmethod
+    def type_name(cls):
+        return type(cls).__name__, "IKEv2 Certificate"
 
-class Ike2EapForm(ClientBaseForm):
+
+class Ike2EapForm(ConnectionForm):
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
 
@@ -61,8 +78,12 @@ class Ike2EapForm(ClientBaseForm):
         connection.profile = self.cleaned_data['profile']
         connection.save()
 
+    @staticmethod
+    def type_name(cls):
+        return type(cls).__name__, "IKEv2 EAP (Username/Password)"
 
-class Ike2EapCertificateForm(ClientBaseForm):
+
+class Ike2EapCertificateForm(ConnectionForm):
     certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
@@ -87,5 +108,9 @@ class Ike2EapCertificateForm(ClientBaseForm):
         connection.profile = self.cleaned_data['profile']
         connection.domain = self.cleaned_data['certificate']
         connection.save()
+
+    @staticmethod
+    def type_name(cls):
+        return type(cls).__name__, "IKEv2 Certificate + EAP (Username/Password)"
 
 

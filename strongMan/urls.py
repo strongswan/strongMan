@@ -9,7 +9,7 @@ from .apps.vici import urls as vici_urls
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^vici/', include(vici_urls)),
-    url(r'^connection/', include(connections_urls)),
+    url(r'^connections/', include(connections_urls)),
     url(r'^$', views.overview, name='index'),
     url(r'^certificates/', include(certificates_url)),
     url(r'^login/?$', views.login, name='login'),

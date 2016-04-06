@@ -4,10 +4,12 @@ from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
 from .forms import Ike2CertificateForm, Ike2EapForm, ChooseTypeForm, Ike2EapCertificateForm
 from .models import Connection, Address, Secret
+from . import forms
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
@@ -17,13 +19,25 @@ class ChooseTypView(LoginRequiredMixin, FormView):
     form_class = ChooseTypeForm
 
     def form_valid(self, form):
-        module = __import__(".forms")
-        form_class = getattr(module, self.request.POST['typ'])
-        init_form = form_class()
-        print("Form" + init_form)
-        print("Typ: " + self.request.POST['typ'])
-        self.success_url = "/connection/create/" + self.request.POST['typ']
-        return super(ChooseTypView, self).form_valid(form)
+        form_name = self.request.POST['typ']
+        form_class = getattr(forms, form_name)
+        form = form_class()
+        _, title = form.type_name(form)
+        return render(self.request, 'connections/connection_configuration.html',
+                      {'form': form_class(), 'form_name': form_name, 'title': title})
+
+
+@login_required
+def create(request):
+    print(forms.ConnectionForm.get_types())
+    form_name = request.POST['form_name']
+    form_class = getattr(forms, form_name)
+    form = form_class(request.POST)
+    if form.is_valid():
+        form.create_connection()
+        return redirect('/')
+    else:
+        return redirect('/')
 
 
 class Ike2CertificateCreateView(LoginRequiredMixin, FormView):
@@ -97,8 +111,8 @@ class Ike2EapUpdateView(LoginRequiredMixin, FormView):
         return initial
 
     def get_context_data(self, **kwargs):
-            context = super(Ike2EapUpdateView, self).get_context_data(**kwargs)
-            return context
+        context = super(Ike2EapUpdateView, self).get_context_data(**kwargs)
+        return context
 
 
 class Ike2EapCertificateCreateView(LoginRequiredMixin, FormView):

@@ -7,8 +7,9 @@
     <div class="row">
         <div id="connection-configuration">
             <div class="col-sm-offset-2 col-sm-8">
-                <form action="" method="post">
+                <form action="{% url 'connections:connection_create' %}" method="post" >
                     {% csrf_token %}
+                    <input type="hidden" name="form_name" value={{ form_name }}>
                     {% for field in form %}
                         <div class="form-group row">
                             <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
