@@ -28,6 +28,7 @@
                                   style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="id" value="{{ connection.id }}">
+                                <input type="hidden" name="connection_type" value="{{ connection.connection_type }}">
                                 <input id="toggle_input{{ connection.id }}" type="checkbox" data-toggle="toggle"
                                        data-onstyle="success"
                                        data-offstyle="default"

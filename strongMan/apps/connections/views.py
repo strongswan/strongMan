@@ -1,14 +1,13 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
-from .forms import Ike2CertificateForm, Ike2EapForm, ChooseTypeForm, Ike2EapCertificateForm
-from .models import Connection, Address, Secret
+from .models import Connection, Secret
+from . import models
 from . import forms
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
@@ -16,20 +15,19 @@ from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadE
 
 class ChooseTypView(LoginRequiredMixin, FormView):
     template_name = 'connections/select_typ.html'
-    form_class = ChooseTypeForm
+    form_class = forms.ChooseTypeForm
 
     def form_valid(self, form):
         form_name = self.request.POST['typ']
         form_class = getattr(forms, form_name)
         form = form_class()
-        _, title = form.type_name(form)
         return render(self.request, 'connections/connection_configuration.html',
-                      {'form': form_class(), 'form_name': form_name, 'title': title})
+                      {'form': form_class(), 'form_name': form_name, 'title': get_title(form)})
 
 
 @login_required
+@require_http_methods('POST')
 def create(request):
-    print(forms.ConnectionForm.get_types())
     form_name = request.POST['form_name']
     form_class = getattr(forms, form_name)
     form = form_class(request.POST)
@@ -37,121 +35,28 @@ def create(request):
         form.create_connection()
         return redirect('/')
     else:
-        return redirect('/')
+        return render(request, 'connections/connection_configuration.html', {'form': form, 'title': get_title(form)})
 
 
-class Ike2CertificateCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2CertificateForm
-    success_url = reverse_lazy("index")
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2CertificateCreateView, self).get_context_data(**kwargs)
-        return context
-
-    def form_valid(self, form):
-        form.create_connection()
-        return super(Ike2CertificateCreateView, self).form_valid(form)
-
-
-class Ike2CertificateUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2CertificateForm
-    success_url = reverse_lazy("index")
-
-    def form_valid(self, form):
-        form.update_connection(self.kwargs['pk'])
-        return super(Ike2CertificateUpdateView, self).form_valid(form)
-
-    def get_initial(self):
-        initial = super(Ike2CertificateUpdateView, self).get_initial()
-        connection = Connection.objects.get(id=self.kwargs['pk'])
-        remote_address = Address.objects.filter(remote_addresses=connection).first()
-        initial["profile"] = connection.profile
-        initial["gateway"] = remote_address.value
-        initial["certificate"] = connection.domain
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2CertificateUpdateView, self).get_context_data(**kwargs)
-        return context
-
-
-class Ike2EapCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2EapForm
-    success_url = reverse_lazy("index")
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2EapCreateView, self).get_context_data(**kwargs)
-        return context
-
-    def form_valid(self, form):
-        form.create_connection()
-        return super(Ike2EapCreateView, self).form_valid(form)
-
-
-class Ike2EapUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2EapForm
-    success_url = reverse_lazy("index")
-
-    def form_valid(self, form):
-        form.update_connection(self.kwargs['pk'])
-        return super(Ike2EapUpdateView, self).form_valid(form)
-
-    def get_initial(self):
-        initial = super(Ike2EapUpdateView, self).get_initial()
-        connection = Connection.objects.get(id=self.kwargs['pk'])
-        remote_address = Address.objects.filter(remote_addresses=connection).first()
-        secret = Secret.objects.filter(connection=connection).first()
-        initial["profile"] = connection.profile
-        initial["gateway"] = remote_address.value
-        initial["password"] = secret.data
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2EapUpdateView, self).get_context_data(**kwargs)
-        return context
-
-
-class Ike2EapCertificateCreateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2EapCertificateForm
-    success_url = reverse_lazy("index")
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2EapCertificateCreateView, self).get_context_data(**kwargs)
-        return context
-
-    def form_valid(self, form):
-        form.create_connection()
-        return super(Ike2EapCertificateCreateView, self).form_valid(form)
-
-
-class Ike2EapCertificateUpdateView(LoginRequiredMixin, FormView):
-    template_name = 'connections/connection_configuration.html'
-    form_class = Ike2EapCertificateForm
-    success_url = reverse_lazy("index")
-
-    def form_valid(self, form):
-        form.update_connection(self.kwargs['pk'])
-        return super(Ike2EapCertificateUpdateView, self).form_valid(form)
-
-    def get_initial(self):
-        initial = super(Ike2EapCertificateUpdateView, self).get_initial()
-        connection = Connection.objects.get(id=self.kwargs['pk'])
-        remote_address = Address.objects.filter(remote_addresses=connection).first()
-        secret = Secret.objects.filter(connection=connection).first()
-        initial["profile"] = connection.profile
-        initial["gateway"] = remote_address.value
-        initial["password"] = secret.data
-        initial["certificate"] = connection.domain
-        return initial
-
-    def get_context_data(self, **kwargs):
-        context = super(Ike2EapCertificateUpdateView, self).get_context_data(**kwargs)
-        return context
+@login_required
+def update(request, id):
+    if request.method == 'GET':
+        connection = get_connection_typ(id)
+        form_class = get_form_class(connection)
+        form = form_class()
+        form.fill(connection)
+        return render(request, 'connections/connection_configuration.html',
+                      {'form': form, 'form_name': get_form_name(form), 'title': get_title(form)})
+    elif request.method == 'POST':
+        form_name = request.POST['form_name']
+        form_class = getattr(forms, form_name)
+        form = form_class(request.POST)
+        if form.is_valid():
+            form.update_connection(id)
+            return redirect('/')
+        else:
+            return render(request, 'connections/connection_configuration.html',
+                      {'form': form, 'form_name': get_form_name(form), 'title': get_title(form)})
 
 
 @login_required
@@ -194,3 +99,29 @@ def delete_connection(request, pk):
         connection.delete_all_connected_models()
         connection.delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def get_title(form):
+    _, title = form.type_name(form)
+    return title
+
+
+def get_form_name(form):
+    name, _ = form.type_name(form)
+    return name
+
+
+def get_connection_typ(connection_id):
+    print(Connection.get_types())
+    for cls in Connection.get_types():
+        connection_class = getattr(models, cls)
+        connection = connection_class.objects.filter(id=connection_id)
+        if connection:
+            return connection.first()
+
+
+def get_form_class(connection):
+    typ = type(connection)
+    for model, form_name in forms.ConnectionForm.get_models():
+        if model == typ:
+            return getattr(forms, form_name)

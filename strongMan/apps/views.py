@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from .connections.models import Connection, Address
+from .connections import models
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
@@ -25,13 +26,18 @@ def overview(request):
         messages.warning(request, str(e))
 
     connections = []
-    for connection in Connection.objects.all():
-        connection_dict = dict(id=connection.id, profile=connection.profile, state=connection.state)
-        address = Address.objects.filter(remote_addresses=connection).first()
-        connection_dict['remote'] = address.value
-        connection_dict['edit'] = "/connection/update/"+str(connection.typ.id)+"/"+str(connection.id)
-        connection_dict['delete'] = "/connection/delete/"+str(connection.id)
-        connections.append(connection_dict)
+
+    for cls in Connection.get_types():
+        connection_class = getattr(models, cls)
+        for connection in connection_class.objects.all():
+            connection_dict = dict(id=connection.id, profile=connection.profile, state=connection.state)
+            address = Address.objects.filter(remote_addresses=connection).first()
+            connection_dict['remote'] = address.value
+            connection_dict['edit'] = "/connections/" + str(connection.id)
+            connection_dict['connection_type'] = cls
+            connection_dict['delete'] = "/connections/delete/" + str(connection.id)
+            connections.append(connection_dict)
+
     context = dict(connections=connections)
     return render(request, 'index.html', context)
 
@@ -58,6 +64,7 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return render(request, 'login.html')
+
 
 @login_required
 @require_http_methods('GET')

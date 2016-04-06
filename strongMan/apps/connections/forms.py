@@ -1,11 +1,15 @@
 from django import forms
-from .models import Connection, Address, Authentication, Secret
+from .models import Address, Authentication, Secret, IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
 from strongMan.apps.certificates.models import Identity
 
 
 class ConnectionForm(forms.Form):
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
+
+    def fill(self, connection):
+        self.fields['profile'].initial = connection.profile
+
 
     def create_connection(self):
         raise NotImplementedError
@@ -16,10 +20,16 @@ class ConnectionForm(forms.Form):
     def type_name(self):
         raise NotImplementedError
 
+    def get_model(self):
+        raise NotImplementedError
+
     @classmethod
     def get_types(cls):
-        subclasses = [subclass() for subclass in cls.__subclasses__()]
-        return tuple(subclass.type_name(subclass) for subclass in subclasses)
+        return tuple(subclass().type_name(subclass) for subclass in cls.__subclasses__())
+
+    @classmethod
+    def get_models(cls):
+        return [subclass().get_model() for subclass in cls.__subclasses__()]
 
 
 class ChooseTypeForm(forms.Form):
@@ -37,22 +47,28 @@ class Ike2CertificateForm(ConnectionForm):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
         domain = self.cleaned_data['certificate']
-        connection = Connection(profile=profile, auth='pubkey', version=2, domain=domain)
+        connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
         Authentication(name='local', peer_id=profile, auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
-        connection = Connection.objects.get(id=pk)
+        connection = IKEv2Certificate.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
         connection.domain = self.cleaned_data['certificate']
         connection.save()
 
+    def fill(self, connection):
+        super(Ike2CertificateForm, self).fill(connection)
+
     @staticmethod
     def type_name(cls):
         return type(cls).__name__, "IKEv2 Certificate"
+
+    def get_model(self):
+        return IKEv2Certificate, type(self).__name__
 
 
 class Ike2EapForm(ConnectionForm):
@@ -64,23 +80,29 @@ class Ike2EapForm(ConnectionForm):
         gateway = self.cleaned_data['gateway']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        connection = Connection(profile=profile, auth='pubkey', version=2)
+        connection = IKEv2EAP(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', peer_id=profile, auth='pubkey', local=connection).save()
+        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
-        connection = Connection.objects.get(id=pk)
+        connection = IKEv2EAP.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         Secret.objects.filter(connection=connection).update(data=self.cleaned_data['password'])
         connection.profile = self.cleaned_data['profile']
         connection.save()
 
+    def fill(self, connection):
+        super(Ike2EapForm, self).fill(connection)
+
     @staticmethod
     def type_name(cls):
         return type(cls).__name__, "IKEv2 EAP (Username/Password)"
+
+    def get_model(self):
+        return IKEv2EAP, type(self).__name__
 
 
 class Ike2EapCertificateForm(ConnectionForm):
@@ -94,23 +116,28 @@ class Ike2EapCertificateForm(ConnectionForm):
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
         domain = self.cleaned_data['certificate']
-        connection = Connection(profile=profile, auth='pubkey', version=2, domain=domain)
+        connection = IKEv2CertificateEAP(profile=profile, auth='pubkey', version=2, domain=domain)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', peer_id=profile, auth='pubkey', local=connection).save()
+        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
-        connection = Connection.objects.get(id=pk)
+        connection = IKEv2CertificateEAP.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         Secret.objects.filter(connection=connection).update(data=self.cleaned_data['password'])
         connection.profile = self.cleaned_data['profile']
         connection.domain = self.cleaned_data['certificate']
         connection.save()
 
+    def fill(self, connection):
+        super(Ike2CertificateForm, self).fill(connection)
+
     @staticmethod
     def type_name(cls):
         return type(cls).__name__, "IKEv2 Certificate + EAP (Username/Password)"
 
+    def get_model(self):
+        return IKEv2CertificateEAP, type(self).__name__
 
