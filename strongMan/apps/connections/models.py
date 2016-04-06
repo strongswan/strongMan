@@ -13,7 +13,7 @@ class Connection(models.Model):
 
     def dict(self):
         children = OrderedDict()
-        for child in self.children:
+        for child in self.children.all():
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
@@ -70,9 +70,9 @@ class Child(models.Model):
 
     def dict(self):
         child = OrderedDict(mode=self.mode)
-        child['local_ts'] = [local_t.value for local_t in self.local_ts]
-        child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts]
-        child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposal]
+        child['local_ts'] = [local_t.value for local_t in self.local_ts.all()]
+        child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts.all()]
+        child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposal.all()]
 
 
 class Secret(models.Model):
@@ -82,7 +82,7 @@ class Secret(models.Model):
 
     def dict(self):
         secrets = OrderedDict(type=self.type, data=self.data)
-        secrets['owners'] = [owner.value for owner in self.remote_addresses]
+        secrets['owners'] = [owner.value for owner in self.remote_addresses.all()]
         return secrets
 
 
