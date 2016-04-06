@@ -1,6 +1,6 @@
 from django import forms
 from .models import Connection, Address, Authentication, Secret, Typ
-from strongMan.apps.certificates.models import Identity
+from strongMan.apps.certificates.models import AbstractIdentity
 
 
 class ClientBaseForm(forms.Form):
@@ -13,7 +13,7 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ClientBaseForm):
-    certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
+    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
@@ -60,7 +60,7 @@ class Ike2EapForm(ClientBaseForm):
 
 
 class Ike2EapCertificateForm(ClientBaseForm):
-    certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
+    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
 
