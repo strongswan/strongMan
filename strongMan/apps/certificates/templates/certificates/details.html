@@ -3,6 +3,19 @@
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Details{% endblock small-title %}
 {% block content %}
+    <script>
+        function removeBtnClicked(form) {
+            jform = $(form);
+            btn = jform.find('.remove-btn');
+            if (btn.hasClass('btn-default')) {
+                btn.removeClass('btn-default').addClass('btn-danger');
+                btn.find('.removebtn-text').text('Are you sure?');
+                return false;
+            } else {
+                return true;
+            }
+        }
+    </script>
     <div class="container" id="certificate-detail">
         <div class="row">
             {% if certificate %}
@@ -12,17 +25,17 @@
                         {% include "certificates/widgets/PublicKey_view.html" with x509=certificate %}
                     </div>
                     {% if not readonly %}
-                    <div class="row text-center">
-                        <form action="" method="POST" style="display: inline;">
-                            {% csrf_token %}
+                        <div class="row text-center">
+                            <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
+                                {% csrf_token %}
                             <span title="Remove certificate">
                                 <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
                                         id="remove_cert-btn">
-                                    <span class="glyphicon glyphicon-remove"></span> Remove certificate
+                                    <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove certificate</span>
                                 </button>
                             </span>
-                        </form>
-                    </div>
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
             {% endif %}
@@ -33,12 +46,12 @@
                         {% include "certificates/widgets/PrivateKey_view.html" with private=private %}
                     </div>
                     <div class="row text-center">
-                        <form action="" method="POST" style="display: inline;">
+                        <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
                             {% csrf_token %}
                                 <span title="Remove private key">
                                     <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
                                             id="remove_privatekey-btn">
-                                        <span class="glyphicon glyphicon-remove"></span> Remove private key
+                                        <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove private key</span>
                                     </button>
                                 </span>
                         </form>
@@ -46,14 +59,5 @@
                 </div>
             {% endif %}
         </div>
-        <script>
-            $(".remove-btn")
-                    .mouseenter(function () {
-                        $("#" + this.id).removeClass('btn-default').addClass('btn-danger');
-                    })
-                    .mouseleave(function () {
-                        $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
-                    });
-        </script>
     </div>
 {% endblock content %}
