@@ -6,7 +6,7 @@ from django.test import TestCase, RequestFactory
 from strongMan.apps.certificates.container_reader import X509Reader
 from strongMan.apps.certificates.models import Certificate, PrivateKey, Identity, DistinguishedName, CertificateFactory, \
     UserCertificate, ViciCertificate, TextIdentity, DnIdentity, AbstractIdentity
-from strongMan.apps.certificates.request_handler.request_handler import AddHandler
+from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
 
 
 class CreateRequest:
@@ -97,6 +97,13 @@ class UserCertificateTest(TestCase):
         self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
+
+    def test_encrypted_der_container(self):
+        Paths.PKCS12_rsa.add_to_db()
+        cert = UserCertificate.objects.first()
+        reader = X509Reader.by_bytes(cert.der_container)
+        reader.parse()
+        self.assertEqual(reader.der_dump(), cert.der_container)
 
     def test_delete_privatekey(self):
         Paths.PKCS12_rsa.add_to_db()

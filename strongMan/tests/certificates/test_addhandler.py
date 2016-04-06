@@ -3,7 +3,7 @@ import os
 from django.test import TestCase, RequestFactory
 
 from strongMan.apps.certificates.models import Certificate, PrivateKey
-from strongMan.apps.certificates.request_handler.request_handler import AddHandler
+from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
 
 
 def create_request(page, context):

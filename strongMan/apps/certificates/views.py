@@ -4,7 +4,8 @@ from django.views.decorators.http import require_http_methods
 
 from strongMan.apps.certificates.request_handler import OverviewHandler
 from .models import Certificate
-from .request_handler.request_handler import AddHandler, DetailsHandler
+from .request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.request_handler.DetailsHandler import DetailsHandler
 from .forms import AddForm
 
 

@@ -13,7 +13,8 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ClientBaseForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
+    #Todo
+    #certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
@@ -60,7 +61,8 @@ class Ike2EapForm(ClientBaseForm):
 
 
 class Ike2EapCertificateForm(ClientBaseForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
+    #Todo
+    #certificate = forms.ModelChoiceField(queryset=AbstractIdentity.all_identities(), empty_label=None)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
 

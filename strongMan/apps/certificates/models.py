@@ -5,6 +5,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from .container_reader import X509Reader
+from ..encryption import fields
 
 
 class DjangoEnum(Enum):
@@ -16,7 +17,7 @@ class DjangoEnum(Enum):
 
 class KeyContainer(models.Model):
     id = models.AutoField(primary_key=True)
-    der_container = models.BinaryField()
+    der_container = fields.EncryptedField()
     type = models.CharField(max_length=10)
     algorithm = models.CharField(max_length=3)
     public_key_hash = models.TextField()
@@ -108,8 +109,7 @@ def certificate_clean_submodels(sender, **kwargs):
     cert = kwargs['instance']
     cert.subject.delete()
     cert.issuer.delete()
-    # cert.valid_domains.all().delete()
-
+    cert.identities.all().delete()
 
 class UserCertificate(Certificate):
     private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
