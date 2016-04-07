@@ -72,7 +72,7 @@ class Child(models.Model):
         child = OrderedDict(mode=self.mode)
         child['local_ts'] = [local_t.value for local_t in self.local_ts.all()]
         child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts.all()]
-        child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposal.all()]
+        child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposals.all()]
 
 
 class Secret(models.Model):
@@ -82,7 +82,7 @@ class Secret(models.Model):
 
     def dict(self):
         secrets = OrderedDict(type=self.type, data=self.data)
-        secrets['owners'] = [owner.value for owner in self.remote_addresses.all()]
+        secrets['owners'] = [owner.value for owner in self.connection.remote_addresses.all()]
         return secrets
 
 
