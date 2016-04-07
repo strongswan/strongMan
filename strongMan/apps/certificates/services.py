@@ -1,3 +1,4 @@
+import strongMan.apps.certificates.models.certificates
 from strongMan.apps.certificates import models
 from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader, ContainerDetector
 
@@ -45,7 +46,7 @@ class UserCertificateManager:
             e = CertificateManagerException(
                 "Private key already exists.")
             return AddKeyContainerResult(False, exceptions=[e])
-        privatekey = models.PrivateKey.by_reader(reader)
+        privatekey = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(reader)
         privatekey.connect_to_certificates()
         return AddKeyContainerResult(True, privatekey=privatekey)
 
@@ -60,7 +61,7 @@ class UserCertificateManager:
         if already_exists:
             e = CertificateManagerException("Certificate " + reader.cname() + " already exists.")
             return AddKeyContainerResult(False, exceptions=[e])
-        cert = models.CertificateFactory.user_certificate_by_x509reader(reader)
+        cert = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(reader)
         cert.set_privatekey_if_exists()
         cert.save()
         result = AddKeyContainerResult(True, certificate=cert, further_certificates=[])
@@ -92,7 +93,7 @@ class UserCertificateManager:
 
     @classmethod
     def _certificate_by_hashserial(cls, publickey_hash, serial_number):
-        certs = models.UserCertificate.objects.filter(public_key_hash=publickey_hash, serial_number=serial_number)
+        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(public_key_hash=publickey_hash, serial_number=serial_number)
         if len(certs) > 0:
             return certs[0]
         else:
@@ -100,7 +101,7 @@ class UserCertificateManager:
 
     @classmethod
     def _certificate_by_hash(cls, publickey_hash):
-        certs = models.UserCertificate.objects.filter(public_key_hash=publickey_hash)
+        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(public_key_hash=publickey_hash)
         if len(certs) > 0:
             return certs[0]
         else:
@@ -108,7 +109,7 @@ class UserCertificateManager:
 
     @classmethod
     def _privatekey_by_hash(cls, publickey_hash):
-        keys = models.PrivateKey.objects.filter(public_key_hash=publickey_hash)
+        keys = strongMan.apps.certificates.models.certificates.PrivateKey.objects.filter(public_key_hash=publickey_hash)
         if len(keys) > 0:
             return keys[0]
         else:
@@ -122,7 +123,7 @@ class ViciCertificateManager:
         Deletes all ViciCertificates, reads the vici interface and save all Certificates there
         :return None
         '''
-        models.ViciCertificate.objects.all().delete()
+        strongMan.apps.certificates.models.certificates.ViciCertificate.objects.all().delete()
         wrapper = ViciWrapper()
         vici_certs = wrapper.get_certificates()
         for dict in vici_certs:
@@ -134,7 +135,7 @@ class ViciCertificateManager:
 
     @classmethod
     def _add_x509(cls, vici_dict):
-        cert = models.CertificateFactory.vicicertificate_by_dict(vici_dict)
+        cert = strongMan.apps.certificates.models.certificates.CertificateFactory.vicicertificate_by_dict(vici_dict)
         if cls._usercert_already_exists(cert):
             cert.delete()
             raise CertificateManagerException("Vicicertificate already exists as a UserCertificate.")

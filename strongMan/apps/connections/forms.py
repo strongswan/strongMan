@@ -1,6 +1,6 @@
 from django import forms
 from .models import Connection, Address, Authentication, Secret, Typ
-from strongMan.apps.certificates.models import AbstractIdentity
+from strongMan.apps.certificates.models.identities import AbstractIdentity
 
 
 class ClientBaseForm(forms.Form):

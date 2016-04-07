@@ -1,22 +1,15 @@
-from enum import Enum
-
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
-from .container_reader import X509Reader
-from ..encryption import fields
+from ..container_reader import X509Reader
+from .core import CertificateException, CertificateModel, DjangoAbstractBase
+from .identities import AbstractIdentity, TextIdentity, DnIdentity
+from strongMan.apps.encryption import fields
 
 
-class DjangoEnum(Enum):
-    @classmethod
-    def choices(cls):
-        # This method converts a Python enum to Django Choises used in the database models
-        return [(x.value, x.name) for x in cls]
-
-
-class KeyContainer(models.Model):
-    id = models.AutoField(primary_key=True)
+class KeyContainer(CertificateModel, models.Model):
     der_container = fields.EncryptedField()
     type = models.CharField(max_length=10)
     algorithm = models.CharField(max_length=3)
@@ -71,7 +64,7 @@ class PrivateKey(KeyContainer):
         return keys[0]
 
 
-class DistinguishedName(models.Model):
+class DistinguishedName(CertificateModel, models.Model):
     blob = models.BinaryField()
     location = models.TextField()
     country = models.TextField()
@@ -86,17 +79,17 @@ class DistinguishedName(models.Model):
                ", O=" + self.organization + ", OU=" + self.unit + ", CN=" + self.cname
 
 
-class Certificate(KeyContainer):
+class Certificate(KeyContainer, DjangoAbstractBase):
     serial_number = models.TextField()
     hash_algorithm = models.CharField(max_length=20)
     is_CA = models.BooleanField()
     valid_not_after = models.DateTimeField()
     valid_not_before = models.DateTimeField()
-    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="issuer", null=True)
-    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="subject", null=True)
-
-    def all_identities(self):
-        return AbstractIdentity.all_identities(cert_id=self.id)
+    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_issuer", null=True)
+    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_subject", null=True)
+    identities = GenericRelation(AbstractIdentity,
+                                 content_type_field='certificate_type',
+                                 object_id_field='certificate_id')
 
 
 @receiver(pre_delete, sender=Certificate)
@@ -110,6 +103,7 @@ def certificate_clean_submodels(sender, **kwargs):
     cert.subject.delete()
     cert.issuer.delete()
     cert.identities.all().delete()
+
 
 class UserCertificate(Certificate):
     private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
@@ -244,88 +238,3 @@ class CertificateFactory:
         vicicert.has_private_key = 'has_privkey' in cert_dict and cert_dict['has_privkey'] == b'yes'
         vicicert.save()
         return vicicert
-
-
-class AbstractIdentity(models.Model):
-    '''
-    https://wiki.strongswan.org/projects/strongswan/wiki/IdentityParsing
-    '''
-    certificate = models.ForeignKey(Certificate, null=True, related_name='identities', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(super(AbstractIdentity, self))
-
-    def value(self):
-        raise NotImplementedError()
-
-    @classmethod
-    def get_all_subclasses(cls):
-        all_subclasses = []
-
-        for subclass in cls.__subclasses__():
-            all_subclasses.append(subclass)
-            all_subclasses.extend(subclass.get_all_subclasses())
-
-        return all_subclasses
-
-    @classmethod
-    def all_identities(cls, cert_id=None):
-        if cert_id is None:
-            ids = [identity.id for identity in AbstractIdentity.objects.all()]
-        else:
-            ids = [identity.id for identity in AbstractIdentity.objects.filter(certificate_id=cert_id)]
-        all_idents = []
-        for subclass in AbstractIdentity.get_all_subclasses():
-            idents = list(subclass.objects.filter(pk__in=ids))
-            all_idents += idents
-
-        return all_idents
-
-
-class TextIdentity(AbstractIdentity):
-    text = models.TextField(null=False)
-
-    def __str__(self):
-        return self.text
-
-    def value(self):
-        return self.text
-
-    @classmethod
-    def by_san(cls, subjectAltName, certificate):
-        ident = cls()
-        ident.text = subjectAltName
-        ident.certificate = certificate
-        ident.save()
-        return ident
-
-
-class DnIdentity(AbstractIdentity):
-    '''
-    https://tools.ietf.org/html/rfc5280#section-4.2.1.6
-    '''
-
-    def __str__(self):
-        return str(self.certificate.subject)
-
-    def value(self):
-        return self.certificate.subject
-
-    @classmethod
-    def by_cert(cls, certificate):
-        ident = cls()
-        ident.certificate = certificate
-        ident.save()
-        return ident
-
-
-class Identity(models.Model):
-    pass
-
-
-class CertificateException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)

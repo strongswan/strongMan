@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
 
+import strongMan.apps.certificates.models.certificates
+import strongMan.apps.certificates.models.identities
 from .. import models
 from ..forms import CertificateSearchForm
 from ..services import ViciCertificateManager
@@ -41,12 +43,13 @@ class AbstractOverviewHandler:
         return x509_list
 
     def _search_for(self, all_certs, search_text):
-        identities = models.AbstractIdentity.all_identities()
         cert_ids = []
+        identities = strongMan.apps.certificates.models.identities.AbstractIdentity.objects.all()
         for ident in identities:
-            if search_text in str(ident).lower():
-                cert_ids.append(ident.certificate.id)
-        return all_certs.filter(id__in=cert_ids)
+            ident = ident.subclass()
+            if search_text.lower() in str(ident).lower():
+                cert_ids.append(ident.certificate.pk)
+        return all_certs.filter(pk__in=cert_ids)
 
     def handle(self):
         try:
@@ -82,7 +85,7 @@ class ViciOverviewHandler(AbstractOverviewHandler):
             ViciCertificateManager.reload_certs()
         except ViciSocketException as e:
             raise OverviewHandlerException("Vici is not reachable!") from e
-        return models.ViciCertificate.objects.all()
+        return strongMan.apps.certificates.models.certificates.ViciCertificate.objects.all()
 
 
 class EntityOverviewHandler(AbstractOverviewHandler):
@@ -90,7 +93,7 @@ class EntityOverviewHandler(AbstractOverviewHandler):
         return "entities"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.filter(is_CA=False)
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(is_CA=False)
 
 
 class MainOverviewHandler(AbstractOverviewHandler):
@@ -98,7 +101,7 @@ class MainOverviewHandler(AbstractOverviewHandler):
         return "all"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.all()
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.all()
 
 
 class RootOverviewHandler(AbstractOverviewHandler):
@@ -106,7 +109,7 @@ class RootOverviewHandler(AbstractOverviewHandler):
         return "root"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.filter(is_CA=True)
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(is_CA=True)
 
 
 class OverviewHandlerException(Exception):

@@ -2,6 +2,7 @@ import os
 
 from django.test import TestCase
 
+import strongMan.apps.certificates.models.certificates
 import strongMan.apps.certificates.models as models
 from strongMan.apps.certificates import container_reader
 from strongMan.apps.certificates.container_reader import ContainerTypes, ContainerDetector, AbstractContainerReader, X509Reader, \
@@ -152,7 +153,7 @@ class PCKS1ContainerTest(TestCase):
         bytes = Paths.PKCS1_ec.read()
         priv = PKCS1Reader.by_bytes(bytes)
         priv.parse()
-        privatekey = models.PrivateKey.by_reader(priv)
+        privatekey = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(priv)
         self.assertIsNotNone(privatekey)
         self.assertIsNotNone(privatekey.algorithm)
         self.assertIsNotNone(privatekey.der_container)
@@ -221,7 +222,7 @@ class PCKS8ContainerTest(TestCase):
         bytes = Paths.PKCS8_ec.read()
         x509 = PKCS8Reader.by_bytes(bytes)
         x509.parse()
-        public = models.PrivateKey.by_reader(x509)
+        public = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(x509)
         self.assertIsNotNone(public)
         self.assertIsNotNone(public.algorithm)
         self.assertIsNotNone(public.der_container)
@@ -254,8 +255,8 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         containe = PKCS12Reader.by_bytes(bytes)
         containe.parse()
-        cert = models.CertificateFactory.user_certificate_by_x509reader(containe.public_key())
-        self.assertIsInstance(cert, models.Certificate)
+        cert = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(containe.public_key())
+        self.assertIsInstance(cert, strongMan.apps.certificates.models.certificates.Certificate)
 
     def test_private_key(self):
         bytes = Paths.PKCS12_rsa.read()
@@ -276,8 +277,8 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         container = PKCS12Reader.by_bytes(bytes)
         container.parse()
-        private = models.PrivateKey.by_reader(container.private_key())
-        public = models.CertificateFactory.user_certificate_by_x509reader(container.public_key())
+        private = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(container.private_key())
+        public = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(container.public_key())
         self.assertEqual(private.public_key_hash, public.public_key_hash)
 
 
@@ -352,7 +353,7 @@ class X509ContainerTest(TestCase):
         bytes = Paths.X509_rsa_ca.read()
         x509 = X509Reader.by_bytes(bytes)
         x509.parse()
-        public = models.CertificateFactory.user_certificate_by_x509reader(x509)
+        public = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(x509)
         self.assertIsNotNone(public)
         self.assertIsNotNone(public.subject)
         self.assertIsNotNone(public.issuer)

@@ -1,5 +1,5 @@
 from django.db import models
-from strongMan.apps.certificates.models import AbstractIdentity
+from strongMan.apps.certificates.models.identities import TextIdentity
 from collections import OrderedDict
 
 
@@ -10,7 +10,7 @@ class Typ(models.Model):
 class Connection(models.Model):
     state = models.BooleanField(default=False)
     typ = models.ForeignKey(Typ, null=True, blank=True, default=None)
-    domain = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None)
+    domain = models.ForeignKey(TextIdentity, null=True, blank=True, default=None)
     profile = models.CharField(max_length=50)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()

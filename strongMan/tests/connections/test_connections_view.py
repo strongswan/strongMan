@@ -1,7 +1,8 @@
 from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection
-from strongMan.apps.certificates.models import TextIdentity, Certificate
+from strongMan.apps.certificates.models.certificates import Certificate
+from strongMan.apps.certificates.models.identities import TextIdentity
 from strongMan.apps.connections import views
 from django import forms
 

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from strongMan.apps.connections.forms import Ike2CertificateForm, Ike2EapCertificateForm, Ike2EapForm, ChooseTypeForm
-from strongMan.apps.certificates.models import TextIdentity
+from strongMan.apps.certificates.models.identities import TextIdentity
 
 
 class ConnectionFormsTest(TestCase):

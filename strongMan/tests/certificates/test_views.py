@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory, Client
 
-from strongMan.apps.certificates.models import Certificate, PrivateKey
+from strongMan.apps.certificates.models import Certificate
+from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
 from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
 
 
@@ -99,7 +100,7 @@ class AddHandlerTest(TestCase):
         self.assertTrue(not context['public'].is_CA)
         self.assertEqual(2, self.certificates_count())
         self.assertEqual(0, self.privatekeys_count())
-        domains_count = context['public'].all_identities().__len__()
+        domains_count = context['public'].identities.all().__len__()
         self.assertEqual(505, domains_count)
 
     def test_x509_with_pw(self):

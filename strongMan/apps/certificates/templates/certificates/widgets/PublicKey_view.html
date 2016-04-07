@@ -55,8 +55,8 @@
                             <table class="table">
                                 <tr>
                                     <td>Identities</td>
-                                    <td>{% for identity in x509.all_identities %}
-                                        - {{ identity }} <br/>
+                                    <td>{% for identity in x509.identities.all %}
+                                        - {{ identity.subclass }} <br/>
                                     {% endfor %}</td>
                                 </tr>
                             </table>
