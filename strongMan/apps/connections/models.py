@@ -110,5 +110,6 @@ class Authentication(models.Model):
 
     def dict(self):
         auth = OrderedDict(auth=self.auth)
+        auth['id'] = self.identity
         return auth
 
