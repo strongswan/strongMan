@@ -12,8 +12,7 @@ class ViciWrapperTest(TestCase):
         self.vici_wrapper.unload_all_connections()
         self.connection = Connection(profile='rw', auth='pubkey', version=1)
         self.connection.save()
-        Authentication(name='local-1', identity='home', auth='pubkey', local=self.connection).save()
-        print(self.connection.dict())
+        Authentication(name='local-1', auth='pubkey', local=self.connection).save()
 
     def test_vici_socket(self):
         with self.assertRaises(ViciSocketException):
@@ -31,10 +30,6 @@ class ViciWrapperTest(TestCase):
         status = self.vici_wrapper.get_status()
         self.assertTrue(bool(status))
 
-    def test_vici_get_certificates_empty(self):
-        certificates = self.vici_wrapper.get_certificates()
-        self.assertFalse(bool(certificates))
-
     def test_vici_load_connection(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
@@ -45,7 +40,7 @@ class ViciWrapperTest(TestCase):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
         self.assertEquals(1,self.vici_wrapper.get_connections_names().__len__())
-        self.assertTrue(self.vici_wrapper.is_connection_active(self.connection.profile))
+        self.assertTrue(self.vici_wrapper.is_connection_loaded(self.connection.profile))
 
     def test_vici_unload_connection(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())

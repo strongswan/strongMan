@@ -1,6 +1,6 @@
 import socket
 from collections import OrderedDict
-from .exception import ViciSocketException, ViciLoadException
+from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException
 from strongMan.apps.vici import vici
 
 
@@ -75,7 +75,7 @@ class ViciWrapper:
             certificates.append(certificate)
         return certificates
 
-    def is_connection_active(self, connection_name):
+    def is_connection_loaded(self, connection_name):
         '''
         :param connection_name:
         :type connection_name: str
@@ -84,6 +84,12 @@ class ViciWrapper:
         '''
         for connection in self.get_connections_names():
             if connection == connection_name:
+                return True
+        return False
+
+    def is_connection_established(self, connection_name):
+        for sa in self.get_sas():
+            if connection_name in sa:
                 return True
         return False
 
@@ -108,3 +114,41 @@ class ViciWrapper:
         '''
         return self.get_status()['plugins']
 
+    def get_sas(self):
+        sas = []
+        for sa in self.session.list_sas():
+            sas.append(sa)
+        return sas
+
+    def initiate(self, child_name, connection_name):
+        '''
+        :param child_name, connection_name:
+        :type child_name: str
+        :type ike_name: str
+        :return: log
+        :rtype: List OrderedDict
+        '''
+        sa = OrderedDict(ike=connection_name, child=child_name)
+        try:
+            logs = self.session.initiate(sa)
+            report = []
+            for log in logs:
+                report.append(log)
+        except Exception as e:
+            raise ViciInitiateException("SA can't be initiated!") from e
+        return report
+
+    def terminate_connection(self, connection_name):
+        '''
+        :param connection_name:
+        :type connection_name: str
+        '''
+        ike = OrderedDict(ike=connection_name)
+        try:
+            logs = self.session.terminate(ike)
+            report = []
+            for log in logs:
+                report.append(log)
+        except Exception as e:
+            raise ViciTerminateException("Cant't terminate connection " + connection_name + "!") from e
+        return report

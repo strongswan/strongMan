@@ -3,3 +3,9 @@ class ViciSocketException(Exception):
 
 class ViciLoadException(Exception):
     '''Raise when load failes'''
+
+class ViciInitiateException(Exception):
+    '''Raise when load failes'''
+
+class ViciTerminateException(Exception):
+    '''Raise when load failes'''

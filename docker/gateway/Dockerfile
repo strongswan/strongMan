@@ -7,7 +7,9 @@ ENV STRONGSWAN_VERSION 5.4.0
 RUN mkdir /opt/strongSwan \
 && apt-get update \
 
-&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential curl > /dev/null 2>&1 \
+&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential vim freeradius freeradius-mysql> /dev/null 2>&1 \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get -q -y install mysql-server \
 && wget http://download.strongswan.org/strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && tar xjvf strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && cd strongswan-$STRONGSWAN_VERSION \
@@ -26,14 +28,18 @@ RUN mkdir /opt/strongSwan \
 && make -j > /dev/null 2>&1 \
 && make install > /dev/null 2>&1 \
 && cd / \
-&& git clone https://github.com/Sebubu/StrongMan.git \
-&& cd StrongMan \
+&& git clone https://github.com/Sebubu/strongMan.git \
+&& cd strongMan \
 && pip install --upgrade pip \
 && pip install -r requirements.txt \
-&& cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/swanctl/* /etc/swanctl/
+&& cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/swanctl/* /etc/swanctl/ \
+&& cp /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/ipsec.secrets /etc/
 
 ADD swanctl.conf /etc/swanctl/swanctl.conf
 ADD strongswan.conf /etc/strongswan.conf
+ADD radiusd.conf /etc/freeradius/radiusd.conf
+ADD clients.conf /etc/freeradius/clients.conf
+ADD eap-radius.conf /etc/strongswan.d/charon/eap-radius.conf
 
 
 

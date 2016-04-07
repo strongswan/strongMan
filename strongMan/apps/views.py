@@ -10,8 +10,6 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
 
-
-
 @require_http_methods(('GET', 'POST'))
 def login(request):
     if request.method == 'POST':
