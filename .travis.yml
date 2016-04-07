@@ -20,7 +20,7 @@ before_install:
 
 script:
   - docker-compose up -d gateway
-  - sleep 10
+  - sleep 20
   - docker-compose run roadwarrior /bin/sh -c "cd /StrongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test --settings=strongMan.settings.local"
 
 

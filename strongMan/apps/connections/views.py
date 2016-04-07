@@ -43,7 +43,6 @@ def overview(request):
     return render(request, 'index.html', context)
 
 
-
 class ChooseTypView(LoginRequiredMixin, FormView):
     template_name = 'connections/select_typ.html'
     form_class = forms.ChooseTypeForm
@@ -53,7 +52,7 @@ class ChooseTypView(LoginRequiredMixin, FormView):
         form_class = getattr(forms, form_name)
         form = form_class()
         return render(self.request, 'connections/connection_configuration.html',
-                      {'form': form_class(), 'form_name': form_name, 'title': get_title(form)})
+                      {'form': form_class(), 'form_name': form_name, 'title': _get_title(form)})
 
 
 @login_required
@@ -63,7 +62,7 @@ def create(request):
         form_class = getattr(forms, form_name)
         form = form_class()
         return render(request, 'connections/connection_configuration.html',
-                      {'form': form_class(), 'form_name': form_name, 'title': get_title(form)})
+                      {'form': form_class(), 'form_name': form_name, 'title': _get_title(form)})
 
     elif request.method == 'POST':
         form_name = request.POST['form_name']
@@ -73,18 +72,17 @@ def create(request):
             form.create_connection()
             return redirect('/')
         else:
-            return render(request, 'connections/connection_configuration.html', {'form': form, 'title': get_title(form)})
+            return render(request, 'connections/connection_configuration.html', {'form': form, 'title': _get_title(form)})
 
 
 @login_required
 def update(request, id):
     if request.method == 'GET':
-        connection = get_connection_typ(id)
-        form_class = get_form_class(connection)
-        form = form_class()
+        connection = Connection.objects.get(id=id).subclass()
+        form = forms.ConnectionForm().subclass(connection)
         form.fill(connection)
         return render(request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': get_form_name(form), 'title': get_title(form)})
+                      {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
     elif request.method == 'POST':
         form_name = request.POST['form_name']
         form_class = getattr(forms, form_name)
@@ -94,13 +92,13 @@ def update(request, id):
             return redirect('/')
         else:
             return render(request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': get_form_name(form), 'title': get_title(form)})
+                          {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
 
 
 @login_required
 @require_http_methods('POST')
 def toggle_connection(request):
-    connection = Connection.objects.get(id=request.POST['id'])
+    connection = Connection.objects.get(id=request.POST['id']).subclass()
     response = dict(id=request.POST['id'], success=False)
     try:
         vici_wrapper = ViciWrapper()
@@ -123,8 +121,8 @@ def toggle_connection(request):
 
 
 @login_required
-def delete_connection(request, pk):
-    connection = Connection.objects.get(id=pk)
+def delete_connection(request, id):
+    connection = Connection.objects.get(id=id).subclass()
     try:
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is True:
@@ -139,25 +137,10 @@ def delete_connection(request, pk):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def get_title(form):
+def _get_title(form):
     return form.get_choice_name()
 
 
-def get_form_name(form):
-    return type(form).__name__
+def _get_type_name(cls):
+    return type(cls).__name__
 
-
-def get_connection_typ(connection_id):
-    print(Connection.get_types())
-    for cls in Connection.get_types():
-        connection_class = getattr(models, cls)
-        connection = connection_class.objects.filter(id=connection_id)
-        if connection:
-            return connection.first()
-
-
-def get_form_class(connection):
-    typ = type(connection)
-    for model, form_name in forms.ConnectionForm.get_models():
-        if model == typ:
-            return getattr(forms, form_name)
