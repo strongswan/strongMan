@@ -17,11 +17,11 @@ class Connection(models.Model):
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
-        ike_sa['local_addrs'] = [local_address.value for local_address in self.local_addresses]
-        ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.remote_addresses]
-        ike_sa['vips'] = [vip.value for vip in self.vips]
+        ike_sa['local_addrs'] = [local_address.value for local_address in self.local_addresses.all()]
+        ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.remote_addresses.all()]
+        ike_sa['vips'] = [vip.value for vip in self.vips.all()]
         ike_sa['version'] = self.version
-        ike_sa['proposals'] = [proposal.type for proposal in self.proposals]
+        ike_sa['proposals'] = [proposal.type for proposal in self.proposals.all()]
         ike_sa['children'] = children
 
         connection = OrderedDict()
