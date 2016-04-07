@@ -1,6 +1,8 @@
 from django import forms
-from .models import Address, Authentication, Secret, IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
-from strongMan.apps.certificates.models import Identity
+
+from strongMan.apps.certificates.models.identities import AbstractIdentity
+from .models import Address, Authentication, Secret
+from .models import IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
 
 
 class ConnectionForm(forms.Form):
@@ -25,7 +27,8 @@ class ConnectionForm(forms.Form):
 
     @classmethod
     def get_choices(cls):
-        return tuple(tuple((type(subclass()).__name__, subclass().get_choice_name())) for subclass in cls.__subclasses__())
+        return tuple(
+            tuple((type(subclass()).__name__, subclass().get_choice_name())) for subclass in cls.__subclasses__())
 
     @classmethod
     def get_models(cls):
@@ -41,7 +44,7 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
+    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
@@ -104,7 +107,7 @@ class Ike2EapForm(ConnectionForm):
 
 
 class Ike2EapCertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=Identity.objects.all(), empty_label=None)
+    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
 

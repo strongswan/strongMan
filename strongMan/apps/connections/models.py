@@ -1,12 +1,10 @@
 from django.forms import Form
 from django.db import models
-from strongMan.apps.certificates.models import Identity
+from strongMan.apps.certificates.models.identities import AbstractIdentity
 from collections import OrderedDict
-
 
 class Connection(models.Model):
     state = models.BooleanField(default=False)
-    domain = models.ForeignKey(Identity, null=True, blank=True, default=None)
     profile = models.CharField(max_length=50)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()
@@ -112,8 +110,8 @@ class Authentication(models.Model):
     local = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='local')
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
-    identity = models.CharField(max_length=200)
     auth = models.CharField(max_length=50)
+    identity = models.ForeignKey(AbstractIdentity)
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, id=self.identity)

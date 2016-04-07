@@ -1,7 +1,8 @@
 from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection
-from strongMan.apps.certificates.models import Identity, Certificate
+from strongMan.apps.certificates.models.certificates import Certificate
+from strongMan.apps.certificates.models.identities import TextIdentity
 from strongMan.apps.connections import views
 
 
@@ -17,9 +18,7 @@ class ConnectionViewTest(TestCase):
         certificate = Certificate(serial_number="007", is_CA=True, valid_not_after="2011-09-01T13:20:30+03:00",
                                   valid_not_before="2011-09-01T13:20:30+03:00")
         certificate.save()
-        identity = Identity.factory("test.pem")
-        identity.certificate=certificate
-        identity.save()
+        identity = TextIdentity.by_san("test.pem", certificate)
         self.factory = RequestFactory()
 
     def test_select_post(self):
@@ -27,16 +26,14 @@ class ConnectionViewTest(TestCase):
         self.assertEquals(response.status_code, 200)
 
     def test_Ike2CertificateCreate_post(self):
-        url = '/connections/create/'
-        domain = Identity.objects.first()
-
+        url = '/connection/create/'
+        domain = TextIdentity.objects.first()
         self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id, 'form_name': 'Ike2CertificateForm'})
-
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2CertificateCreate_update(self):
-        url_create = '/connections/create/'
-        domain = Identity.objects.first()
+        url_create = '/connection/create/'
+        domain = TextIdentity.objects.first()
 
         self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'certificate': domain.id, 'form_name': 'Ike2CertificateForm'})
 
@@ -67,16 +64,16 @@ class ConnectionViewTest(TestCase):
         self.assertEquals(connection.profile, 'hans')
 
     def test_Ike2EapCertificateCreate_post(self):
-        url = '/connections/create/'
-        domain = Identity.objects.first()
+        url = '/connection/create/'
+        domain = TextIdentity.objects.first()
 
         self.client.post(url, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id, 'form_name': 'Ike2EapCertificateForm'})
 
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2EapCertificateCreate_update(self):
-        url_create = '/connections/create/'
-        domain = Identity.objects.first()
+        url_create = '/connection/create/'
+        domain = TextIdentity.objects.first()
 
         self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'username': "username", 'password': "password", 'certificate': domain.id, 'form_name': 'Ike2EapCertificateForm'})
 

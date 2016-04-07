@@ -54,9 +54,9 @@
                         <div style="overflow: scroll;max-height: 200px;">
                             <table class="table">
                                 <tr>
-                                    <td>Valid domains</td>
-                                    <td>{% for domain in x509.valid_domains.all %}
-                                        {{ domain.value }} <br/>
+                                    <td>Identities</td>
+                                    <td>{% for identity in x509.identities.all %}
+                                        - {{ identity.subclass }} <br/>
                                     {% endfor %}</td>
                                 </tr>
                             </table>

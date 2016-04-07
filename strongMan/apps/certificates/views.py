@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from strongMan.apps.certificates.request_handler import OverviewHandler
-from .models import Certificate
-from .request_handler.request_handler import AddHandler, DetailsHandler
+from strongMan.apps.certificates.models.certificates import Certificate
+from .request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.request_handler.DetailsHandler import DetailsHandler
 from .forms import AddForm
 
 

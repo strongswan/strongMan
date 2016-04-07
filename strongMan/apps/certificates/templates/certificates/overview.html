@@ -130,6 +130,7 @@
                 <h3>No certificates to show</h3>
             </div>
         {% endif %}
+    {% comment %}
         <script>
             $(".remove-btn")
                     .mouseenter(function () {
@@ -139,5 +140,6 @@
                         $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
                     });
         </script>
+    {% endcomment %}
     </div>
 {% endblock content %}

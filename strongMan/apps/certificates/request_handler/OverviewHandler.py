@@ -1,9 +1,13 @@
+from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
 
-from ..forms import CertificateSearchForm
+import strongMan.apps.certificates.models.certificates
+import strongMan.apps.certificates.models.identities
 from .. import models
+from ..forms import CertificateSearchForm
 from ..services import ViciCertificateManager
+from ...vici.wrapper.exception import ViciSocketException
 
 
 class AbstractOverviewHandler:
@@ -21,6 +25,9 @@ class AbstractOverviewHandler:
         raise NotImplementedError()
 
     def all_certificates(self):
+        '''
+        Returns all possible certificates. Can raise a OvervieHandlerException
+        '''
         raise NotImplementedError()
 
     def _paginate(self, certificate_list, page=1):
@@ -36,27 +43,35 @@ class AbstractOverviewHandler:
         return x509_list
 
     def _search_for(self, all_certs, search_text):
-        domains = models.Identity.objects.filter(subjectaltname__contains=search_text)
         cert_ids = []
-        for domain in domains:
-            cert_ids.append(domain.certificate.id)
-        return all_certs.filter(id__in=cert_ids)
+        identities = strongMan.apps.certificates.models.identities.AbstractIdentity.objects.all()
+        for ident in identities:
+            ident = ident.subclass()
+            if search_text.lower() in str(ident).lower():
+                cert_ids.append(ident.certificate.pk)
+        return all_certs.filter(pk__in=cert_ids)
 
     def handle(self):
-        search_pattern = ""
-        page = 1
+        try:
+            all_certs = self.all_certificates()
+        except OverviewHandlerException as e:
+            messages.add_message(self.request, messages.WARNING, str(e))
+            return self._render()
+
         if self.request.method == "GET":
-            result = self.all_certificates()
-        else:
-            form = CertificateSearchForm(self.request.POST)
-            if not form.is_valid():
-                result = self.all_certificates()
-            else:
-                search_pattern = form.cleaned_data["search_text"]
-                all_certs = self.all_certificates()
-                result = self._search_for(all_certs, search_pattern)
-                page = form.cleaned_data["page"]
-        x509_list = self._paginate(result, page=page)
+            return self._render(all_certs)
+
+        form = CertificateSearchForm(self.request.POST)
+        if not form.is_valid():
+            return self._render(all_certs)
+
+        search_pattern = form.cleaned_data["search_text"]
+        search_result = self._search_for(all_certs, search_pattern)
+        page = form.cleaned_data["page"]
+        return self._render(search_result, page, search_pattern)
+
+    def _render(self, certificates=[], page=1, search_pattern=""):
+        x509_list = self._paginate(certificates, page=page)
         return render(self.request, 'certificates/overview.html',
                       {'publics': x509_list, "view": self.page_tag(), "search_pattern": search_pattern})
 
@@ -66,8 +81,11 @@ class ViciOverviewHandler(AbstractOverviewHandler):
         return "vici"
 
     def all_certificates(self):
-        ViciCertificateManager.reload_certs()
-        return models.ViciCertificate.objects.all()
+        try:
+            ViciCertificateManager.reload_certs()
+        except ViciSocketException as e:
+            raise OverviewHandlerException("Vici is not reachable!") from e
+        return strongMan.apps.certificates.models.certificates.ViciCertificate.objects.all()
 
 
 class EntityOverviewHandler(AbstractOverviewHandler):
@@ -75,7 +93,7 @@ class EntityOverviewHandler(AbstractOverviewHandler):
         return "entities"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.filter(is_CA=False)
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(is_CA=False)
 
 
 class MainOverviewHandler(AbstractOverviewHandler):
@@ -83,7 +101,7 @@ class MainOverviewHandler(AbstractOverviewHandler):
         return "all"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.all()
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.all()
 
 
 class RootOverviewHandler(AbstractOverviewHandler):
@@ -91,4 +109,8 @@ class RootOverviewHandler(AbstractOverviewHandler):
         return "root"
 
     def all_certificates(self):
-        return models.UserCertificate.objects.filter(is_CA=True)
+        return strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(is_CA=True)
+
+
+class OverviewHandlerException(Exception):
+    pass

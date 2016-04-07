@@ -1,12 +1,12 @@
-from django.test import TestCase, RequestFactory, Client
-from strongMan.apps.certificates.request_handler.request_handler import AddHandler
-from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
-from django.core.urlresolvers import reverse
-from strongMan.apps.certificates import views
-from django.http.response import Http404
-from django.contrib.auth.models import User
 
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.test import TestCase, RequestFactory, Client
+
+from strongMan.apps.certificates.models import Certificate
+from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
+from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
 
 
 class TestCert:
@@ -35,12 +35,14 @@ class Paths:
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
     X509_googlecom = TestCert("google.com_der.crt")
 
+
 class CreateRequest:
     '''
     This class is a with object. __enter__ opens a file and __exit__ closes the file.
     with CreateRequest(page, testcert) as request:
         Do stuff #!#!#!
     '''
+
     def __init__(self, page, testcert, password=""):
         self.page = page
         self.testcert = testcert
@@ -88,7 +90,7 @@ class AddHandlerTest(TestCase):
             (req, page, context) = handler.handle()
 
     def test_x509_valid_domains(self):
-        self.add_rw_certificate() #Add a sample domain
+        self.add_rw_certificate()  # Add a sample domain
 
         with CreateRequest("/certificates/add", Paths.X509_googlecom) as request:
             handler = AddHandler.by_request(request)
@@ -98,7 +100,7 @@ class AddHandlerTest(TestCase):
         self.assertTrue(not context['public'].is_CA)
         self.assertEqual(2, self.certificates_count())
         self.assertEqual(0, self.privatekeys_count())
-        domains_count = context['public'].valid_domains.all().__len__()
+        domains_count = context['public'].identities.all().__len__()
         self.assertEqual(505, domains_count)
 
     def test_x509_with_pw(self):
@@ -118,7 +120,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(0, self.privatekeys_count())
 
     def test_pkcs1_with_certificate(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS1_rsa_ca) as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -128,7 +130,7 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["private"])
 
     def test_pkcs8_with_certificate(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca) as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -138,7 +140,7 @@ class AddHandlerTest(TestCase):
         self.assertIsNotNone(context["private"])
 
     def test_pkcs8_with_certificate_encrypted(self):
-        self.test_x509() # Add x509
+        self.test_x509()  # Add x509
         with CreateRequest("/certificates/add", Paths.PKCS8_rsa_ca_encrypted, password="strongman") as request:
             handler = AddHandler.by_request(request)
             (req, page, context) = handler.handle()
@@ -178,7 +180,7 @@ class AddHandlerTest(TestCase):
         self.assertEqual(0, self.certificates_count())
 
     def test_pkcs12_ca_already_imported(self):
-        self.test_x509() # Add x509 CA
+        self.test_x509()  # Add x509 CA
         self.assertEqual(1, self.certificates_count(), "CA imported.")
         with CreateRequest("/certificates/add", Paths.PKCS12_rsa) as request:
             handler = AddHandler.by_request(request)
@@ -208,6 +210,7 @@ class DetailsViewTest(TestCase):
         response = self.client.post(reverse('certificates:add'), context)
         file.close()
         self.assertContains(response, "added")
+
         def count(self, model):
             return model.objects.all().__len__()
 
@@ -261,7 +264,7 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
-        #print(response.content.decode("utf-8"))
+        # print(response.content.decode("utf-8"))
         self.assertContains(response, 'hsr.ch')
         self.assertContains(response, 'PKCS1')
 
@@ -270,7 +273,8 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.X509_googlecom)
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
-        response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"remove_privatekey": "remove_privatekey"})
+        response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
+                                    {"remove_privatekey": "remove_privatekey"})
         self.assertContains(response, 'hsr.ch')
         self.assertNotContains(response, 'PKCS1')
 
@@ -279,7 +283,8 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.X509_googlecom)
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
-        response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"remove_cert": "remove_cert"})
+        response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
+                                    {"remove_cert": "remove_cert"})
         self.assertEqual(self.count(Certificate), 1)
 
     def test_add_same_publickey_different_serialnumber(self):
@@ -316,7 +321,7 @@ class DetailsViewTest(TestCase):
         self.assertEqual(self.count(PrivateKey), 1)
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
-                                      {"remove_privatekey": "remove_privatekey"})
+                                    {"remove_privatekey": "remove_privatekey"})
         self.assertEqual(self.count(PrivateKey), 1)
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
@@ -331,37 +336,12 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
-                                      {"remove_cert": "remove_cert"})
+                                    {"remove_cert": "remove_cert"})
         self.assertEqual(self.count(Certificate), 1)
         self.assertEqual(self.count(PrivateKey), 1)
-
-
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
         self.assertEqual(response.status_code, 404)
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
         self.assertContains(response, 'PKCS1')
         self.assertContains(response, 'hsr.ch')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
