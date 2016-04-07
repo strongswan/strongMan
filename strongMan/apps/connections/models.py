@@ -24,6 +24,12 @@ class Connection(models.Model):
         ike_sa['proposals'] = [proposal.type for proposal in self.proposals.all()]
         ike_sa['children'] = children
 
+        for local in self.local.all():
+            ike_sa.update(local.dict())
+
+        for remote in self.remote.all():
+            ike_sa.update(remote.dict())
+
         connection = OrderedDict()
         connection[self.profile] = ike_sa
         return connection
@@ -90,7 +96,8 @@ class Address(models.Model):
     value = models.CharField(max_length=50)
     local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='local_ts')
     remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts')
-    remote_addresses = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote_addresses')
+    remote_addresses = models.ForeignKey(Connection, null=True, blank=True, default=None,
+                                         related_name='remote_addresses')
     local_addresses = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='local_addresses')
     vips = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='vips')
 
@@ -104,12 +111,12 @@ class Proposal(models.Model):
 class Authentication(models.Model):
     local = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='local')
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
-    name = models.CharField(max_length=50)  #starts with remote-* or local-*
+    name = models.CharField(max_length=50)  # starts with remote-* or local-*
     identity = models.CharField(max_length=200)
     auth = models.CharField(max_length=50)
 
     def dict(self):
-        auth = OrderedDict(auth=self.auth)
-        auth['id'] = self.identity
+        parameters = OrderedDict(auth=self.auth, id=self.identity)
+        auth = OrderedDict()
+        auth[self.name] = parameters
         return auth
-
