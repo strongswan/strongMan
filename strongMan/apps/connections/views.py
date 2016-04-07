@@ -6,11 +6,42 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import FormView
-from .models import Connection, Secret
+from .models import Connection, Secret, Address
 from . import models
 from . import forms
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
+
+
+@require_http_methods('GET')
+@login_required
+def overview(request):
+    try:
+        vici_wrapper = ViciWrapper()
+        for connection in Connection.objects.all():
+            connection.state = vici_wrapper.is_connection_active(connection.profile)
+            connection.save()
+    except ViciSocketException as e:
+        messages.warning(request, str(e))
+    except ViciLoadException as e:
+        messages.warning(request, str(e))
+
+    connections = []
+
+    for cls in Connection.get_types():
+        connection_class = getattr(models, cls)
+        for connection in connection_class.objects.all():
+            connection_dict = dict(id=connection.id, profile=connection.profile, state=connection.state)
+            address = Address.objects.filter(remote_addresses=connection).first()
+            connection_dict['remote'] = address.value
+            connection_dict['edit'] = "/connections/" + str(connection.id)
+            connection_dict['connection_type'] = cls
+            connection_dict['delete'] = "/connections/delete/" + str(connection.id)
+            connections.append(connection_dict)
+
+    context = dict(connections=connections)
+    return render(request, 'index.html', context)
+
 
 
 class ChooseTypView(LoginRequiredMixin, FormView):
