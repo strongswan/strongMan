@@ -140,13 +140,11 @@ def delete_connection(request, pk):
 
 
 def get_title(form):
-    _, title = form.type_name(form)
-    return title
+    return form.get_choice_name()
 
 
 def get_form_name(form):
-    name, _ = form.type_name(form)
-    return name
+    return type(form).__name__
 
 
 def get_connection_typ(connection_id):

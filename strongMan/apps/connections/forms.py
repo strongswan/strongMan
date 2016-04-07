@@ -17,20 +17,19 @@ class ConnectionForm(forms.Form):
     def update_connection(self):
         raise NotImplementedError
 
-    def type_name(self):
-        raise NotImplementedError
-
     def get_model(self):
         raise NotImplementedError
 
+    def get_choice_name(self):
+        raise NotImplementedError
+
     @classmethod
-    def get_types(cls):
-        subclasses = [subclass() for subclass in cls.__subclasses__()]
-        return tuple(subclass.type_name(subclass) for subclass in subclasses)
+    def get_choices(cls):
+        return tuple(tuple((type(subclass()).__name__, subclass().get_choice_name())) for subclass in cls.__subclasses__())
 
     @classmethod
     def get_models(cls):
-        return [subclass().get_model() for subclass in cls.__subclasses__()]
+        return tuple(tuple((subclass().get_model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
 
 
 class ChooseTypeForm(forms.Form):
@@ -38,7 +37,7 @@ class ChooseTypeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ChooseTypeForm, self).__init__(*args, **kwargs)
-        self.fields['typ'].choices = ConnectionForm.get_types()
+        self.fields['typ'].choices = ConnectionForm.get_choices()
 
 
 class Ike2CertificateForm(ConnectionForm):
@@ -64,12 +63,11 @@ class Ike2CertificateForm(ConnectionForm):
     def fill(self, connection):
         super(Ike2CertificateForm, self).fill(connection)
 
-    @staticmethod
-    def type_name(cls):
-        return type(cls).__name__, "IKEv2 Certificate"
+    def get_choice_name(self):
+        return "IKEv2 Certificate"
 
     def get_model(self):
-        return IKEv2Certificate, type(self).__name__
+        return IKEv2Certificate
 
 
 class Ike2EapForm(ConnectionForm):
@@ -98,12 +96,11 @@ class Ike2EapForm(ConnectionForm):
     def fill(self, connection):
         super(Ike2EapForm, self).fill(connection)
 
-    @staticmethod
-    def type_name(cls):
-        return type(cls).__name__, "IKEv2 EAP (Username/Password)"
+    def get_choice_name(self):
+        return "IKEv2 EAP (Username/Password)"
 
     def get_model(self):
-        return IKEv2EAP, type(self).__name__
+        return IKEv2EAP
 
 
 class Ike2EapCertificateForm(ConnectionForm):
@@ -135,10 +132,8 @@ class Ike2EapCertificateForm(ConnectionForm):
     def fill(self, connection):
         super(Ike2CertificateForm, self).fill(connection)
 
-    @staticmethod
-    def type_name(cls):
-        return type(cls).__name__, "IKEv2 Certificate + EAP (Username/Password)"
-
     def get_model(self):
-        return IKEv2CertificateEAP, type(self).__name__
+        return IKEv2CertificateEAP
 
+    def get_choice_name(self):
+        return "IKEv2 Certificate + EAP (Username/Password)"
