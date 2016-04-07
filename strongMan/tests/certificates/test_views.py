@@ -3,8 +3,6 @@ from strongMan.apps.certificates.request_handler.request_handler import AddHandl
 from strongMan.apps.certificates.models import Certificate, PrivateKey
 import os
 from django.core.urlresolvers import reverse
-from strongMan.apps.certificates import views
-from django.http.response import Http404
 from django.contrib.auth.models import User
 
 
