@@ -1,7 +1,6 @@
 from django import forms
 
 from .container_reader import ContainerDetector, ContainerTypes
-from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader
 
 
 class CertificateSearchForm(forms.Form):
@@ -29,26 +28,6 @@ class AddForm(forms.Form):
         cert_bytes = self._cert_bytes()
         detected_type = ContainerDetector.detect_type(cert_bytes, password=password)
         return detected_type
-
-    def container_reader(self):
-        '''
-        :return: A subinstance of AbstractContainerReader
-        '''
-        assert self.is_valid()
-        password = self._read_password()
-        cert_bytes = self._cert_bytes()
-        type = self.container_type()
-        if type == ContainerTypes.X509:
-            container = X509Reader.by_bytes(cert_bytes, password=password)
-        elif type == ContainerTypes.PKCS1:
-            container = PKCS1Reader.by_bytes(cert_bytes, password=password)
-        elif type == ContainerTypes.PKCS8:
-            container = PKCS8Reader.by_bytes(cert_bytes, password=password)
-        elif type == ContainerTypes.PKCS12:
-            container = PKCS12Reader.by_bytes(cert_bytes, password=password)
-
-        container.parse()
-        return container
 
     def _cert_bytes(self):
         if self.cert_bytes == None:

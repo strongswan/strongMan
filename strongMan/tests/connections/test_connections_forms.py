@@ -1,13 +1,13 @@
 from django.test import TestCase
 from strongMan.apps.connections.forms import Ike2CertificateForm, Ike2EapCertificateForm, Ike2EapForm, ChooseTypeForm
-from strongMan.apps.certificates.models import Identity
+from strongMan.apps.certificates.models.identities import TextIdentity
 
 
 class ConnectionFormsTest(TestCase):
     fixtures = ['initial_data.json']
 
     def setUp(self):
-        self.domain = Identity.factory(value="domain")
+        self.domain = TextIdentity.by_san("domain", None)
         self.domain.save()
 
     def test_ChooseTypeForm(self):
