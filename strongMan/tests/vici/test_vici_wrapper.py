@@ -12,8 +12,7 @@ class ViciWrapperTest(TestCase):
         self.vici_wrapper.unload_all_connections()
         self.connection = Connection(profile='rw', auth='pubkey', version=1)
         self.connection.save()
-        Authentication(name='local-1', identity='home', auth='pubkey', local=self.connection).save()
-        print(self.connection.dict())
+        Authentication(name='local-1', auth='pubkey', local=self.connection).save()
 
     def test_vici_socket(self):
         with self.assertRaises(ViciSocketException):

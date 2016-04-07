@@ -49,12 +49,12 @@ class Ike2CertificateForm(ConnectionForm):
     def create_connection(self):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
-        domain = self.cleaned_data['certificate']
-        connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2, domain=domain)
+        identity = self.cleaned_data['certificate']
+        connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
+        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
+        Authentication(name='local', auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)
@@ -87,7 +87,7 @@ class Ike2EapForm(ConnectionForm):
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
         Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
+        Authentication(name='local', auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
         connection = IKEv2EAP.objects.get(id=pk)
@@ -116,13 +116,13 @@ class Ike2EapCertificateForm(ConnectionForm):
         gateway = self.cleaned_data['gateway']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        domain = self.cleaned_data['certificate']
-        connection = IKEv2CertificateEAP(profile=profile, auth='pubkey', version=2, domain=domain)
+        identity = self.cleaned_data['certificate']
+        connection = IKEv2CertificateEAP(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', identity=profile, auth='pubkey', local=connection).save()
+        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
+        Authentication(name='local', auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
         connection = IKEv2CertificateEAP.objects.get(id=pk)

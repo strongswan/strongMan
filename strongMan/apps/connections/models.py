@@ -111,7 +111,7 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
-    identity = models.ForeignKey(AbstractIdentity)
+    identity = models.ForeignKey(AbstractIdentity,null=True, blank=True, default=None)
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, id=self.identity)
