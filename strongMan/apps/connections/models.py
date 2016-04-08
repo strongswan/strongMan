@@ -58,7 +58,7 @@ class Connection(models.Model):
     def subclass(self):
         for cls in self.get_types():
             connection_class = getattr(sys.modules[__name__], cls)
-            connection = connection_class.objects.filter(self.id)
+            connection = connection_class.objects.filter(id=self.id)
             if connection:
                 return connection.first()
 

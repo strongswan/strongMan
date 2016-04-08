@@ -79,8 +79,8 @@ def create(request):
 def update(request, id):
     if request.method == 'GET':
         connection = Connection.objects.get(id=id).subclass()
-        form_class = get_form_class(connection)
-        form = form_class()
+        print(type(connection))
+        form = forms.ConnectionForm().subclass(connection)
         form.fill(connection)
         return render(request, 'connections/connection_configuration.html',
                       {'form': form, 'form_name': _get_form_name(form), 'title': _get_title(form)})
@@ -145,9 +145,3 @@ def _get_title(form):
 def _get_form_name(form):
     return type(form).__name__
 
-
-def get_form_class(connection):
-    typ = type(connection)
-    for model, form_name in forms.ConnectionForm.get_models():
-        if model == typ:
-            return getattr(forms, form_name)

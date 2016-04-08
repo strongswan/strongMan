@@ -1,3 +1,4 @@
+import sys
 from django import forms
 
 from strongMan.apps.certificates.models.identities import AbstractIdentity
@@ -25,6 +26,14 @@ class ConnectionForm(forms.Form):
     def get_choice_name(self):
         raise NotImplementedError
 
+    def subclass(self, connection):
+        typ = type(connection)
+        print(typ)
+        for model, form_name in self.get_models():
+            if model == typ:
+                form_class = getattr(sys.modules[__name__], form_name)
+                return form_class()
+
     @classmethod
     def get_choices(cls):
         return tuple(
@@ -33,6 +42,8 @@ class ConnectionForm(forms.Form):
     @classmethod
     def get_models(cls):
         return tuple(tuple((subclass().get_model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
+
+
 
 
 class ChooseTypeForm(forms.Form):
