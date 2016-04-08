@@ -83,7 +83,7 @@ def update(request, id):
         form = forms.ConnectionForm().subclass(connection)
         form.fill(connection)
         return render(request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': _get_form_name(form), 'title': _get_title(form)})
+                      {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
     elif request.method == 'POST':
         form_name = request.POST['form_name']
         form_class = getattr(forms, form_name)
@@ -93,14 +93,15 @@ def update(request, id):
             return redirect('/')
         else:
             return render(request, 'connections/connection_configuration.html',
-                          {'form': form, 'form_name': _get_form_name(form), 'title': _get_title(form)})
+                          {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
 
 
 @login_required
 @require_http_methods('POST')
 def toggle_connection(request):
-    connection = Connection.objects.get(id=request.POST['id'])
+    connection = Connection.objects.get(id=request.POST['id']).subclass()
     response = dict(id=request.POST['id'], success=False)
+    print(connection.dict())
     try:
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is False:
@@ -122,8 +123,8 @@ def toggle_connection(request):
 
 
 @login_required
-def delete_connection(request, pk):
-    connection = Connection.objects.get(id=pk)
+def delete_connection(request, id):
+    connection = Connection.objects.get(id=id).subclass()
     try:
         vici_wrapper = ViciWrapper()
         if vici_wrapper.is_connection_active(connection.profile) is True:
@@ -142,6 +143,6 @@ def _get_title(form):
     return form.get_choice_name()
 
 
-def _get_form_name(form):
-    return type(form).__name__
+def _get_type_name(cls):
+    return type(cls).__name__
 

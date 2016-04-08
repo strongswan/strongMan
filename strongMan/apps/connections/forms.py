@@ -45,7 +45,6 @@ class ConnectionForm(forms.Form):
 
 
 
-
 class ChooseTypeForm(forms.Form):
     typ = forms.ChoiceField()
 
