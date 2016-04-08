@@ -1,7 +1,8 @@
-from django.forms import Form
+import sys
 from django.db import models
 from strongMan.apps.certificates.models.identities import AbstractIdentity
 from collections import OrderedDict
+
 
 class Connection(models.Model):
     state = models.BooleanField(default=False)
@@ -53,6 +54,13 @@ class Connection(models.Model):
 
     def get_typ(self):
         return type(self).__name__
+
+    def subclass(self):
+        for cls in self.get_types():
+            connection_class = getattr(sys.modules[__name__], cls)
+            connection = connection_class.objects.filter(self.id)
+            if connection:
+                return connection.first()
 
 
 class IKEv2Certificate(Connection):
@@ -111,7 +119,7 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
-    identity = models.ForeignKey(AbstractIdentity,null=True, blank=True, default=None)
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None)
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, id=self.identity)

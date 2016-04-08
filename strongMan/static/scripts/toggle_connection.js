@@ -5,7 +5,7 @@ $(document).ready(function () {
         $.ajax({ // create an AJAX call...
             data: $(this).serialize(), // get the form data
             type: 'POST', // GET or POST
-            url: '/connection/toggle/', // the file to call
+            url: '/connections/toggle/', // the file to call
             success: function (response) { // on success..
                 if (response.success) {
                     var toggle = '#toggle_input' + response.id;
