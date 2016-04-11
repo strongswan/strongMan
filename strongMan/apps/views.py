@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
+from .request_handler import AboutHandler
 
 
 
@@ -37,16 +38,7 @@ def logout(request):
 
 
 @login_required
-@require_http_methods('GET')
+@require_http_methods(['GET', 'POST'])
 def about(request):
-    context = OrderedDict()
-    try:
-        vici_wrapper = ViciWrapper()
-        context = vici_wrapper.get_version()
-        context['plugins'] = vici_wrapper.get_plugins()
-    except ViciSocketException as e:
-        messages.warning(request, str(e))
-    except ViciLoadException as e:
-        messages.warning(request, str(e))
-
-    return render(request, 'about.html', context)
+    handler = AboutHandler(request)
+    return handler.handle()
