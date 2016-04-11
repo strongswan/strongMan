@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load vici_checker %}
 {% block title %}About{% endblock title %}
 {% block content %}
     <div id="about">
-
-
+    {% vici_reachable as reachable %}
+    {% if reachable %}
         <div id="daemon_info" class="row">
             <div class="col-xs-12">
                 Daemon: {{ daemon }} <br>
@@ -19,6 +20,7 @@
             </div>
         </div>
         <hr>
+    {% endif %}
         <div id="pw_change" class="row">
             <div class="col-md-3"></div>
             <div class="col-xs-12 col-md-6 panel panel-default">
@@ -33,7 +35,7 @@
                 <span title="Change your password" class="pull-right">
                     <button type="submit" class="btn btn-default" name="change_pw_btn"
                             id="change_pw_btn">
-                        <span class="glyphicon glyphicon-remove"></span> Change password
+                        <span class="glyphicon glyphicon-refresh"></span> Change password
                     </button>
                 </span>
                 </form>

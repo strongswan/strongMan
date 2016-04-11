@@ -22,7 +22,7 @@ def overview(request):
             connection.state = vici_wrapper.is_connection_active(connection.profile)
             connection.save()
     except ViciSocketException as e:
-        messages.warning(request, str(e))
+        return render(request, 'index.html')
     except ViciLoadException as e:
         messages.warning(request, str(e))
 

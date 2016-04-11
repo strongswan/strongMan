@@ -1,11 +1,11 @@
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 from collections import OrderedDict
+
 from django.contrib import messages
 from django.shortcuts import render
+
+from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
+from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from .forms import PasswordChangeForm
-
-
 
 
 class AboutHandler:
@@ -19,24 +19,22 @@ class AboutHandler:
             vici_wrapper = ViciWrapper()
             context = vici_wrapper.get_version()
             context['plugins'] = vici_wrapper.get_plugins()
-        except ViciSocketException as e:
-            messages.warning(self.request, str(e))
         except ViciLoadException as e:
             messages.warning(self.request, str(e))
+        except ViciSocketException as e:
+            pass
         context["pw_form"] = form
         return render(self.request, 'about.html', context)
 
     def handle(self):
         if self.request.method == "GET":
             return self._render_page()
-        if self.request.method ==   "POST":
+        if self.request.method == "POST":
             form = PasswordChangeForm(self.request.POST)
             if not form.is_valid():
                 for msg in form.error_msg:
                     messages.warning(self.request, msg)
-
                 return self._render_page()
-
             try:
                 self._change_password(form)
                 messages.info(self.request, "Password changed successfully!")
@@ -99,6 +97,7 @@ class AboutHandler:
             if letter.isdigit():
                 return True
         return False
+
 
 class AboutException(Exception):
     pass
