@@ -5,6 +5,16 @@ from strongMan.apps.certificates.models.identities import AbstractIdentity
 from .models import Address, Authentication, Secret
 from .models import IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
 
+class CertificateChoice(forms.ModelChoiceField):
+    def __init__(self, **kwargs):
+        super(CertificateChoice, self).__init__(self, kwargs)
+        self.b = True
+
+    @property
+    def is_certificate_choice(self):
+        print("called!")
+        return True
+
 
 class ConnectionForm(forms.Form):
     profile = forms.CharField(max_length=50, initial="")
@@ -54,7 +64,7 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=AbstractIdentity.objects.all(), empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']

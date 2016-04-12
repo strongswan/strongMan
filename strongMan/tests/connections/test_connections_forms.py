@@ -19,6 +19,10 @@ class ConnectionFormsTest(TestCase):
 
         self.identity = certificate.identities.first()
 
+    def test_form(self):
+        form = Ike2CertificateForm()
+        print(form.auto_id)
+
     def test_ChooseTypeForm(self):
         form_data = {'typ':  "Ike2CertificateForm"}
         form = ChooseTypeForm(data=form_data)

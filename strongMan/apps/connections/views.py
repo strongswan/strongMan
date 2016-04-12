@@ -48,9 +48,11 @@ class ChooseTypView(LoginRequiredMixin, FormView):
     form_class = forms.ChooseTypeForm
 
     def form_valid(self, form):
+        return create(self.request)
         form_name = self.request.POST['typ']
         form_class = getattr(forms, form_name)
         form = form_class()
+
         return render(self.request, 'connections/connection_configuration.html',
                       {'form': form_class(), 'form_name': form_name, 'title': _get_title(form)})
 

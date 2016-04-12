@@ -14,7 +14,9 @@
                         <div class="form-group row">
                             <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
                             <div class="controls col-sm-10">
-                                {% if field|field_type == "Select" %}
+                            CertiChoice -{{ field.is_certificate_choice }}!{{ field.b }}
+                                {% if field|field_type == "Select" and field.is_certificate_choice %}
+
                                     <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
                                         {% for choise in field.field.queryset %}
                                             <option value="{{ choise.id }}" {% if field.value == choise.id %}
