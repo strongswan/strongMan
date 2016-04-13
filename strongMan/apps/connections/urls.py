@@ -5,7 +5,7 @@ from . import views
 app_name = 'connections'
 urlpatterns = [
     url(r'^$', views.overview, name='index'),
-    url(r'^add/$', views.ChooseTypView.as_view(), name='connections_choose'),
+    url(r'^add/$', views.create, name='connections_choose'),
     url(r'^add/create/$', views.create, name='connection_create'),
     url(r'^(?P<id>\d+)/$', views.update, name='connection_update'),
     url(r'delete/(?P<id>\d+)/$', views.delete_connection, name='connection_delete'),

@@ -2,17 +2,14 @@ import sys
 from django import forms
 
 from strongMan.apps.certificates.models.identities import AbstractIdentity
+from ..certificates.models.certificates import UserCertificate
 from .models import Address, Authentication, Secret
 from .models import IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
 
-class CertificateChoice(forms.ModelChoiceField):
-    def __init__(self, **kwargs):
-        super(CertificateChoice, self).__init__(self, kwargs)
-        self.b = True
 
+class CertificateChoice(forms.ModelChoiceField):
     @property
     def is_certificate_choice(self):
-        print("called!")
         return True
 
 
@@ -64,7 +61,7 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ConnectionForm):
-    certificate = CertificateChoice(queryset=AbstractIdentity.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label=None)
 
     def create_connection(self):
         profile = self.cleaned_data['profile']

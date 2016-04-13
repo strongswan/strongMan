@@ -14,6 +14,7 @@
                 </div>
                 <form action="" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="wizard_step" value="select_type"/>
                     {% for field in form %}
                         <div class="form-group">
                             <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>

@@ -7,16 +7,26 @@
     <div class="row">
         <div id="connection-configuration">
             <div class="col-sm-offset-2 col-sm-8">
-                <form action="{% if request.path|slice:":-16" == "/" %}{% url 'connections:connection_create' %}{% endif %}" method="post">
+                <form action="
+                        {% if request.path|slice:":-16" == "/" %}{% url 'connections:connection_create' %}{% endif %}"
+                      method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="wizard_step" value="configure"/>
                     <input type="hidden" name="form_name" value={{ form_name }}>
                     {% for field in form %}
                         <div class="form-group row">
                             <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
                             <div class="controls col-sm-10">
-                            CertiChoice -{{ field.is_certificate_choice }}!{{ field.b }}
-                                {% if field|field_type == "Select" and field.is_certificate_choice %}
-
+                                {% if field|field_type == "Select" and  field.field.is_certificate_choice %}
+                                    <select class="selectpicker" data-live-search="true" name="{{ field.name }}"
+                                            id="id_{{ field.name }}" data-show-subtext="True">
+                                        {% for choise in field.field.queryset %}
+                                            <option value="{{ choise.id }}" {% if field.value == choise.id %}
+                                                    selected{% endif %}
+                                                    data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif field|field_type == "Select" %}
                                     <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
                                         {% for choise in field.field.queryset %}
                                             <option value="{{ choise.id }}" {% if field.value == choise.id %}

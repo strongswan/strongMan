@@ -129,6 +129,9 @@ class UserCertificate(Certificate):
         if privatekey.certificates.all().__len__() == 0:
             privatekey.delete()
 
+    def __str__(self):
+        return str(self.subject)
+
 
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):
