@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
+
+import strongMan.apps.connections.forms.add_wizard
 from .. import forms
-from ...certificates.models.certificates import UserCertificate
+
 
 class CreateHandler:
     def __init__(self, request):
         self.request = request
 
     def _render_select_type(self):
-        return render(self.request, 'connections/select_typ.html', {'form': forms.ChooseTypeForm()})
+        return render(self.request, 'connections/select_typ.html', {'form': strongMan.apps.connections.forms.add_wizard.ChooseTypeForm()})
 
     def _render_configure(self, form, form_name):
         return render(self.request, 'connections/connection_configuration.html',
@@ -21,7 +23,7 @@ class CreateHandler:
 
     def _handle_select_type(self):
         form, form_name = self._init_form()
-        #print(UserCertificate.objects.count())
+        # print(UserCertificate.objects.count())
         return self._render_configure(form, form_name)
 
     def _handle_update_certificate(self):

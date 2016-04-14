@@ -9,7 +9,7 @@
         <div id="connection-configuration">
             <div class="col-sm-offset-2 col-sm-8">
                 <form action="
-                        {% if request.path|slice:":-16" == "/" %}{% url 'connections:connection_create' %}{% endif %}"
+                        {% if request.path|slice:":-16" == "/" %}{% url 'connections:connections_choose' %}{% endif %}"
                       method="post">
                     {% csrf_token %}
                     <input class="wizard_step" type="hidden" name="wizard_step" value="configure"/>

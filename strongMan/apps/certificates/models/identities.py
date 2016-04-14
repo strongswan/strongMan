@@ -21,6 +21,9 @@ class AbstractIdentity(DjangoAbstractBase, CertificateModel, models.Model):
     def type(self):
         raise NotImplementedError()
 
+    def abstract_identity(self):
+        return AbstractIdentity.objects.get(pk=self.pk)
+
 
 class TextIdentity(AbstractIdentity):
     text = models.TextField(null=False)
