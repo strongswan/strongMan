@@ -5,12 +5,77 @@ from strongMan.apps.certificates.models.identities import AbstractIdentity
 from ..certificates.models.certificates import UserCertificate
 from .models import Address, Authentication, Secret
 from .models import IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
+from django.core.exceptions import ValidationError
 
 
 class CertificateChoice(forms.ModelChoiceField):
     @property
     def is_certificate_choice(self):
         return True
+
+class IdentityChoiceValue:
+    def __init__(self, identity):
+        self.identity = identity
+
+    def __str__(self):
+        return str(self.identity)
+
+    def type(self):
+        return self.identity.type()
+
+
+class IdentityChoice(forms.ChoiceField):
+    def __init__(self, *args, **kwargs):
+        super(IdentityChoice, self).__init__(*args, **kwargs)
+        self._certificate = None
+
+    def validate(self, value):
+        not_selected = value == '-1'
+        if not_selected:
+            raise ValidationError("This field is required.")
+        super(IdentityChoice, self).validate(value)
+
+    @property
+    def is_identity_choice(self):
+        return True
+
+    @property
+    def certificate(self):
+        return self._certificate
+
+    @certificate.setter
+    def certificate(self, value):
+        self._certificate = value
+        self.choices = IdentityChoice.to_choices(self._certificate.identities.all())
+
+    @classmethod
+    def load_identities(cls, form, certificate_field_name, identity_field_name):
+        data_source = {}
+        if not form.data == {}:
+            data_source = form.data
+        elif not form.initial == {}:
+            data_source = form.initial
+        else:
+            raise Exception("Initial and data is empty!")
+        if not certificate_field_name in data_source:
+            return
+        cert_id = data_source[certificate_field_name]
+        cert = UserCertificate.objects.filter(pk=cert_id).first()
+        identity = form.fields[identity_field_name]
+        if not identity.certificate == cert and cert is not None:
+            identity.certificate = cert
+
+
+    @classmethod
+    def to_choices(cls, identity_queryset):
+        choices = [('',"")]
+        for ident in identity_queryset:
+            subident = ident.subclass()
+            choice = (subident.pk, IdentityChoiceValue(subident))
+            choices.append(choice)
+        return choices
+
+
 
 
 class ConnectionForm(forms.Form):
@@ -41,6 +106,13 @@ class ConnectionForm(forms.Form):
                 form_class = getattr(sys.modules[__name__], form_name)
                 return form_class()
 
+    def update_certificates(self):
+        '''
+        This methos is called when a certificate field changed and the identites have to be refreshed
+        :return: None
+        '''
+        pass
+
     @classmethod
     def get_choices(cls):
         return tuple(
@@ -61,7 +133,11 @@ class ChooseTypeForm(forms.Form):
 
 
 class Ike2CertificateForm(ConnectionForm):
-    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate", required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
+
+    def update_certificates(self):
+        IdentityChoice.load_identities(self, "certificate", "identity")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']

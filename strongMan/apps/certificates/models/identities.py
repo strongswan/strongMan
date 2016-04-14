@@ -18,6 +18,9 @@ class AbstractIdentity(DjangoAbstractBase, CertificateModel, models.Model):
     def value(self):
         raise NotImplementedError()
 
+    def type(self):
+        raise NotImplementedError()
+
 
 class TextIdentity(AbstractIdentity):
     text = models.TextField(null=False)
@@ -27,6 +30,9 @@ class TextIdentity(AbstractIdentity):
 
     def value(self):
         return self.text
+
+    def type(self):
+        return "subjectAltName"
 
     @classmethod
     def by_san(cls, subjectAltName, certificate):
@@ -44,6 +50,9 @@ class DnIdentity(AbstractIdentity):
 
     def value(self):
         return self.certificate.subject
+
+    def type(self):
+        return "distinguishedName"
 
     @classmethod
     def by_cert(cls, certificate):
