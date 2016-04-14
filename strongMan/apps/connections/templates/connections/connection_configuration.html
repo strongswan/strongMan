@@ -37,13 +37,15 @@
 
                                 {% elif field|field_type == "Select" and  field.field.is_identity_choice %}
                                     <select class="selectpicker" data-live-search="true" name="{{ field.name }}"
-                                            id="id_{{ field.name }}" data-show-subtext="True">
-                                        {% if field.value == None %}
+                                            id="id_{{ field.name }}" data-show-subtext="True"
+                                            {% if field.field.choices|length == 0 %}disabled="True"{% endif %}>
+                                        {% if field.value == "" %}
                                             <option value="" selected>{{ field.empty_label }}</option>
                                         {% endif %}
 
                                         {% for value, identity in field.field.choices %}
-                                            <option value="{{ value }}" {% if field.value|slugify == value|slugify %}selected{% endif %}
+                                            <option value="{{ value }}"
+                                                    {% if field.value|slugify == value|slugify %}selected{% endif %}
                                                     data-subtext="{{ identity.type }}">{{ identity }}</option>
                                         {% endfor %}
                                     </select>

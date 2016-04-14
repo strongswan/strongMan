@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .. import forms
-
+from ...certificates.models.certificates import UserCertificate
 
 class CreateHandler:
     def __init__(self, request):
@@ -13,23 +13,24 @@ class CreateHandler:
         return render(self.request, 'connections/connection_configuration.html',
                       {'form': form, 'form_name': form_name, 'title': self._get_title(form)})
 
-    def _handle_select_type(self):
-        form_name = self.request.POST['typ']
+    def _init_form(self, data=None, initial=None):
+        form_name = self.request.POST['form_name']
         form_class = getattr(forms, form_name)
-        form = form_class()
+        form = form_class(data=data, initial=initial)
+        return form, form_name
+
+    def _handle_select_type(self):
+        form, form_name = self._init_form()
+        #print(UserCertificate.objects.count())
         return self._render_configure(form, form_name)
 
     def _handle_update_certificate(self):
-        form_name = self.request.POST['form_name']
-        form_class = getattr(forms, form_name)
-        form = form_class(initial=self.request.POST)
+        form, form_name = self._init_form(initial=self.request.POST)
         form.update_certificates()
         return self._render_configure(form, form_name)
 
     def _handle_configure(self):
-        form_name = self.request.POST['form_name']
-        form_class = getattr(forms, form_name)
-        form = form_class(self.request.POST)
+        form, form_name = self._init_form(self.request.POST)
         form.update_certificates()
         if form.is_valid():
             form.create_connection()

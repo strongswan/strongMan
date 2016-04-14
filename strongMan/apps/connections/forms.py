@@ -68,7 +68,7 @@ class IdentityChoice(forms.ChoiceField):
 
     @classmethod
     def to_choices(cls, identity_queryset):
-        choices = [('',"")]
+        choices = []
         for ident in identity_queryset:
             subident = ident.subclass()
             choice = (subident.pk, IdentityChoiceValue(subident))
@@ -125,11 +125,11 @@ class ConnectionForm(forms.Form):
 
 
 class ChooseTypeForm(forms.Form):
-    typ = forms.ChoiceField()
+    form_name = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         super(ChooseTypeForm, self).__init__(*args, **kwargs)
-        self.fields['typ'].choices = ConnectionForm.get_choices()
+        self.fields['form_name'].choices = ConnectionForm.get_choices()
 
 
 class Ike2CertificateForm(ConnectionForm):
@@ -200,9 +200,13 @@ class Ike2EapForm(ConnectionForm):
 
 
 class Ike2EapCertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate", required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
+
+    def update_certificates(self):
+        IdentityChoice.load_identities(self, "certificate", "identity")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
