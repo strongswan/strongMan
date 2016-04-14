@@ -4,12 +4,16 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
+
+import strongMan.apps.connections.forms.add_wizard
+import strongMan.apps.connections.forms.core
 from .models import Connection, Secret, Address
 from . import models
 from . import forms
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 from .request_handler.CreateHandler import CreateHandler
+from .request_handler.UpdateHandler import UpdateHandler
 
 
 @require_http_methods('GET')
@@ -46,14 +50,18 @@ def overview(request):
 @require_http_methods(['POST', 'GET'])
 def create(request):
     handler = CreateHandler(request)
-    return handler.handle()
+    ret = handler.handle()
+    print(ret.content)
+    return ret
 
 
 @login_required
 def update(request, id):
+    handler = UpdateHandler(request, id)
+    return handler.handle()
     if request.method == 'GET':
         connection = Connection.objects.get(id=id).subclass()
-        form = forms.ConnectionForm().subclass(connection)
+        form = strongMan.apps.connections.forms.add_wizard.ConnectionForm().subclass(connection)
         form.fill(connection)
         return render(request, 'connections/connection_configuration.html',
                       {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})

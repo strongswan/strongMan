@@ -3,29 +3,53 @@
 {% load connections_extras %}
 {% block title %}Connection{% endblock title %}
 {% block small-title %}{{ title }}{% endblock small-title %}
+
 {% block content %}
     <div class="row">
         <div id="connection-configuration">
             <div class="col-sm-offset-2 col-sm-8">
                 <form action="
-                        {% if request.path|slice:":-16" == "/" %}{% url 'connections:connection_create' %}{% endif %}"
+                        {% if request.path|slice:":-16" == "/" %}{% url 'connections:connections_choose' %}{% endif %}"
                       method="post">
                     {% csrf_token %}
-                    <input type="hidden" name="wizard_step" value="configure"/>
+                    <input class="wizard_step" type="hidden" name="wizard_step" value="configure"/>
                     <input type="hidden" name="form_name" value={{ form_name }}>
                     {% for field in form %}
                         <div class="form-group row">
                             <label class="control-label col-sm-2" for="id_{{ field.name }}">{{ field.label }}</label>
                             <div class="controls col-sm-10">
                                 {% if field|field_type == "Select" and  field.field.is_certificate_choice %}
+                                    <div class="certificate_picker" id="cp_{{ field.name }}">
+                                        <select class="selectpicker" data-live-search="true"
+                                                name="{{ field.name }}"
+                                                id="id_{{ field.name }}" data-show-subtext="True">
+                                            {% if field.value == None %}
+                                                <option value="-1" selected>{{ field.empty_label }}</option>
+                                            {% endif %}
+                                            {% for choise in field.field.queryset %}
+                                                <option value="{{ choise.id }}"
+                                                        {% if field.value|slugify == choise.id|slugify %}
+                                                        selected{% endif %}
+                                                        data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                {% elif field|field_type == "Select" and  field.field.is_identity_choice %}
                                     <select class="selectpicker" data-live-search="true" name="{{ field.name }}"
-                                            id="id_{{ field.name }}" data-show-subtext="True">
-                                        {% for choise in field.field.queryset %}
-                                            <option value="{{ choise.id }}" {% if field.value == choise.id %}
-                                                    selected{% endif %}
-                                                    data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
+                                            id="id_{{ field.name }}" data-show-subtext="True"
+                                            {% if field.field.choices|length == 0 %}disabled="True"{% endif %}>
+                                        {% if field.value == "" %}
+                                            <option value="" selected>{{ field.empty_label }}</option>
+                                        {% endif %}
+
+                                        {% for value, identity in field.field.choices %}
+                                            <option value="{{ value }}"
+                                                    {% if field.value|slugify == value|slugify %}selected{% endif %}
+                                                    data-subtext="{{ identity.type }}">{{ identity }}</option>
                                         {% endfor %}
                                     </select>
+
                                 {% elif field|field_type == "Select" %}
                                     <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
                                         {% for choise in field.field.queryset %}
@@ -68,4 +92,23 @@
             </div>
         </div>
     </div>
+    <script>
+        var previous = null;
+        var div = $(".certificate_picker");
+        var select = div.find("select")
+
+        div.mouseenter(function (e) {
+            // Store the current value on focus and on change
+            var myselect = $(this).find("select")
+            previous = myselect[0].value;
+        });
+        select.change(function () {
+            // Make sure the previous value is updated
+            previous = this.value;
+            form = $(this).closest("form");
+            form.children(".wizard_step").val("update_certificate");
+            form.submit();
+        });
+
+    </script>
 {% endblock %}
