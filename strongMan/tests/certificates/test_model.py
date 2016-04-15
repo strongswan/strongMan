@@ -247,3 +247,11 @@ class ViciCertificateTest(TestCase):
         vicicert = CertificateFactory.vicicertificate_by_dict(dict)
         self.assertEqual(count(ViciCertificate), 1)
         self.assertTrue(vicicert.has_private_key)
+
+class AbstractDjangoClassTest(TestCase):
+    def test_abstractidentity_to_subclasses(self):
+        Paths.X509_googlecom.add_to_db()
+        abstract_ident = AbstractIdentity.objects.all()
+        real_ident = AbstractIdentity.subclasses(abstract_ident)
+        for ident in real_ident:
+            self.assertIsInstance(ident,tuple(AbstractIdentity.all_subclasses()))

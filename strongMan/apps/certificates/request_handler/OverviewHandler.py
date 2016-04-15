@@ -41,11 +41,13 @@ class AbstractOverviewHandler:
         return x509_list
 
     def _search_for(self, all_certs, search_text):
+        import time
         cert_ids = []
         identities = models.identities.AbstractIdentity.objects.all()
+        identities = models.identities.AbstractIdentity.subclasses(identities)
         for ident in identities:
-            ident = ident.subclass()
             if search_text.lower() in str(ident).lower():
+                #Todo Extreeeeem langsam wegem Generic Foreignkey! Dafugg
                 cert_ids.append(ident.certificate.pk)
         return all_certs.filter(pk__in=cert_ids)
 
@@ -64,7 +66,10 @@ class AbstractOverviewHandler:
             return self._render(all_certs)
 
         search_pattern = form.cleaned_data["search_text"]
-        search_result = self._search_for(all_certs, search_pattern)
+        if not search_pattern == '':
+            search_result = self._search_for(all_certs, search_pattern)
+        else:
+            search_result = all_certs
         page = form.cleaned_data["page"]
         return self._render(search_result, page, search_pattern)
 

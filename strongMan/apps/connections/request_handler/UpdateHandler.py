@@ -8,12 +8,15 @@ class UpdateHandler:
         self.request = request
         self.id = id
 
+    @property
+    def connection(self):
+        return Connection.objects.get(pk=self.id).subclass()
+
     def _render_get(self):
-        connection = Connection.objects.get(id=self.id).subclass()
-        form = forms.add_wizard.ConnectionForm().subclass(connection)
-        form.fill(connection)
+        form = forms.add_wizard.ConnectionForm().subclass(self.connection)
+        form.fill(self.connection)
         return render(self.request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form)})
+                      {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form),'connection': self.connection})
     def handle(self):
         if self.request.method == 'GET':
             return self._render_get()
@@ -25,7 +28,7 @@ class UpdateHandler:
             form = form_class(initial=self.request.POST)
             form.update_certificates()
             return render(self.request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form)})
+                      {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form),'connection': self.connection})
         else:
             form_name = self.request.POST['form_name']
             form_class = getattr(forms, form_name)
@@ -36,7 +39,7 @@ class UpdateHandler:
                 return redirect('/')
             else:
                 return render(self.request, 'connections/connection_configuration.html',
-                              {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form)})
+                              {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form),'connection': self.connection})
 
     def _get_title(self, form):
         return form.get_choice_name()

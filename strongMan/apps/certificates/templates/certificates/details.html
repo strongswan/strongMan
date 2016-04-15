@@ -1,21 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load staticfiles %}
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Details{% endblock small-title %}
+{% block html-head %}
+    <script src="{% static 'js/certificates/details.js' %}"></script>
+{% endblock html-head %}
 {% block content %}
-    <script>
-        function removeBtnClicked(form) {
-            jform = $(form);
-            btn = jform.find('.remove-btn');
-            if (btn.hasClass('btn-default')) {
-                btn.removeClass('btn-default').addClass('btn-danger');
-                btn.find('.removebtn-text').text('Are you sure?');
-                return false;
-            } else {
-                return true;
-            }
-        }
-    </script>
+
     <div class="container" id="certificate-detail">
         <div class="row">
             {% if certificate %}

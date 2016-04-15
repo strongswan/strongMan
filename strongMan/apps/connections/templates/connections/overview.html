@@ -19,7 +19,9 @@
             <tbody>
             {% for connection in connections %}
                 <tr>
-                    <td>{{ connection.profile }}</td>
+                    <td><a class="profilelink"
+                           href="{% url "connections:connection_update" connection.id %}"><b>{{ connection.profile }}</b></a>
+                    </td>
                     <td>{{ connection.remote }}</td>
                     <td>
                     <span title="Turn connection on / off">
@@ -43,27 +45,26 @@
                         <span title="Remove connection">
                         <a href="{{ connection.delete }}" id="delete-{{ connection.id }}"
                            class="btn btn-default white-background black remove-btn">
-                            <span class="glyphicon glyphicon-remove"></span>
+                            <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text"></span>
                         </a>
                         </span>
-                        <span title="Edit connection">
-                        <a href="{{ connection.edit }}" id="edit-{{ connection.id }}"
-                           class="btn btn-primary edit-btn">
-                            <span class="glyphicon glyphicon-edit"></span>
-                        </a>
-                        </span>
+
                         </div>
                     </td>
                 </tr>
             {% endfor %}
             <script>
-                $(".remove-btn")
-                        .mouseenter(function () {
-                            $("#" + this.id).removeClass('btn-default').addClass('btn-danger');
-                        })
-                        .mouseleave(function () {
-                            $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
-                        });
+                $(".remove-btn").click(function () {
+                    btn = $(this);
+                    if (btn.hasClass('btn-default')) {
+                        btn.removeClass('btn-default').addClass('btn-danger');
+                        btn.children('.removebtn-text').text('Remove connection');
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+
 
             </script>
             </tbody>

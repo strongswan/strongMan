@@ -19,21 +19,19 @@ class CreateHandler:
         form_name = self.request.POST['form_name']
         form_class = getattr(forms, form_name)
         form = form_class(data=data, initial=initial)
+        form.update_certificates()
         return form, form_name
 
     def _handle_select_type(self):
         form, form_name = self._init_form()
-        # print(UserCertificate.objects.count())
         return self._render_configure(form, form_name)
 
     def _handle_update_certificate(self):
         form, form_name = self._init_form(initial=self.request.POST)
-        form.update_certificates()
         return self._render_configure(form, form_name)
 
     def _handle_configure(self):
         form, form_name = self._init_form(self.request.POST)
-        form.update_certificates()
         if form.is_valid():
             form.create_connection()
             return redirect('/')

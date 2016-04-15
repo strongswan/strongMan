@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
-from strongMan.apps.certificates.request_handler import OverviewHandler
 from strongMan.apps.certificates.models.certificates import Certificate
-from .request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.request_handler import OverviewHandler
 from strongMan.apps.certificates.request_handler.DetailsHandler import DetailsHandler
 from .forms import AddForm
+from .request_handler.AddHandler import AddHandler
 
 
 @login_required

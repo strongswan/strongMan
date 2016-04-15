@@ -62,9 +62,13 @@ class ConnectionForm(forms.Form):
 
 
 class Ike2CertificateForm(ConnectionForm):
-    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate",
+    certificate = CertificateChoice(queryset=UserCertificate.objects.none(), empty_label="Choose certificate",
                                     required=True)
     identity = IdentityChoice(choices=(), initial="", required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(Ike2CertificateForm, self).__init__(*args, **kwargs)
+        self.fields['certificate'].queryset = UserCertificate.objects.all() #init queryset, otherwise it's not going to be updated
 
     def update_certificates(self):
         IdentityChoice.load_identities(self, "certificate", "identity")
@@ -141,6 +145,10 @@ class Ike2EapCertificateForm(ConnectionForm):
     identity = IdentityChoice(choices=(), initial="", required=True)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super(Ike2EapCertificateForm, self).__init__(*args, **kwargs)
+        self.fields['certificate'].queryset = UserCertificate.objects.all()
 
     def update_certificates(self):
         IdentityChoice.load_identities(self, "certificate", "identity")

@@ -109,6 +109,39 @@ body {
 #connection-configuration{
     margin-top: 30px;
 }
+#connection-overview td a.profilelink {
+    display: block;
+    padding: 5px;
+}
+
+#connection-configuration .panel{
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+#connection-configuration .panel h3{
+    margin-bottom: 15px;
+}
+#connection-configuration .panel #row-gateway{
+    padding-bottom: 20px;
+}
+
+#connection-configuration .form-Ike2CertificateForm #row-identity{
+    padding-bottom: 20px;
+}
+
+#connection-configuration .form-Ike2EapCertificateForm #row-identity{
+    padding-bottom: 20px;
+}
+#connection-configuration .form-Ike2EapCertificateForm #row-password{
+    padding-bottom: 20px;
+}
+
+#connection-configuration .form-Ike2EapForm #row-password{
+    padding-bottom: 20px;
+}
+
+
 .title-area hr{
     margin-top: 10px;
     margin-bottom: 30px;

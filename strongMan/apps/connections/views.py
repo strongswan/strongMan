@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
+from django.core.urlresolvers import reverse
 
 import strongMan.apps.connections.forms.add_wizard
 import strongMan.apps.connections.forms.core
@@ -114,9 +115,11 @@ def delete_connection(request, id):
     except ViciLoadException as e:
         messages.warning(request, str(e))
     finally:
+        connection_name = connection.profile
         connection.delete_all_connected_models()
         connection.delete()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        messages.info(request, "Connection " + connection_name + " has been deleted.")
+        return HttpResponseRedirect(reverse("connections:index"))
 
 
 def _get_title(form):

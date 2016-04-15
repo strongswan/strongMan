@@ -4,6 +4,7 @@ from strongMan.apps.certificates.models import UserCertificate
 
 
 class CertificateChoice(forms.ModelChoiceField):
+
     @property
     def is_certificate_choice(self):
         return True
@@ -46,7 +47,7 @@ class IdentityChoice(forms.ChoiceField):
         elif not form.initial == {}:
             data_source = form.initial
         else:
-            raise Exception("Initial and data is empty!")
+            return
         if not certificate_field_name in data_source:
             return
         cert_id = data_source[certificate_field_name]

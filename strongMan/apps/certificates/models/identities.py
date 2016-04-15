@@ -12,6 +12,7 @@ class AbstractIdentity(DjangoAbstractBase, CertificateModel, models.Model):
     certificate_id = models.PositiveIntegerField()
     certificate = GenericForeignKey('certificate_type', 'certificate_id')
 
+
     def __str__(self):
         return str(super(AbstractIdentity, self))
 

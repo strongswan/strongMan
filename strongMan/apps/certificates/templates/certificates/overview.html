@@ -13,40 +13,27 @@
 {% endcomment %}
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
+
 {% block content %}
     <div id="certificate-overview">
         <div class="row" id="header">
             <div class="col-md-10 col-xs-9 btn-group" role="group">
-
                 <a href="{% url "certificates:overview" %}" {% if view == "all" %}disabled="True" {% endif %}
                    class="btn btn-default">
-                        <span title="Show all certificates">
-                            All
-                        </span>
+                        <span title="Show all certificates">All</span>
                 </a>
-
-
                 <a href="{% url 'certificates:overview_ca' %}" {% if view == "root" %}disabled="True" {% endif %}
                    class="btn btn-default">
-                        <span title="Show only root certificates">
-                            Root
-                    </span>
+                        <span title="Show only root certificates">Root</span>
                 </a>
-
-
                 <a href="{% url 'certificates:overview_certs' %}" {% if view == "entities" %}disabled="True" {% endif %}
                    class="btn btn-default">
-                        <span title="Show only entity certificates">
-                            Entities
-                        </span>
+                        <span title="Show only entity certificates">Entities</span>
                 </a>
                 <a href="{% url 'certificates:overview_vici' %}" {% if view == "vici" %}disabled="True" {% endif %}
                    class="btn btn-default">
-                        <span title="Shows the certificates provided by the vici interface">
-                            Vici
-                        </span>
+                        <span title="Shows the certificates provided by the vici interface">Vici</span>
                 </a>
-
             </div>
             <div class="pull-right" id="add-btn">
                 <span title="Add a new key container">
@@ -130,16 +117,5 @@
                 <h3>No certificates to show</h3>
             </div>
         {% endif %}
-    {% comment %}
-        <script>
-            $(".remove-btn")
-                    .mouseenter(function () {
-                        $("#" + this.id).removeClass('btn-default').addClass('btn-danger');
-                    })
-                    .mouseleave(function () {
-                        $(".remove-btn").removeClass('btn-danger').addClass('btn-default');
-                    });
-        </script>
-    {% endcomment %}
     </div>
 {% endblock content %}
