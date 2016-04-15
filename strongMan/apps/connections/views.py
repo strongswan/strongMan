@@ -1,16 +1,19 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from django.views.generic.edit import FormView
+
+import strongMan.apps.connections.forms.add_wizard
+import strongMan.apps.connections.forms.core
 from .models import Connection, Secret, Address
 from . import models
 from . import forms
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException, ViciInitiateException, ViciTerminateException
+from .request_handler.CreateHandler import CreateHandler
+from .request_handler.UpdateHandler import UpdateHandler
 
 
 @require_http_methods('GET')
@@ -22,7 +25,7 @@ def overview(request):
             connection.state = vici_wrapper.is_connection_established(connection.profile)
             connection.save()
     except ViciSocketException as e:
-        messages.warning(request, str(e))
+        return render(request, 'index.html')
     except ViciLoadException as e:
         messages.warning(request, str(e))
 
@@ -43,43 +46,22 @@ def overview(request):
     return render(request, 'index.html', context)
 
 
-class ChooseTypView(LoginRequiredMixin, FormView):
-    template_name = 'connections/select_typ.html'
-    form_class = forms.ChooseTypeForm
-
-    def form_valid(self, form):
-        form_name = self.request.POST['typ']
-        form_class = getattr(forms, form_name)
-        form = form_class()
-        return render(self.request, 'connections/connection_configuration.html',
-                      {'form': form_class(), 'form_name': form_name, 'title': _get_title(form)})
-
-
 @login_required
+@require_http_methods(['POST', 'GET'])
 def create(request):
-    if request.method == 'GET':
-        form_name = request.POST['typ']
-        form_class = getattr(forms, form_name)
-        form = form_class()
-        return render(request, 'connections/connection_configuration.html',
-                      {'form': form_class(), 'form_name': form_name, 'title': _get_title(form)})
-
-    elif request.method == 'POST':
-        form_name = request.POST['form_name']
-        form_class = getattr(forms, form_name)
-        form = form_class(request.POST)
-        if form.is_valid():
-            form.create_connection()
-            return redirect('/')
-        else:
-            return render(request, 'connections/connection_configuration.html', {'form': form, 'title': _get_title(form)})
+    handler = CreateHandler(request)
+    ret = handler.handle()
+    print(ret.content)
+    return ret
 
 
 @login_required
 def update(request, id):
+    handler = UpdateHandler(request, id)
+    return handler.handle()
     if request.method == 'GET':
         connection = Connection.objects.get(id=id).subclass()
-        form = forms.ConnectionForm().subclass(connection)
+        form = strongMan.apps.connections.forms.add_wizard.ConnectionForm().subclass(connection)
         form.fill(connection)
         return render(request, 'connections/connection_configuration.html',
                       {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
@@ -145,7 +127,7 @@ def delete_connection(request, id):
 
 
 def _get_title(form):
-    return form.get_choice_name
+    return form.get_choice_name()
 
 
 def _get_type_name(cls):

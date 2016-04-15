@@ -24,6 +24,7 @@ class ViciWrapper:
         try:
             self.session.load_conn(connection)
         except Exception as e:
+            print(e)
             raise ViciLoadException("Connection cannot be loaded!") from e
 
     def unload_connection(self, connection_name):

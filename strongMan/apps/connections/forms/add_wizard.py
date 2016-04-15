@@ -1,9 +1,18 @@
 import sys
 from django import forms
 
-from strongMan.apps.certificates.models.identities import AbstractIdentity
-from .models import Address, EapAuthentication, Authentication, Secret, Child, Proposal
-from .models import IKEv2EAP, IKEv2CertificateEAP, IKEv2Certificate
+from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
+from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
+from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
+    IKEv2CertificateEAP, Child, EapAuthentication, Proposal
+
+
+class ChooseTypeForm(forms.Form):
+    form_name = forms.ChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super(ChooseTypeForm, self).__init__(*args, **kwargs)
+        self.fields['form_name'].choices = ConnectionForm.get_choices()
 
 
 class ConnectionForm(forms.Form):
@@ -33,6 +42,13 @@ class ConnectionForm(forms.Form):
                 form_class = getattr(sys.modules[__name__], form_name)
                 return form_class()
 
+    def update_certificates(self):
+        '''
+        This methos is called when a certificate field changed and the identites have to be refreshed
+        :return: None
+        '''
+        pass
+
     @classmethod
     def get_choices(cls):
         return tuple(
@@ -43,21 +59,19 @@ class ConnectionForm(forms.Form):
         return tuple(tuple((subclass().get_model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
 
 
-class ChooseTypeForm(forms.Form):
-    typ = forms.ChoiceField()
-
-    def __init__(self, *args, **kwargs):
-        super(ChooseTypeForm, self).__init__(*args, **kwargs)
-        self.fields['typ'].choices = ConnectionForm.get_choices()
-
-
 class Ike2CertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate",
+                                    required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
+
+    def update_certificates(self):
+        IdentityChoice.load_identities(self, "certificate", "identity")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
-        identity = self.cleaned_data['certificate']
+        identity_id = self.cleaned_data["identity"]
+        identity = AbstractIdentity.objects.get(pk=identity_id)
         connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
@@ -68,11 +82,16 @@ class Ike2CertificateForm(ConnectionForm):
         connection = IKEv2Certificate.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
-        connection.domain = self.cleaned_data['certificate']
+        remote = connection.remote.first()
+        remote.identity = AbstractIdentity.objects.get(pk=self.cleaned_data['identity'])
+        remote.save()
         connection.save()
 
     def fill(self, connection):
         super(Ike2CertificateForm, self).fill(connection)
+        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
+        self.initial['identity'] = connection.remote.first().identity.pk
+        self.update_certificates()
 
     @property
     def get_choice_name(self):
@@ -125,16 +144,22 @@ class Ike2EapForm(ConnectionForm):
 
 
 class Ike2EapCertificateForm(ConnectionForm):
-    certificate = forms.ModelChoiceField(queryset=AbstractIdentity.objects.all(), empty_label=None)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate",
+                                    required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
+
+    def update_certificates(self):
+        IdentityChoice.load_identities(self, "certificate", "identity")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
         gateway = self.cleaned_data['gateway']
         username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        identity = self.cleaned_data['certificate']
+        identity_id = self.cleaned_data["identity"]
+        identity = AbstractIdentity.objects.get(pk=identity_id)
         connection = IKEv2CertificateEAP(profile=profile, auth='pubkey', version=2)
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
@@ -151,7 +176,12 @@ class Ike2EapCertificateForm(ConnectionForm):
         connection.save()
 
     def fill(self, connection):
-        super(Ike2CertificateForm, self).fill(connection)
+        super(Ike2EapCertificateForm, self).fill(connection)
+        self.fields['username'].initial = "to implement!"
+        self.fields['password'].initial = "to implement!"
+        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
+        self.initial['identity'] = connection.remote.first().identity.pk
+        self.update_certificates()
 
     @property
     def get_model(self):

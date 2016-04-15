@@ -22,9 +22,8 @@ class ConnectionViewTest(TestCase):
         manager.add_keycontainer(bytes)
 
         certificate = Certificate.objects.first()
-        certificate = certificate.subclass()
-
-        self.identity = certificate.identities.first()
+        self.certificate = certificate.subclass()
+        self.identity = self.certificate.identities.first()
         self.factory = RequestFactory()
 
     def test_select_post(self):
@@ -38,8 +37,7 @@ class ConnectionViewTest(TestCase):
 
     def test_Ike2CertificateCreate_update(self):
         url_create = '/connections/add/create/'
-
-        self.client.post(url_create, {'gateway': "gateway", 'profile': 'profile', 'certificate': self.identity.id, 'form_name': 'Ike2CertificateForm'})
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': "gateway", 'profile': 'profile', 'certificate': self.certificate.pk, 'identity': self.identity.pk, 'form_name': 'Ike2CertificateForm'})
 
         connection_created = Connection.objects.first()
         self.assertEquals(connection_created.profile, 'profile')

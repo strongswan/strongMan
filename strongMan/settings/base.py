@@ -2,6 +2,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
+DB_SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
 ALLOWED_HOSTS = []
 
 
