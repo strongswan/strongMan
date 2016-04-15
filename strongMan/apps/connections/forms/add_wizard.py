@@ -4,7 +4,7 @@ from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
 from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
-    IKEv2CertificateEAP, Child, EapAuthentication, Proposal
+    IKEv2CertificateEAP, Child, EapAuthentication, Proposal, CertificateAuthentication
 
 
 class ChooseTypeForm(forms.Form):
@@ -38,9 +38,10 @@ class ConnectionForm(forms.Form):
     def subclass(self, connection):
         typ = type(connection)
         for model, form_name in self.get_models():
-            if model == typ:
+            if type(model) == typ:
                 form_class = getattr(sys.modules[__name__], form_name)
                 return form_class()
+        return self
 
     def update_certificates(self):
         '''
@@ -74,9 +75,15 @@ class Ike2CertificateForm(ConnectionForm):
         identity = AbstractIdentity.objects.get(pk=identity_id)
         connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2)
         connection.save()
+        child = Child(name=profile, connection=connection)
+        child.save()
+        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="aes128gcm128-modp2048", child=child).save()
         Address(value=gateway, remote_addresses=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
-        Authentication(name='local', auth='pubkey', local=connection).save()
+        Address(value='localhost', local_addresses=connection).save()
+        Address(value='0.0.0.0', vips=connection).save()
+        Authentication(name='remote', auth='pubkey', remote=connection).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity).save()
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)
@@ -89,8 +96,8 @@ class Ike2CertificateForm(ConnectionForm):
 
     def fill(self, connection):
         super(Ike2CertificateForm, self).fill(connection)
-        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
-        self.initial['identity'] = connection.remote.first().identity.pk
+        self.initial['certificate'] = connection.local.first().subclass().identity.certificate.pk
+        self.initial['identity'] = connection.local.first().subclass().identity.pk
         self.update_certificates()
 
     @property
@@ -164,7 +171,7 @@ class Ike2EapCertificateForm(ConnectionForm):
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
+        CertificateAuthentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
         Authentication(name='local', auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
@@ -179,8 +186,8 @@ class Ike2EapCertificateForm(ConnectionForm):
         super(Ike2EapCertificateForm, self).fill(connection)
         self.fields['username'].initial = "to implement!"
         self.fields['password'].initial = "to implement!"
-        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
-        self.initial['identity'] = connection.remote.first().identity.pk
+        self.initial['certificate'] = connection.remote.first().subclass().identity.certificate.pk
+        self.initial['identity'] = connection.remote.first().subclass().identity.pk
         self.update_certificates()
 
     @property

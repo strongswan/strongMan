@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 from django.test import TestCase
-from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address
+from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, CertificateAuthentication
 from strongMan.apps.certificates.models import Certificate
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
@@ -28,8 +28,8 @@ class ConnectionModelTest(TestCase):
         certificate = Certificate.objects.first()
         certificate = certificate.subclass()
 
-        Authentication(name='remote-1', identity=certificate.identities.first(), auth='pubkey', remote=connection).save()
-        Authentication(name='local-1', identity=certificate.identities.first(), auth='pubkey', local=connection).save()
+        Authentication(name='remote-1', auth='pubkey', remote=connection).save()
+        CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey', local=connection).save()
 
         Secret(type='EAP', data="password", connection=connection).save()
 

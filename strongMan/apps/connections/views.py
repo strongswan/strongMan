@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -50,31 +51,13 @@ def overview(request):
 @require_http_methods(['POST', 'GET'])
 def create(request):
     handler = CreateHandler(request)
-    ret = handler.handle()
-    print(ret.content)
-    return ret
+    return handler.handle()
 
 
 @login_required
 def update(request, id):
     handler = UpdateHandler(request, id)
     return handler.handle()
-    if request.method == 'GET':
-        connection = Connection.objects.get(id=id).subclass()
-        form = strongMan.apps.connections.forms.add_wizard.ConnectionForm().subclass(connection)
-        form.fill(connection)
-        return render(request, 'connections/connection_configuration.html',
-                      {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
-    elif request.method == 'POST':
-        form_name = request.POST['form_name']
-        form_class = getattr(forms, form_name)
-        form = form_class(request.POST)
-        if form.is_valid():
-            form.update_connection(id)
-            return redirect('/')
-        else:
-            return render(request, 'connections/connection_configuration.html',
-                          {'form': form, 'form_name': _get_type_name(form), 'title': _get_title(form)})
 
 
 @login_required

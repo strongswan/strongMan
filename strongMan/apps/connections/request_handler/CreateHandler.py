@@ -56,7 +56,7 @@ class CreateHandler:
             return self._render_select_type()
 
     def _get_title(self, form):
-        return form.get_choice_name()
+        return form.get_choice_name
 
     def _get_type_name(self, cls):
         return type(cls).__name__

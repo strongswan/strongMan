@@ -27,11 +27,10 @@ class Connection(models.Model):
             local = local.subclass()
             ike_sa.update(local.dict())
 
-        '''
         for remote in self.remote.all():
             remote = remote.subclass()
             ike_sa.update(remote.dict())
-        '''
+
         connection = OrderedDict()
         connection[self.profile] = ike_sa
         return connection
@@ -74,6 +73,7 @@ class IKEv2Certificate(Connection):
 class IKEv2EAP(Connection):
     pass
 
+
 class IKEv2CertificateEAP(Connection):
     pass
 
@@ -97,7 +97,8 @@ class Secret(models.Model):
     connection = models.ForeignKey(Connection, null=True, blank=True, default=None)
 
     def dict(self):
-        secrets = OrderedDict(type=self.type, data=self.data, id='eap-test')
+        child = self.connection.subclass().children.first()
+        secrets = OrderedDict(type=self.type, data=self.data, id=child.name)
         #secrets['lers'] = [owner.value for owner in self.connection.remote_addresses.all()]
         #secrets['owners'] = [owner.value for owner in self.connection.local_addresses.all()]
         return secrets
@@ -124,7 +125,6 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None)
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth)
@@ -156,4 +156,14 @@ class EapAuthentication(Authentication):
         auth = super(EapAuthentication, self).dict()
         values = auth[self.name]
         values['eap_id'] = self.eap_id
+        return auth
+
+
+class CertificateAuthentication(Authentication):
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None)
+
+    def dict(self):
+        auth = super(CertificateAuthentication, self).dict()
+        values = auth[self.name]
+        values['certs'] = [self.identity.subclass().certificate.der_container]
         return auth

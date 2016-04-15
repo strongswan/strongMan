@@ -1,7 +1,7 @@
-import strongMan.apps.connections.forms.add_wizard
 from ..models import Connection
 from .. import forms
 from django.shortcuts import render, redirect
+
 
 class UpdateHandler:
     def __init__(self, request, id):
@@ -14,6 +14,7 @@ class UpdateHandler:
         form.fill(connection)
         return render(self.request, 'connections/connection_configuration.html',
                       {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form)})
+
     def handle(self):
         if self.request.method == 'GET':
             return self._render_get()
@@ -39,7 +40,7 @@ class UpdateHandler:
                               {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form)})
 
     def _get_title(self, form):
-        return form.get_choice_name()
+        return form.get_choice_name
 
     def _get_type_name(self, cls):
         return type(cls).__name__

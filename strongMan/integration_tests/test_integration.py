@@ -22,8 +22,8 @@ class IntegrationTest(TestCase):
         self.vici_wrapper.unload_all_connections()
 
     def test_Ike2EapIntegration(self):
-        url = '/connections/add/create/'
-        self.client.post(url, {'gateway': "gateway", 'profile': 'home-1', 'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
+        url_create = '/connections/add/'
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'profile', 'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -35,5 +35,3 @@ class IntegrationTest(TestCase):
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
-
-

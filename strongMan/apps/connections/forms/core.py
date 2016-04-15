@@ -1,5 +1,4 @@
 from django import forms
-
 from strongMan.apps.certificates.models import UserCertificate
 
 

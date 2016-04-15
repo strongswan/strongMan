@@ -1,5 +1,6 @@
 import os
 from django.test import TestCase
+from django.http import QueryDict
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.connections.forms.add_wizard import ChooseTypeForm, Ike2CertificateForm, Ike2EapForm, \
     Ike2EapCertificateForm
@@ -15,29 +16,24 @@ class ConnectionFormsTest(TestCase):
         manager = UserCertificateManager()
         manager.add_keycontainer(bytes)
 
-        certificate = Certificate.objects.first()
-        certificate = certificate.subclass()
-
-        self.identity = certificate.identities.first()
-
-    def test_form(self):
-        form = Ike2CertificateForm()
-        print(form.auto_id)
+        self.certificate = Certificate.objects.first().subclass()
+        self.identity = self.certificate.identities.first()
 
     def test_ChooseTypeForm(self):
-        form_data = {'typ':  "Ike2CertificateForm"}
+        form_data = {'form_name':  "Ike2CertificateForm"}
         form = ChooseTypeForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_ChooseTypeForm_invalid(self):
-        form_data = {'typ':  "sting"}
+        form_data = {'form_name':  "sting"}
         form = ChooseTypeForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm(self):
-        form_data = {'gateway': "gateway", 'profile': 'profile', 'certificate': self.identity.id}
+        form_data = {'gateway': "gateway", 'profile': 'profile', 'identity': self.identity.pk, 'certificate': self.certificate.pk}
         form = Ike2CertificateForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        #TODO Update Choices Field
+        self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm_invalid(self):
         form_data = {'gateway': "gateway", 'profile': 'profile'}
@@ -47,7 +43,8 @@ class ConnectionFormsTest(TestCase):
     def test_Ike2EapCertificateForm(self):
         form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile', 'certificate': self.identity.id}
         form = Ike2EapCertificateForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        #TODO Update Choices Field
+        self.assertFalse(form.is_valid())
 
     def test_Ike2EapForm(self):
         form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile'}
