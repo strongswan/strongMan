@@ -7,6 +7,9 @@ from strongMan.apps.certificates.request_handler import OverviewHandler
 from strongMan.apps.certificates.request_handler.DetailsHandler import DetailsHandler
 from .forms import AddForm
 from .request_handler.AddHandler import AddHandler
+from .tables import UserCertificateTable
+from .models import UserCertificate
+from django_tables2 import RequestConfig
 
 
 @login_required

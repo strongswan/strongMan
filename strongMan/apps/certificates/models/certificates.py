@@ -132,6 +132,9 @@ class UserCertificate(Certificate):
     def __str__(self):
         return str(self.subject)
 
+    @property
+    def has_private_key(self):
+        return not self.private_key is None
 
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):

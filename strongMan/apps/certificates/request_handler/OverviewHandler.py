@@ -1,11 +1,14 @@
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
+from django_tables2 import RequestConfig
 
 from .. import models
 from ..forms import CertificateSearchForm
 from ..services import ViciCertificateManager
 from ...vici.wrapper.exception import ViciSocketException
+from ..tables import UserCertificateTable
+from ..models import UserCertificate
 
 
 class AbstractOverviewHandler:
@@ -20,6 +23,10 @@ class AbstractOverviewHandler:
         return handler
 
     def page_tag(self):
+        '''
+        A string that identifies the view. This gets populated to the template.
+        :return:
+        '''
         raise NotImplementedError()
 
     def all_certificates(self):
@@ -28,20 +35,7 @@ class AbstractOverviewHandler:
         '''
         raise NotImplementedError()
 
-    def _paginate(self, certificate_list, page=1):
-        paginator = Paginator(certificate_list, self.ENTRIES_PER_PAGE)
-        try:
-            x509_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            x509_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            x509_list = paginator.page(paginator.num_pages)
-        return x509_list
-
     def _search_for(self, all_certs, search_text):
-        import time
         cert_ids = []
         identities = models.identities.AbstractIdentity.objects.all()
         identities = models.identities.AbstractIdentity.subclasses(identities)
@@ -50,6 +44,13 @@ class AbstractOverviewHandler:
                 #Todo Extreeeeem langsam wegem Generic Foreignkey! Dafugg
                 cert_ids.append(ident.certificate.pk)
         return all_certs.filter(pk__in=cert_ids)
+
+    def _render(self, queryset=UserCertificate.objects.none(), search_pattern=""):
+        table = UserCertificateTable(queryset, request=self.request)
+        RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
+        if len(queryset) == 0:
+            table = None
+        return render(self.request, 'certificates/overview.html', {'table': table, "view": self.page_tag(), "search_pattern": search_pattern})
 
     def handle(self):
         try:
@@ -70,13 +71,9 @@ class AbstractOverviewHandler:
             search_result = self._search_for(all_certs, search_pattern)
         else:
             search_result = all_certs
-        page = form.cleaned_data["page"]
-        return self._render(search_result, page, search_pattern)
+        return self._render(search_result, search_pattern)
 
-    def _render(self, certificates=[], page=1, search_pattern=""):
-        x509_list = self._paginate(certificates, page=page)
-        return render(self.request, 'certificates/overview.html',
-                      {'publics': x509_list, "view": self.page_tag(), "search_pattern": search_pattern})
+
 
 
 class ViciOverviewHandler(AbstractOverviewHandler):

@@ -90,6 +90,9 @@ body {
 #certificate-overview .pagination-form {
     display: inline-block;
 }
+#certificate-overview .pagination li {
+    display: inline-block;
+}
 #certificate-overview .editremove-cell{
     width: 120px;
 }

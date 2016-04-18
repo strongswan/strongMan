@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% load i18n %}
+{% load render_table from django_tables2 %}
 {% comment %}
     Input:
     :param publics: list of certificates
@@ -13,7 +15,9 @@
 {% endcomment %}
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
-
+{% block html-head %}
+<link rel="stylesheet" href="{% static "django_tables2/themes/paleblue/css/screen.css" %}" />
+{% endblock %} html-header %}
 {% block content %}
     <div id="certificate-overview">
         <div class="row" id="header">
@@ -48,7 +52,7 @@
 
 
         <div class="row" id="search">
-            <form action="" method="POST" style="display: inline;">
+            <form action="" method="POST" >
                 {% csrf_token %}
                 <input type="hidden" name="page" value="1">
                 <div class="col-lg-6">
@@ -56,7 +60,7 @@
                         <input class="form-control" type="text" name="search_text" value="{{ search_pattern }}"
                                placeholder="Filter your certificates by domain names">
                         <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default" type="button" name="search"><span
+                            <button type="submit" class="btn btn-default" type="button" name="search" {% if not table %}disabled="True"{% endif %}><span
                                     class="glyphicon glyphicon-search"></span> Search
                             </button>
                             <a href="" class="btn btn-default" {% if search_pattern == "" %}disabled="True"{% endif %}
@@ -67,55 +71,13 @@
                     </div>
                 </div>
             </form>
-
-
         </div>
-
-        {% if publics %}
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="">
-                        {% if view == "vici" %}
-                            {% include "certificates/widgets/ViciCertificateTable_view.html" with certificates=publics %}
-                        {% else %}
-                            {% include "certificates/widgets/CertificateModelTable_view.html" with certificates=publics %}
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="my-pagination row">
-                <div class="text-center">
-                    {% if publics.has_previous %}
-                        <form action="" method="POST" class="pagination-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="search_text" value="{{ search_pattern }}">
-                            <input type="hidden" name="page" value="{{ publics.previous_page_number }}">
-                            <button type="submit" class="btn btn-default" name="next">
-                                <span class="glyphicon glyphicon-chevron-left"></span> Previous
-                            </button>
-                        </form>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ publics.number }} of {{ publics.paginator.num_pages }}
-                    </span>
-
-                    {% if publics.has_next %}
-                        <form action="" method="POST" class="pagination-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="search_text" value="{{ search_pattern }}">
-                            <input type="hidden" name="page" value="{{ publics.next_page_number }}">
-                            <button type="submit" class="btn btn-default" name="next">
-                                Next <span class="glyphicon glyphicon-chevron-right"></span>
-                            </button>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-        {% else %}
-            <div class="row" id="no_certs_to_show">
-                <h3>No certificates to show</h3>
-            </div>
-        {% endif %}
+    {% if table %}
+        <div class="col-xs-12">
+        {% render_table table 'table.html' %}
+        </div>
+    {% else %}
+        <h3>No certificates to show</h3>
+    {% endif %}
     </div>
 {% endblock content %}
