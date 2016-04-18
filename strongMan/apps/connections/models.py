@@ -1,7 +1,11 @@
 import sys
-from django.db import models
-from strongMan.apps.certificates.models.identities import AbstractIdentity
 from collections import OrderedDict
+
+from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+
+from strongMan.apps.certificates.models.identities import AbstractIdentity
 
 
 class Connection(models.Model):
@@ -35,20 +39,6 @@ class Connection(models.Model):
         connection[self.profile] = ike_sa
         return connection
 
-    def delete_all_connected_models(self):
-        Secret.objects.filter(connection=self).delete()
-        for child in Child.objects.filter(connection=self):
-            Proposal.objects.filter(child=child).delete()
-            Address.objects.filter(local_ts=child).delete()
-            Address.objects.filter(remote_ts=child).delete()
-            child.delete()
-        Proposal.objects.filter(connection=self).delete()
-        Address.objects.filter(local_addresses=self).delete()
-        Address.objects.filter(remote_addresses=self).delete()
-        Address.objects.filter(vips=self).delete()
-        Authentication.objects.filter(local=self).delete()
-        Authentication.objects.filter(remote=self).delete()
-
     @classmethod
     def get_types(cls):
         subclasses = [subclass() for subclass in cls.__subclasses__()]
@@ -64,6 +54,22 @@ class Connection(models.Model):
             if connection:
                 return connection.first()
         return self
+
+
+@receiver(pre_delete, sender=Connection)
+def delete_all_connected_models(sender, **kwargs):
+    Secret.objects.filter(connection=sender).delete()
+    for child in Child.objects.filter(connection=sender):
+        Proposal.objects.filter(child=child).delete()
+        Address.objects.filter(local_ts=child).delete()
+        Address.objects.filter(remote_ts=child).delete()
+        child.delete()
+    Proposal.objects.filter(connection=sender).delete()
+    Address.objects.filter(local_addresses=sender).delete()
+    Address.objects.filter(remote_addresses=sender).delete()
+    Address.objects.filter(vips=sender).delete()
+    Authentication.objects.filter(local=sender).delete()
+    Authentication.objects.filter(remote=sender).delete()
 
 
 class IKEv2Certificate(Connection):
@@ -167,3 +173,10 @@ class CertificateAuthentication(Authentication):
         values = auth[self.name]
         values['certs'] = [self.identity.subclass().certificate.der_container]
         return auth
+
+    def private_key_dict(self):
+        key = self.identity.subclass().certificate.private_key
+        print("private key: " + str(key))
+
+        return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
+

@@ -11,7 +11,6 @@ from strongMan.apps.vici.wrapper.exception import ViciInitiateException
 
 
 class IntegrationTest(TestCase):
-
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create(username='testuser')
@@ -23,7 +22,8 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'profile', 'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'profile',
+                                      'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 

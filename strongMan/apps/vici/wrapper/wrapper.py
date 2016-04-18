@@ -42,6 +42,16 @@ class ViciWrapper:
         except Exception as e:
             raise ViciLoadException("Secret cannot be loaded!") from e
 
+    def load_key(self, key):
+        '''
+        :type secret: dict
+        '''
+        try:
+            self.session.load_key(key)
+        except Exception as e:
+            raise ViciLoadException("Private key cannot be loaded!") from e
+
+
     def load_certificate(self, certificate):
         '''
         :type certificate: dict
