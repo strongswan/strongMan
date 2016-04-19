@@ -65,7 +65,8 @@
                                     {% else %}
                                         <input type="{{ field|field_type|slice:":-5" }}" class="form-control"
                                                name="{{ field.name }}"
-                                               value="{{ field.value }}">
+                                               value="{{ field.value }}"
+                                        {% for key, value in field.field.widget.attrs.items %}{{ key }}="{{ value }}"{% endfor %}>
                                     {% endif %}
                                     {% if field.errors %}
                                         <div class="alert alert-danger" role="alert">

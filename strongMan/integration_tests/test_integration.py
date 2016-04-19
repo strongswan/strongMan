@@ -22,8 +22,8 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'profile',
-                                      'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'EAP',
+                                      'username': "eap-test", 'password': "Ar3etTnp", 'typ': 'Ike2EapForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 

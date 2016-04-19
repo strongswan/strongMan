@@ -1,15 +1,18 @@
 from django.contrib import messages
 from django.shortcuts import render
+from django_tables2 import RequestConfig
 
 from ..models import Connection, Address
 from .. import models
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
+from ..tables import ConnectionTable
 
 
 class OverviewHandler:
     def __init__(self, request):
         self.request = request
+        self.ENTRIES_PER_PAGE = 10
 
     def handle(self):
         try:
@@ -17,7 +20,15 @@ class OverviewHandler:
         except ViciExceptoin as e:
             messages.warning(self.request, str(e))
 
-        return render(self.request, 'index.html', self._get_connection_context())
+        return self._render()
+
+    def _render(self):
+        queryset = Connection.objects.all()
+        table = ConnectionTable(queryset, request=self.request)
+        RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
+        if len(queryset) == 0:
+            table = None
+        return render(self.request, 'index.html', {'table': table})
 
     def _get_connection_context(self):
         connections = []

@@ -20,9 +20,7 @@ def overview(request):
 @require_http_methods(['POST', 'GET'])
 def create(request):
     handler = CreateHandler(request)
-    ret = handler.handle()
-    print(ret.content)
-    return ret
+    return handler.handle()
 
 
 @login_required

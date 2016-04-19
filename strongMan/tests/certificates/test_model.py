@@ -219,6 +219,14 @@ class UserCertificateTest(TestCase):
         cert2 = UserCertificate.objects.get(id=2)
         self.assertIsNotNone(cert2.private_key)
 
+    def test_certificate_identities(self):
+        Paths.X509_googlecom.add_to_db()
+        classes = [Certificate, UserCertificate]
+        for clas in classes:
+            cert = clas.objects.first()
+            count = len(cert.identities)
+            self.assertEqual(count, 505)
+
 
 class SerializedDict:
     def __init__(self, path):

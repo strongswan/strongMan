@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 from ..container_reader import X509Reader
 from .core import CertificateException, CertificateModel, DjangoAbstractBase
-from .identities import AbstractIdentity, TextIdentity, DnIdentity
+from .identities import TextIdentity, DnIdentity
 from strongMan.apps.encryption import fields
 
 
@@ -14,9 +14,9 @@ class KeyContainer(CertificateModel, models.Model):
     type = models.CharField(max_length=10)
     algorithm = models.CharField(max_length=3)
     public_key_hash = models.TextField()
-
     class Meta:
         abstract = True
+
 
     @classmethod
     def by_bytes(cls, container_bytes, password=None):
@@ -87,9 +87,10 @@ class Certificate(KeyContainer, DjangoAbstractBase):
     valid_not_before = models.DateTimeField()
     issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_issuer", null=True)
     subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_subject", null=True)
-    identities = GenericRelation(AbstractIdentity,
-                                 content_type_field='certificate_type',
-                                 object_id_field='certificate_id')
+
+    @property
+    def identities(self):
+        return self.ident_certificates_abstractidentity.all()
 
 
 @receiver(pre_delete, sender=Certificate)

@@ -1,17 +1,11 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+
 from django.db import models
 
 from .core import DjangoAbstractBase, CertificateModel
 
 
 class AbstractIdentity(DjangoAbstractBase, CertificateModel, models.Model):
-    # GenericForeignKey:
-    # http://voorloopnul.com/blog/using-django-generic-relations/
-    certificate_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    certificate_id = models.PositiveIntegerField()
-    certificate = GenericForeignKey('certificate_type', 'certificate_id')
-
+    certificate = models.ForeignKey('certificates.Certificate', related_name="ident_%(app_label)s_%(class)s")
 
     def __str__(self):
         return str(super(AbstractIdentity, self))

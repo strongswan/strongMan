@@ -10,7 +10,7 @@ from strongMan.apps.connections.models import IKEv2Certificate, Address, Authent
 
 
 class ChooseTypeForm(forms.Form):
-    form_name = forms.ChoiceField()
+    form_name = forms.ChoiceField(label="Type:")
 
     def __init__(self, *args, **kwargs):
         super(ChooseTypeForm, self).__init__(*args, **kwargs)
@@ -18,8 +18,9 @@ class ChooseTypeForm(forms.Form):
 
 
 class ConnectionForm(forms.Form):
-    profile = forms.CharField(max_length=50, initial="")
-    gateway = forms.CharField(max_length=50, initial="")
+    profile = forms.CharField(max_length=50, initial="", label="Name",
+                              widget=forms.TextInput(attrs={'placeholder': 'Name your connection thus you rerecognize it'}))
+    gateway = forms.CharField(max_length=50, initial="", widget=forms.TextInput(attrs={'placeholder': 'Hostname or IP'}))
 
     def fill(self, connection):
         self.fields['profile'].initial = connection.profile

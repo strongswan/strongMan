@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
 from django_tables2 import RequestConfig
 
@@ -41,7 +40,6 @@ class AbstractOverviewHandler:
         identities = models.identities.AbstractIdentity.subclasses(identities)
         for ident in identities:
             if search_text.lower() in str(ident).lower():
-                #Todo Extreeeeem langsam wegem Generic Foreignkey! Dafugg
                 cert_ids.append(ident.certificate.pk)
         return all_certs.filter(pk__in=cert_ids)
 
@@ -72,8 +70,6 @@ class AbstractOverviewHandler:
         else:
             search_result = all_certs
         return self._render(search_result, search_pattern)
-
-
 
 
 class ViciOverviewHandler(AbstractOverviewHandler):

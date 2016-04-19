@@ -45,7 +45,7 @@ class UpdateHandler:
                               {'form': form, 'form_name': self._get_type_name(form), 'title': self._get_title(form),'connection': self.connection})
 
     def _get_title(self, form):
-        return form.get_choice_name()
+        return form.get_choice_name
 
 
     def _get_type_name(self, cls):
