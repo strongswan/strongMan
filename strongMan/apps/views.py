@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -6,11 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 from .request_handler import AboutHandler
-
-
 
 
 @require_http_methods(('GET', 'POST'))

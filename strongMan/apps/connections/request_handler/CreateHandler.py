@@ -28,10 +28,12 @@ class CreateHandler:
 
     def _handle_update_certificate(self):
         form, form_name = self._init_form(initial=self.request.POST)
+        form.update_certificates()
         return self._render_configure(form, form_name)
 
     def _handle_configure(self):
         form, form_name = self._init_form(self.request.POST)
+        form.update_certificates()
         if form.is_valid():
             form.create_connection()
             return redirect('/')
@@ -54,7 +56,7 @@ class CreateHandler:
             return self._render_select_type()
 
     def _get_title(self, form):
-        return form.get_choice_name()
+        return form.get_choice_name
 
     def _get_type_name(self, cls):
         return type(cls).__name__

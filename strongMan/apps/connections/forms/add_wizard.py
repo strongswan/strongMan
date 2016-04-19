@@ -5,7 +5,8 @@ from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
 from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
-    IKEv2CertificateEAP
+    IKEv2CertificateEAP, Child, EapAuthentication, Proposal, CertificateAuthentication
+
 
 
 class ChooseTypeForm(forms.Form):
@@ -38,11 +39,18 @@ class ConnectionForm(forms.Form):
 
     def subclass(self, connection):
         typ = type(connection)
-        print(typ)
         for model, form_name in self.get_models():
-            if model == typ:
+            if type(model) == typ:
                 form_class = getattr(sys.modules[__name__], form_name)
                 return form_class()
+        return self
+
+    def update_certificates(self):
+        '''
+        This methos is called when a certificate field changed and the identites have to be refreshed
+        :return: None
+        '''
+        pass
 
     def update_certificates(self):
         '''
@@ -54,7 +62,7 @@ class ConnectionForm(forms.Form):
     @classmethod
     def get_choices(cls):
         return tuple(
-            tuple((type(subclass()).__name__, subclass().get_choice_name())) for subclass in cls.__subclasses__())
+            tuple((type(subclass()).__name__, subclass().get_choice_name)) for subclass in cls.__subclasses__())
 
     @classmethod
     def get_models(cls):
@@ -80,9 +88,15 @@ class Ike2CertificateForm(ConnectionForm):
         identity = AbstractIdentity.objects.get(pk=identity_id)
         connection = IKEv2Certificate(profile=profile, auth='pubkey', version=2)
         connection.save()
+        child = Child(name=profile, connection=connection)
+        child.save()
+        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="aes128gcm128-modp2048", child=child).save()
         Address(value=gateway, remote_addresses=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
-        Authentication(name='local', auth='pubkey', local=connection).save()
+        Address(value='localhost', local_addresses=connection).save()
+        Address(value='0.0.0.0', vips=connection).save()
+        Authentication(name='remote', auth='pubkey', remote=connection).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity).save()
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)
@@ -95,13 +109,15 @@ class Ike2CertificateForm(ConnectionForm):
 
     def fill(self, connection):
         super(Ike2CertificateForm, self).fill(connection)
-        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
-        self.initial['identity'] = connection.remote.first().identity.pk
+        self.initial['certificate'] = connection.local.first().subclass().identity.certificate.pk
+        self.initial['identity'] = connection.local.first().subclass().identity.pk
         self.update_certificates()
 
+    @property
     def get_choice_name(self):
         return "IKEv2 Certificate"
 
+    @property
     def get_model(self):
         return IKEv2Certificate
 
@@ -117,10 +133,16 @@ class Ike2EapForm(ConnectionForm):
         password = self.cleaned_data['password']
         connection = IKEv2EAP(profile=profile, auth='pubkey', version=2)
         connection.save()
+        child = Child(name=username, connection=connection)
+        child.save()
+        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="aes128gcm128-modp2048", child=child).save()
         Address(value=gateway, remote_addresses=connection).save()
+        Address(value='localhost', local_addresses=connection).save()
+        Address(value='0.0.0.0', vips=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection).save()
-        Authentication(name='local', auth='pubkey', local=connection).save()
+        Authentication(name='remote-eap', auth='pubkey', remote=connection).save()
+        EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=username).save()
 
     def update_connection(self, pk):
         connection = IKEv2EAP.objects.get(id=pk)
@@ -132,9 +154,11 @@ class Ike2EapForm(ConnectionForm):
     def fill(self, connection):
         super(Ike2EapForm, self).fill(connection)
 
+    @property
     def get_choice_name(self):
         return "IKEv2 EAP (Username/Password)"
 
+    @property
     def get_model(self):
         return IKEv2EAP
 
@@ -164,7 +188,7 @@ class Ike2EapCertificateForm(ConnectionForm):
         connection.save()
         Address(value=gateway, remote_addresses=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
-        Authentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
+        CertificateAuthentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
         Authentication(name='local', auth='pubkey', local=connection).save()
 
     def update_connection(self, pk):
@@ -179,12 +203,14 @@ class Ike2EapCertificateForm(ConnectionForm):
         super(Ike2EapCertificateForm, self).fill(connection)
         self.fields['username'].initial = "to implement!"
         self.fields['password'].initial = "to implement!"
-        self.initial['certificate'] = connection.remote.first().identity.certificate.pk
-        self.initial['identity'] = connection.remote.first().identity.pk
+        self.initial['certificate'] = connection.remote.first().subclass().identity.certificate.pk
+        self.initial['identity'] = connection.remote.first().subclass().identity.pk
         self.update_certificates()
 
+    @property
     def get_model(self):
         return IKEv2CertificateEAP
 
+    @property
     def get_choice_name(self):
         return "IKEv2 Certificate + EAP (Username/Password)"

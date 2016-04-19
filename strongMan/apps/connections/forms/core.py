@@ -1,10 +1,8 @@
 from django import forms
-
 from strongMan.apps.certificates.models import UserCertificate
 
 
 class CertificateChoice(forms.ModelChoiceField):
-
     @property
     def is_certificate_choice(self):
         return True

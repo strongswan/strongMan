@@ -30,10 +30,6 @@ class ViciWrapperTest(TestCase):
         status = self.vici_wrapper.get_status()
         self.assertTrue(bool(status))
 
-    def test_vici_get_certificates_empty(self):
-        certificates = self.vici_wrapper.get_certificates()
-        self.assertFalse(bool(certificates))
-
     def test_vici_load_connection(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
@@ -44,7 +40,7 @@ class ViciWrapperTest(TestCase):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
         self.assertEquals(1,self.vici_wrapper.get_connections_names().__len__())
-        self.assertTrue(self.vici_wrapper.is_connection_active(self.connection.profile))
+        self.assertTrue(self.vici_wrapper.is_connection_loaded(self.connection.profile))
 
     def test_vici_unload_connection(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())

@@ -7,7 +7,7 @@ ENV STRONGSWAN_VERSION 5.4.0
 RUN mkdir /opt/strongSwan \
 && apt-get update \
 
-&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential curl > /dev/null 2>&1 \
+&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential vim > /dev/null 2>&1 \
 && wget http://download.strongswan.org/strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && tar xjvf strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && cd strongswan-$STRONGSWAN_VERSION \
@@ -26,15 +26,11 @@ RUN mkdir /opt/strongSwan \
 && make -j > /dev/null 2>&1 \
 && make install > /dev/null 2>&1 \
 && cd / \
-&& git clone https://github.com/Sebubu/StrongMan.git \
-&& cd StrongMan \
+&& git clone https://github.com/Sebubu/strongMan.git \
+&& cd strongMan \
 && pip install --upgrade pip \
 && pip install -r requirements.txt \
 && cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/carol/etc/swanctl/* /etc/swanctl/
 
 ADD strongswan.conf /etc/strongswan.conf
-
-
-
-
 
