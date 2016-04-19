@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
-from ..models import Connection, Secret
+from ..models import Connection
 
 
 class ToggleHandler:
@@ -28,7 +28,7 @@ class ToggleHandler:
 
     def _load_connection(self, connection, vici_wrapper):
         vici_wrapper.load_connection(connection.dict())
-        for secret in connection.secret_set:
+        for secret in connection.secret_set.all():
             vici_wrapper.load_secret(secret.dict())
 
         self._load_private_key(connection, vici_wrapper)
@@ -44,10 +44,6 @@ class ToggleHandler:
 
     def _load_private_key(self, connection, vici_wrapper):
         try:
-            print("key dict" + str(connection.local.private_key_dict()))
-
-            print("private key!")
-            vici_wrapper.load_key(connection.local.private_key_dict())
-            print("private key loaded!")
-        except ViciExceptoin as e:
-            print(str(e))
+            vici_wrapper.load_key(connection.local.first().subclass().private_key_dict())
+        except:
+            pass

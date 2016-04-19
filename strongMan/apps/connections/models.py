@@ -176,7 +176,5 @@ class CertificateAuthentication(Authentication):
 
     def private_key_dict(self):
         key = self.identity.subclass().certificate.private_key
-        print("private key: " + str(key))
-
         return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
 
