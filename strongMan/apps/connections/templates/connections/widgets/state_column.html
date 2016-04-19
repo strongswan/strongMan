@@ -1,0 +1,14 @@
+<span title="Turn connection on / off">
+    <div class="btn-toolbar">
+        <form id="toggle_connection" action="{% url 'connections:connection_toggle' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ record.id }}">
+            <input type="hidden" name="connection_type" value="{{ record.subclass.get_typ }}">
+            <input id="toggle_input{{ record.id }}" type="checkbox" data-toggle="toggle"
+                   data-onstyle="success"
+                   data-offstyle="default"
+                   {% if record.state %}checked{% endif %} onclick="this.form.click()">
+        </form>
+        <div id="alert_{{ record.id }}" class="btn"></div>
+    </div>
+</span>

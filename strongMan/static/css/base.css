@@ -116,6 +116,10 @@ body {
     display: block;
     padding: 5px;
 }
+#connection-overview td a {
+   display: block;
+   padding: 2px;
+}
 
 #connection-configuration .panel{
     padding-bottom: 30px;
