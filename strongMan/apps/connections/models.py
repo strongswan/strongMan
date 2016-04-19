@@ -131,9 +131,10 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
+    round = models.IntegerField(default=1)
 
     def dict(self):
-        parameters = OrderedDict(auth=self.auth)
+        parameters = OrderedDict(auth=self.auth, round=self.round)
         auth = OrderedDict()
         auth[self.name] = parameters
         return auth
@@ -177,4 +178,3 @@ class CertificateAuthentication(Authentication):
     def private_key_dict(self):
         key = self.identity.subclass().certificate.private_key
         return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
-

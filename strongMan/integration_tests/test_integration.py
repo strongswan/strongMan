@@ -56,6 +56,28 @@ class IntegrationTest(TestCase):
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
 
+    def test_Ike2EapCertificateIntegration(self):
+        url_create = '/connections/add/'
+        cert = Paths.carol_cert.read()
+        key = Paths.carol_key.read()
+        manager = UserCertificateManager()
+        manager.add_keycontainer(cert)
+        manager.add_keycontainer(key)
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Cert',
+                                      'username': "eap-test", 'password': "Ar3etTnp", 'certificate': 1, 'identity': 1,
+                                      'form_name': 'Ike2EapCertificateForm'})
+        self.assertEquals(1, Connection.objects.count())
+        self.assertEquals(1, Child.objects.count())
+
+        connection = Connection.objects.first().subclass()
+        toggle_url = '/connections/toggle/'
+        self.client.post(toggle_url, {'id': connection.id})
+
+        self.assertEqual(self.vici_wrapper.get_connections_names().__len__(), 1)
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
+        self.client.post(toggle_url, {'id': connection.id})
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
+
 
 class TestCert:
     def __init__(self, path):
