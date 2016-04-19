@@ -11,7 +11,7 @@ strongMan is a management interface for strongSwan. Based on Django and Python, 
 The strongMan application implements a persistent connection and asymmetric key management. Several common connection use cases are implemented and can be used in few configuration steps.
 
 ## Dependencies
-- strongSwan with vici plugin (v5.2.0+) <img src="https://www.strongswan.org/images/strongswan.png" width="30">
+- strongSwan with vici plugin (v5.4.0) <img src="https://www.strongswan.org/images/strongswan.png" width="30">
 - python3
 - strongMan has been developed in pure python and can be installed without any compiler
  

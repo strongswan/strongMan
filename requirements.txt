@@ -2,3 +2,4 @@ Django==1.9.2
 django-formtools==1.0
 oscrypto==0.14.2
 pyaes==1.3.0
+django-tables2==1.1.6
