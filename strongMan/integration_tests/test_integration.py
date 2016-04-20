@@ -34,8 +34,8 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': '172.17.0.2', 'profile': 'EAP',
-                                      'certificate': self.ca_cert.pk, 'identity': self.ca_cert.identities.first().pk,
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'EAP',
+                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
                                       'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
 
         self.assertEquals(1, Connection.objects.count())
@@ -52,7 +52,7 @@ class IntegrationTest(TestCase):
 
     def test_Ike2CertificateIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': '172.17.0.2', 'profile': 'Cert',
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Cert',
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
                                       'form_name': 'Ike2CertificateForm'})
@@ -70,7 +70,7 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapCertificateIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': '172.17.0.2', 'profile': 'Eap+Cert',
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Cert',
                                       'username': "eap-test", 'password': "Ar3etTnp",
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,

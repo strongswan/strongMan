@@ -42,25 +42,17 @@ class Connection(models.Model):
 
     def start(self):
         vici_wrapper = ViciWrapper()
-        if vici_wrapper.is_connection_established(self.subclass().profile) is False:
-            self._load_connection(vici_wrapper)
-
-    def stop(self):
-        vici_wrapper = ViciWrapper()
-        if vici_wrapper.is_connection_established(self.profile):
-            self._unload_connection(vici_wrapper)
-
-    def _load_connection(self, vici_wrapper):
         vici_wrapper.load_connection(self.subclass().dict())
-
         for local in self.local.all():
+            local = local.subclass()
             local.load_key()
-            for secret in local.secret_set.all():
+            for secret in Secret.objects.filter(authentication=local):
                 vici_wrapper.load_secret(secret.dict())
 
         for remote in self.remote.all():
-            local.load_key()
-            for secret in remote.secret_set.all():
+            remote = remote.subclass()
+            remote.load_key()
+            for secret in Secret.objects.filter(authentication=remote):
                 vici_wrapper.load_secret(secret.dict())
 
         for child in self.children.all():
@@ -68,12 +60,12 @@ class Connection(models.Model):
         self.state = True
         self.save()
 
-    def _unload_connection(self, vici_wrapper):
+    def stop(self):
+        vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
         vici_wrapper.terminate_connection(self.profile)
         self.state = False
         self.save()
-
 
     @classmethod
     def get_types(cls):
@@ -94,7 +86,6 @@ class Connection(models.Model):
 
 @receiver(pre_delete, sender=Connection)
 def delete_all_connected_models(sender, **kwargs):
-    Secret.objects.filter(connection=sender).delete()
     for child in Child.objects.filter(connection=sender):
         Proposal.objects.filter(child=child).delete()
         Address.objects.filter(local_ts=child).delete()
@@ -104,8 +95,17 @@ def delete_all_connected_models(sender, **kwargs):
     Address.objects.filter(local_addresses=sender).delete()
     Address.objects.filter(remote_addresses=sender).delete()
     Address.objects.filter(vips=sender).delete()
-    Authentication.objects.filter(local=sender).delete()
-    Authentication.objects.filter(remote=sender).delete()
+
+    for local in Authentication.objects.filter(local=sender):
+        for secret in Secret.objects.filter(authentication=local):
+            secret.delete()
+        local.delete()
+
+    for remote in Authentication.objects.filter(remote=sender):
+        for secret in Secret.objects.filter(authentication=remote):
+            secret.delete()
+        remote.delete()
+
 
 
 class IKEv2Certificate(Connection):
@@ -131,19 +131,6 @@ class Child(models.Model):
         #child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts.all()]
         child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposals.all()]
         return child
-
-
-class Secret(models.Model):
-    type = models.CharField(max_length=50)
-    data = models.CharField(max_length=50)
-    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None)
-
-    def dict(self):
-        child = self.connection.subclass().children.first()
-        secrets = OrderedDict(type=self.type, data=self.data, id=child.name)
-        #secrets['lers'] = [owner.value for owner in self.connection.remote_addresses.all()]
-        #secrets['owners'] = [owner.value for owner in self.connection.local_addresses.all()]
-        return secrets
 
 
 class Address(models.Model):
@@ -191,6 +178,9 @@ class Authentication(models.Model):
                 return authentication.first()
         return self
 
+    def load_key(self):
+        pass
+
 
 class EapAuthentication(Authentication):
     eap_id = models.CharField(max_length=50)
@@ -212,5 +202,19 @@ class CertificateAuthentication(Authentication):
         return auth
 
     def load_key(self):
+        vici_wrapper = ViciWrapper()
         key = self.identity.subclass().certificate.subclass().private_key
-        return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
+        vici_wrapper.load_key(OrderedDict(type=str(key.algorithm).upper(), data=key.der_container))
+
+
+class Secret(models.Model):
+    type = models.CharField(max_length=50)
+    data = models.CharField(max_length=50)
+    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None, related_name='authentication')
+
+    def dict(self):
+        eap_id = self.authentication.subclass().eap_id
+        secrets = OrderedDict(type=self.type, data=self.data, id=eap_id)
+        #secrets['lers'] = [owner.value for owner in self.connection.remote_addresses.all()]
+        #secrets['owners'] = [owner.value for owner in self.connection.local_addresses.all()]
+        return secrets

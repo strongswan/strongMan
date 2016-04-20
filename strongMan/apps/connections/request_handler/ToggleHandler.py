@@ -15,13 +15,14 @@ class ToggleHandler:
         response = dict(id=self.request.POST['id'], success=False)
         try:
             vici_wrapper = ViciWrapper()
-            if vici_wrapper.is_connection_established(self.subclass().profile) is False:
-                connection.start()
-            else:
+            if vici_wrapper.is_connection_established(connection.profile):
                 connection.stop()
+            else:
+                connection.start()
             response['success'] = True
         except ViciExceptoin as e:
             response['message'] = str(e)
+            print(str(e))
         finally:
             return JsonResponse(response)
 

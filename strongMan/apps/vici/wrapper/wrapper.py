@@ -146,6 +146,7 @@ class ViciWrapper:
             for log in logs:
                 report.append(log)
         except Exception as e:
+            print(e)
             raise ViciInitiateException("SA can't be initiated!") from e
         return report
 

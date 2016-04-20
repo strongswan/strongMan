@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 from django.test import TestCase
 from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, \
-    CertificateAuthentication, IKEv2EAP
+    CertificateAuthentication, EapAuthentication, IKEv2EAP
 from strongMan.apps.certificates.models import Certificate
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
@@ -28,12 +28,12 @@ class ConnectionModelTest(TestCase):
 
         certificate = Certificate.objects.first()
         certificate = certificate.subclass()
-
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2)
+        auth.save()
         Authentication(name='remote-1', auth='pubkey', remote=connection).save()
         CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
                                   local=connection).save()
-
-        Secret(type='EAP', data="password", connection=connection).save()
+        Secret(type='EAP', data="password", authentication=auth).save()
 
     def test_child_added(self):
         self.assertEquals(2, Child.objects.count())
@@ -48,7 +48,7 @@ class ConnectionModelTest(TestCase):
         self.assertEquals(2, Proposal.objects.count())
 
     def test_authentication_added(self):
-        self.assertEquals(2, Authentication.objects.count())
+        self.assertEquals(3, Authentication.objects.count())
 
     def test_secret_added(self):
         self.assertEquals(1, Secret.objects.count())
@@ -65,7 +65,7 @@ class ConnectionModelTest(TestCase):
         connection = Connection.objects.first()
 
         self.assertEquals(2, Child.objects.count())
-        self.assertEquals(2, Authentication.objects.count())
+        self.assertEquals(3, Authentication.objects.count())
 
         connection.delete()
         self.assertEquals(0, Authentication.objects.count())
