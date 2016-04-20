@@ -169,6 +169,8 @@ class Ike2EapForm(ConnectionForm):
 
     def fill(self, connection):
         super(Ike2EapForm, self).fill(connection)
+        self.fields['username'].initial = connection.local.first().subclass().eap_id
+        self.fields['password'].initial = Secret.objects.filter(connection=connection).first().data
 
     @property
     def get_choice_name(self):
@@ -208,25 +210,35 @@ class Ike2EapCertificateForm(ConnectionForm):
         identity = AbstractIdentity.objects.get(pk=identity_id)
         connection = IKEv2CertificateEAP(profile=profile, auth='pubkey', version=2)
         connection.save()
+        child = Child(name=username, connection=connection)
+        child.save()
+        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="aes128gcm128-modp2048", child=child).save()
         Address(value=gateway, remote_addresses=connection).save()
+        Address(value='localhost', local_addresses=connection).save()
+        Address(value='0.0.0.0', vips=connection).save()
         Secret(type='EAP', data=password, connection=connection).save()
-        CertificateAuthentication(name='remote', auth='pubkey', remote=connection, identity=identity).save()
-        Authentication(name='local', auth='pubkey', local=connection).save()
+        Authentication(name='remote-eap', auth='pubkey', remote=connection).save()
+        EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=username, round=2).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity).save()
 
     def update_connection(self, pk):
         connection = IKEv2CertificateEAP.objects.get(id=pk)
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         Secret.objects.filter(connection=connection).update(data=self.cleaned_data['password'])
         connection.profile = self.cleaned_data['profile']
-        connection.domain = self.cleaned_data['certificate']
+        remote = connection.remote.first()
+        remote.identity = AbstractIdentity.objects.get(pk=self.cleaned_data['identity'])
+        remote.save()
         connection.save()
 
     def fill(self, connection):
         super(Ike2EapCertificateForm, self).fill(connection)
-        self.fields['username'].initial = "to implement!"
-        self.fields['password'].initial = "to implement!"
-        self.initial['certificate'] = connection.remote.first().subclass().identity.certificate.pk
-        self.initial['identity'] = connection.remote.first().subclass().identity.pk
+        self.fields['username'].initial = EapAuthentication.objects.filter(local=connection).first().eap_id
+        self.fields['password'].initial = Secret.objects.filter(connection=connection).first().data
+        certificate = CertificateAuthentication.objects.filter(local=connection).first()
+        self.initial['certificate'] = certificate.identity.certificate.pk
+        self.initial['identity'] = certificate.identity.pk
         self.update_certificates()
 
     @property

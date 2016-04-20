@@ -26,7 +26,8 @@ class ConnectionViewTest(TestCase):
         self.factory = RequestFactory()
 
     def test_select_post(self):
-        response = self.client.post('/connections/add/', {'wizard_step': 'select_type', 'typ': 'Ike2EapForm', 'form_name': 'Ike2EapForm'})
+        response = self.client.post('/connections/add/',
+                                    {'wizard_step': 'select_type', 'typ': 'Ike2EapForm', 'form_name': 'Ike2EapForm'})
         self.assertEquals(response.status_code, 200)
 
     def test_Ike2CertificateCreate_post(self):
@@ -52,6 +53,7 @@ class ConnectionViewTest(TestCase):
                                       'certificate_ca': self.certificate.pk, 'identity_ca': self.identity.pk,
                                       'form_name': 'Ike2CertificateForm', 'wizard_step': 'configure'})
 
+
         connection = Connection.objects.first().subclass()
         self.assertEquals(connection.profile, 'hans')
 
@@ -68,6 +70,7 @@ class ConnectionViewTest(TestCase):
                                       'username': "username", 'password': "password",
                                       'certificate': self.certificate.pk, 'identity': self.identity.pk,
                                       'form_name': 'Ike2EapForm'})
+
         connection_created = Connection.objects.first().subclass()
         self.assertEquals(connection_created.profile, 'profile')
 
@@ -88,9 +91,10 @@ class ConnectionViewTest(TestCase):
                                'certificate': self.certificate.pk, 'identity': self.identity.pk,
                                'certificate_ca': self.certificate.pk, 'identity_ca': self.identity.pk, 'form_name': 'Ike2EapCertificateForm'})
 
+
         self.assertEquals(1, Connection.objects.count())
 
-    #TODO Ike2EapCertificate create
+    # TODO Ike2EapCertificate create
 
     def test_Ike2EapCertificateCreate_update(self):
         url_create = '/connections/add/'
