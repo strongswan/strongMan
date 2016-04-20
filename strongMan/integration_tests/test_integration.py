@@ -22,7 +22,8 @@ class IntegrationTest(TestCase):
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
         self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'EAP',
-                                      'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
+                                      'username': "eap-test", 'password': "Ar3etTnp", 'typ': 'Ike2EapForm'})
+
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -43,7 +44,7 @@ class IntegrationTest(TestCase):
         manager.add_keycontainer(cert)
         manager.add_keycontainer(key)
         self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Cert',
-                                      'certificate': 1, 'identity': 1, 'form_name': 'Ike2CertificateForm'})
+                                      'certificate': 1, 'identity': 1, 'typ': 'Ike2CertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -65,7 +66,7 @@ class IntegrationTest(TestCase):
         manager.add_keycontainer(key)
         self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Cert',
                                       'username': "eap-test", 'password': "Ar3etTnp", 'certificate': 1, 'identity': 1,
-                                      'form_name': 'Ike2EapCertificateForm'})
+                                      'typ': 'Ike2EapCertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 

@@ -1,7 +1,8 @@
 import os
 from collections import OrderedDict
 from django.test import TestCase
-from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address
+from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, \
+    CertificateAuthentication, IKEv2EAP
 from strongMan.apps.certificates.models import Certificate
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
@@ -28,8 +29,9 @@ class ConnectionModelTest(TestCase):
         certificate = Certificate.objects.first()
         certificate = certificate.subclass()
 
-        Authentication(name='remote-1', identity=certificate.identities.first(), auth='pubkey', remote=connection).save()
-        Authentication(name='local-1', identity=certificate.identities.first(), auth='pubkey', local=connection).save()
+        Authentication(name='remote-1', auth='pubkey', remote=connection).save()
+        CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
+                                  local=connection).save()
 
         Secret(type='EAP', data="password", connection=connection).save()
 
@@ -65,9 +67,23 @@ class ConnectionModelTest(TestCase):
         self.assertEquals(2, Child.objects.count())
         self.assertEquals(2, Authentication.objects.count())
 
-        connection.delete_all_connected_models()
+        connection.delete()
         self.assertEquals(0, Authentication.objects.count())
         self.assertEquals(0, Child.objects.count())
+
+    def test_delete_all_connections_subclass(self):
+        connection = IKEv2EAP(profile='eap', auth='pubkey', version=1)
+        connection.save()
+        Child(name='all', mode='TUNNEL', connection=connection).save()
+
+        self.assertEquals(1, IKEv2EAP.objects.count())
+        self.assertEquals(3, Child.objects.count())
+        self.assertEquals(2, Connection.objects.count())
+
+        connection.delete()
+        self.assertEquals(0, IKEv2EAP.objects.count())
+        self.assertEquals(2, Child.objects.count())
+        self.assertEquals(1, Connection.objects.count())
 
 
 class TestCert:

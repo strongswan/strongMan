@@ -2,6 +2,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
+DB_SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
 ALLOWED_HOSTS = []
 
 
@@ -17,6 +18,7 @@ INSTALLED_APPS = [
     'strongMan.apps.vici',
     'strongMan.apps.connections',
     'strongMan.apps.certificates',
+    'django_tables2'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -43,6 +45,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
             ],
         },
     },

@@ -219,6 +219,14 @@ class UserCertificateTest(TestCase):
         cert2 = UserCertificate.objects.get(id=2)
         self.assertIsNotNone(cert2.private_key)
 
+    def test_certificate_identities(self):
+        Paths.X509_googlecom.add_to_db()
+        classes = [Certificate, UserCertificate]
+        for clas in classes:
+            cert = clas.objects.first()
+            count = len(cert.identities)
+            self.assertEqual(count, 505)
+
 
 class SerializedDict:
     def __init__(self, path):
@@ -247,3 +255,11 @@ class ViciCertificateTest(TestCase):
         vicicert = CertificateFactory.vicicertificate_by_dict(dict)
         self.assertEqual(count(ViciCertificate), 1)
         self.assertTrue(vicicert.has_private_key)
+
+class AbstractDjangoClassTest(TestCase):
+    def test_abstractidentity_to_subclasses(self):
+        Paths.X509_googlecom.add_to_db()
+        abstract_ident = AbstractIdentity.objects.all()
+        real_ident = AbstractIdentity.subclasses(abstract_ident)
+        for ident in real_ident:
+            self.assertIsInstance(ident,tuple(AbstractIdentity.all_subclasses()))

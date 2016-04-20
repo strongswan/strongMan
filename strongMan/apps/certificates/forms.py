@@ -5,7 +5,6 @@ from .container_reader import ContainerDetector, ContainerTypes
 
 class CertificateSearchForm(forms.Form):
     search_text = forms.CharField(max_length=200, required=False)
-    page = forms.IntegerField(max_value=99999, min_value=1)
 
 
 class AddForm(forms.Form):

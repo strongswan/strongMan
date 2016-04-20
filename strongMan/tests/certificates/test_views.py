@@ -262,7 +262,6 @@ class DetailsViewTest(TestCase):
         self.add_keycontainer(Paths.PKCS1_rsa_ca)
         self.assertEqual(self.count(Certificate), 2)
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
-        # print(response.content.decode("utf-8"))
         self.assertContains(response, 'hsr.ch')
         self.assertContains(response, 'PKCS1')
 
@@ -343,3 +342,13 @@ class DetailsViewTest(TestCase):
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
         self.assertContains(response, 'PKCS1')
         self.assertContains(response, 'hsr.ch')
+
+    def test_cert_search(self):
+        self.add_keycontainer(Paths.X509_rsa)
+        self.add_keycontainer(Paths.X509_rsa_ca)
+        self.assertEqual(self.count(Certificate), 2)
+        response = self.client.post(reverse('certificates:overview'), {"search_text": "warrior"})
+
+
+        self.assertContains(response, '=roadwarrior.hsr.ch')
+        self.assertNotContains(response, '=hsr.ch')
