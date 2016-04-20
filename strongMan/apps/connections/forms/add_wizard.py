@@ -55,7 +55,7 @@ class ConnectionForm(forms.Form):
 
     def update_certificates(self):
         '''
-        This methos is called when a certificate field changed and the identites have to be refreshed
+        This method is called when a certificate field changed and the identites have to be refreshed
         :return: None
         '''
         pass
@@ -74,13 +74,18 @@ class Ike2CertificateForm(ConnectionForm):
     certificate = CertificateChoice(queryset=UserCertificate.objects.none(), empty_label="Choose certificate",
                                     required=True)
     identity = IdentityChoice(choices=(), initial="", required=True)
+    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate",
+                                    required=True)
+    identity_ca = IdentityChoice(choices=(), initial="", label="CA identity", required=True)
 
     def __init__(self, *args, **kwargs):
         super(Ike2CertificateForm, self).__init__(*args, **kwargs)
-        self.fields['certificate'].queryset = UserCertificate.objects.all() #init queryset, otherwise it's not going to be updated
+        self.fields['certificate'].queryset = UserCertificate.objects.filter(private_key__isnull=False)
+        self.fields['certificate_ca'].queryset = UserCertificate.objects.all()
 
     def update_certificates(self):
         IdentityChoice.load_identities(self, "certificate", "identity")
+        IdentityChoice.load_identities(self, "certificate_ca", "identity_ca")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
@@ -126,6 +131,16 @@ class Ike2CertificateForm(ConnectionForm):
 class Ike2EapForm(ConnectionForm):
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.none(), empty_label="Choose ca certificate",
+                                    required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(Ike2EapForm, self).__init__(*args, **kwargs)
+        self.fields['certificate'].queryset = UserCertificate.objects.all()  # init queryset, otherwise it's not going to be updated
+
+    def update_certificates(self):
+        IdentityChoice.load_identities(self, "certificate", "identity")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']
@@ -165,18 +180,24 @@ class Ike2EapForm(ConnectionForm):
 
 
 class Ike2EapCertificateForm(ConnectionForm):
-    certificate = CertificateChoice(queryset=UserCertificate.objects.all(), empty_label="Choose certificate",
-                                    required=True)
-    identity = IdentityChoice(choices=(), initial="", required=True)
+
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="", widget=forms.PasswordInput)
+    certificate = CertificateChoice(queryset=UserCertificate.objects.none(), empty_label="Choose certificate",
+                                    required=True)
+    identity = IdentityChoice(choices=(), initial="", required=True)
+    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate",
+                                       required=True)
+    identity_ca = IdentityChoice(choices=(), initial="", label="CA identity", required=True)
 
     def __init__(self, *args, **kwargs):
         super(Ike2EapCertificateForm, self).__init__(*args, **kwargs)
-        self.fields['certificate'].queryset = UserCertificate.objects.all()
+        self.fields['certificate'].queryset = UserCertificate.objects.filter(private_key__isnull=False)
+        self.fields['certificate_ca'].queryset = UserCertificate.objects.all()
 
     def update_certificates(self):
         IdentityChoice.load_identities(self, "certificate", "identity")
+        IdentityChoice.load_identities(self, "certificate_ca", "identity_ca")
 
     def create_connection(self):
         profile = self.cleaned_data['profile']

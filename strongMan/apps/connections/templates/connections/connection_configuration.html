@@ -28,7 +28,7 @@
                                             <select class="selectpicker" data-live-search="true"
                                                     name="{{ field.name }}"
                                                     id="id_{{ field.name }}" data-show-subtext="True">
-                                                {% if field.value == None %}
+                                                {% if field.value == None or field.value == '-1' %}
                                                     <option value="-1" selected>{{ field.empty_label }}</option>
                                                 {% endif %}
                                                 {% for choise in field.field.queryset %}

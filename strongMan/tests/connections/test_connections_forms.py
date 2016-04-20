@@ -47,9 +47,13 @@ class ConnectionFormsTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapForm(self):
-        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile'}
+        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password',
+                     'profile': 'profile', 'certificate': self.certificate.pk, 'identity': self.identity.pk}
         form = Ike2EapForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        form.update_certificates()
+        valid = form.is_valid()
+        self.assertTrue(valid)
+
 
     def test_Ike2EapForm_invalid(self):
         form_data = {'gateway': "gateway", 'username': "username", 'password': 'password'}
