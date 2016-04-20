@@ -11,39 +11,17 @@ class ToggleHandler:
         self.request = request
 
     def handle(self):
-        connection = Connection.objects.get(id=self.request.POST['id']).subclass()
+        connection = Connection.objects.get(id=self.request.POST['id'])
         response = dict(id=self.request.POST['id'], success=False)
         try:
             vici_wrapper = ViciWrapper()
-            if vici_wrapper.is_connection_established(connection.profile) is False:
-                self._load_connection(connection, vici_wrapper)
+            if vici_wrapper.is_connection_established(self.subclass().profile) is False:
+                connection.start()
             else:
-                self._unload_connection(connection, vici_wrapper)
-                connection.save()
+                connection.stop()
             response['success'] = True
         except ViciExceptoin as e:
             response['message'] = str(e)
         finally:
             return JsonResponse(response)
 
-    def _load_connection(self, connection, vici_wrapper):
-        vici_wrapper.load_connection(connection.dict())
-        for secret in connection.secret_set.all():
-            vici_wrapper.load_secret(secret.dict())
-
-        self._load_private_key(connection, vici_wrapper)
-
-        for child in connection.children.all():
-            reports = vici_wrapper.initiate(child.name, connection.profile)
-        connection.state = True
-
-    def _unload_connection(self, connection, vici_wrapper):
-        vici_wrapper.unload_connection(connection.profile)
-        vici_wrapper.terminate_connection(connection.profile)
-        connection.state = False
-
-    def _load_private_key(self, connection, vici_wrapper):
-        try:
-            vici_wrapper.load_key(connection.local.first().subclass().private_key_dict())
-        except:
-            pass

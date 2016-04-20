@@ -6,6 +6,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from strongMan.apps.certificates.models.identities import AbstractIdentity
+from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class Connection(models.Model):
@@ -38,6 +39,41 @@ class Connection(models.Model):
         connection = OrderedDict()
         connection[self.profile] = ike_sa
         return connection
+
+    def start(self):
+        vici_wrapper = ViciWrapper()
+        if vici_wrapper.is_connection_established(self.subclass().profile) is False:
+            self._load_connection(vici_wrapper)
+
+    def stop(self):
+        vici_wrapper = ViciWrapper()
+        if vici_wrapper.is_connection_established(self.profile):
+            self._unload_connection(vici_wrapper)
+
+    def _load_connection(self, vici_wrapper):
+        vici_wrapper.load_connection(self.subclass().dict())
+
+        for local in self.local.all():
+            local.load_key()
+            for secret in local.secret_set.all():
+                vici_wrapper.load_secret(secret.dict())
+
+        for remote in self.remote.all():
+            local.load_key()
+            for secret in remote.secret_set.all():
+                vici_wrapper.load_secret(secret.dict())
+
+        for child in self.children.all():
+            reports = vici_wrapper.initiate(child.name, self.profile)
+        self.state = True
+        self.save()
+
+    def _unload_connection(self, vici_wrapper):
+        vici_wrapper.unload_connection(self.profile)
+        vici_wrapper.terminate_connection(self.profile)
+        self.state = False
+        self.save()
+
 
     @classmethod
     def get_types(cls):
@@ -100,7 +136,7 @@ class Child(models.Model):
 class Secret(models.Model):
     type = models.CharField(max_length=50)
     data = models.CharField(max_length=50)
-    connection = models.ForeignKey(Connection, null=True, blank=True, default=None)
+    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None)
 
     def dict(self):
         child = self.connection.subclass().children.first()
@@ -175,6 +211,6 @@ class CertificateAuthentication(Authentication):
         values['certs'] = [self.identity.subclass().certificate.der_container]
         return auth
 
-    def private_key_dict(self):
-        key = self.identity.subclass().certificate.private_key
+    def load_key(self):
+        key = self.identity.subclass().certificate.subclass().private_key
         return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
