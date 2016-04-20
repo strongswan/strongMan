@@ -177,3 +177,8 @@ body {
     margin-top: 60px;
 }
 
+#main-page .jumbotron {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+

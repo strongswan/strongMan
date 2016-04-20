@@ -1,21 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
 {% load render_table from django_tables2 %}
-<div id="connection-overview">
-    <div id="add-btn">
-    <span title="Add a new connection">
-        <a href="{% url "connections:connections_choose" %}" id="add" class="btn btn-orange btn-lg pull-right">
-            <span class="glyphicon glyphicon-plus"></span> Add
-        </a>
-    </span>
-    </div>
-    <div id="con-table">
-        {% if table %}
-            <div class="col-xs-12">
-                {% render_table table 'certificates/widgets/table.html' %}
-            </div>
-        {% else %}
-            <h3 id="no_certs_to_show">No connections to show</h3>
-            <p>Feel free to add a new connection with the orange Add button on the right side.</p>
-        {% endif %}
-    </div>
+{% block title %}Connection{% endblock title %}
+{% block small-title %}Overview{% endblock small-title %}
+{% block content %}
+    <div id="connection-overview">
+        <div id="add-btn">
+        <span title="Add a new connection">
+            <a href="{% url "connections:connections_choose" %}" id="add" class="btn btn-orange btn-lg pull-right">
+                <span class="glyphicon glyphicon-plus"></span> Add
+            </a>
+        </span>
+        </div>
+        <div id="con-table">
+            {% if table %}
+                <div class="col-xs-12">
+                    {% render_table table 'certificates/widgets/table.html' %}
+                </div>
+            {% else %}
+                <h3 id="no_certs_to_show">No connections to show</h3>
+                <p>Feel free to add a new connection with the orange Add button on the right side.</p>
+            {% endif %}
+        </div>
 
-</div>
+    </div>
+{% endblock %}
