@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 
 import strongMan.apps.connections.forms.add_wizard
 from .. import forms
@@ -36,7 +37,7 @@ class CreateHandler:
         form.update_certificates()
         if form.is_valid():
             form.create_connection()
-            return redirect('/')
+            return redirect(reverse("connections:index"))
         else:
             return self._render_configure(form, form_name)
 
