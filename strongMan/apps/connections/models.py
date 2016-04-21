@@ -7,6 +7,7 @@ from django.dispatch import receiver
 
 from strongMan.apps.certificates.models.identities import AbstractIdentity
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from strongMan.apps.encryption import fields
 
 
 class Connection(models.Model):
@@ -209,7 +210,7 @@ class CertificateAuthentication(Authentication):
 
 class Secret(models.Model):
     type = models.CharField(max_length=50)
-    data = models.CharField(max_length=50)
+    data = fields.EncryptedCharField(max_length=50) #models.CharField(max_length=50)
     authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None, related_name='authentication')
 
     def dict(self):
