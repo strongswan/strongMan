@@ -54,43 +54,43 @@
         {% with table.page.paginator.count as total %}
             {% with table.page.object_list|length as count %}
                 {% block pagination %}
-                    <div class="text-center">
-                            {% block pagination.previous %}
-                                <a class="btn btn-default" name="next" {% if not table.page.has_previous %} disabled="True"
-                                   {% else %}href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"{% endif %}>
-                                    <span class="glyphicon glyphicon-chevron-left"></span> Previous
-                                </a>
-                            {% endblock pagination.previous %}
+                    {% if table.page.has_previous %}
+                        <div class="text-center">
+                        {% block pagination.previous %}
+                            <a class="btn btn-default" name="next"
+                               href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">
+                                <span class="glyphicon glyphicon-chevron-left"></span> Previous
+                            </a>
+                        {% endblock pagination.previous %}
+                    {% endif %}
 
-
-                        {% if table.page.has_previous or table.page.has_next %}
-                            {% block pagination.current %}
-                                <span class="current">
+                {% if table.page.has_previous or table.page.has_next %}
+                    {% block pagination.current %}
+                        <span class="current">
                                     {% blocktrans with table.page.number as current and table.paginator.num_pages as total %}
                                         Page {{ current }} of {{ total }}
                                     {% endblocktrans %}
                                 </span>
-                            {% endblock pagination.current %}
-                        {% endif %}
+                    {% endblock pagination.current %}
+                {% endif %}
 
-
-                            {% block pagination.next %}
-                                <a {% if table.page.has_next %}href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
-                                    {% else %} disabled="True" {% endif %}"
-                                   class="btn btn-default" name="next">
-                                    Next <span class="glyphicon glyphicon-chevron-right"></span>
-                                </a>
-                            {% endblock pagination.next %}
-
-                        {% block pagination.cardinality %}
-                            <div class="cardinality">
-                                {% if total != count %}{% blocktrans %}{{ count }} of {{ total }}
-                                {% endblocktrans %}{% else %}{{ total }}{% endif %}
-                                {% if total == 1 %}{{ table.data.verbose_name }}{% else %}
-                                    {{ table.data.verbose_name_plural }}{% endif %}
-                            </div>
-                        {% endblock pagination.cardinality %}
+                {% if table.page.has_next %}
+                    {% block pagination.next %}
+                        <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                           class="btn btn-default" name="next">
+                            Next <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    {% endblock pagination.next %}
+                {% endif %}
+                {% block pagination.cardinality %}
+                    <div class="cardinality">
+                        {% if total != count %}{% blocktrans %}{{ count }} of {{ total }}
+                        {% endblocktrans %}{% else %}{{ total }}{% endif %}
+                        {% if total == 1 %}{{ table.data.verbose_name }}{% else %}
+                            {{ table.data.verbose_name_plural }}{% endif %}
                     </div>
+                {% endblock pagination.cardinality %}
+                </div>
                 {% endblock pagination %}
             {% endwith %}
         {% endwith %}
