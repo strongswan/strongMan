@@ -28,7 +28,7 @@ class OverviewHandler:
         RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
         if len(queryset) == 0:
             table = None
-        return render(self.request, 'index.html', {'table': table})
+        return render(self.request, 'connections/overview.html', {'table': table})
 
     def _get_connection_context(self):
         connections = []

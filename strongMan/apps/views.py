@@ -7,6 +7,10 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from .request_handler import AboutHandler
 
+@login_required
+@require_http_methods(['GET', 'POST'])
+def index(request):
+    return render(request, 'index.html')
 
 @require_http_methods(('GET', 'POST'))
 def login(request):

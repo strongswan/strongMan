@@ -5,10 +5,11 @@ from .apps import views
 from .apps.certificates import urls as certificates_url
 from .apps.connections import urls as connections_urls, views as connectionviews
 from .apps.vici import urls as vici_urls
+from .apps.views import index
 
 
 urlpatterns = [
-    url(r'^$',connectionviews.overview, name='index'),
+    url(r'^$', index, name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^vici/', include(vici_urls)),
     url(r'^connections/', include(connections_urls)),

@@ -1,9 +1,48 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Connection{% endblock title %}
-{% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-    {% if user.is_authenticated %}
-        {% include "connections/overview.html" %}
-    {% endif %}
+    <div id="main-page">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="jumbotron">
+                    <h2>Welcome to strongMan!</h2>
+                    <p>strongMan is a management interface for the strongSwan VPN solution.
+                        strongMan provides a user friendly graphical interface to configure and establish IPsec
+                        connections.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <h3>Getting started</h3>
+                <ul>
+                    <li>
+                        Create a new connection with your credentials and etablish a IPsec tunnel in the <a
+                            href="{% url "certificates:overview" %}"">connections section</a>.
+                    </li>
+                    <li>
+                        Upload certificates to etablish a IPsec tunnel in the <a
+                            href="{% url "certificates:overview" %}"">certificates section</a>.
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <h3>Links</h3>
+                <ul>
+                    <li>
+                        <a href="https://strongswan.org/">strongswan.org</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/Sebubu/strongMan">Github sourcecode</a>
+                    </li>
+                    <li>
+                        How-to
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
 {% endblock %}

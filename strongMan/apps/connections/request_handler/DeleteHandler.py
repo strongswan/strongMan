@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
@@ -21,5 +22,7 @@ class DeleteHandler:
         except ViciExceptoin as e:
             messages.warning(self.request, str(e))
         finally:
+            profilname = connection.profile
             connection.delete()
-            return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
+            messages.info(self.request, "Connection " + profilname + " deleted.")
+            return HttpResponseRedirect(reverse("connections:index"))
