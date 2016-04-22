@@ -21,7 +21,6 @@ class Connection(models.Model):
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
-        #ike_sa['local_addrs'] = [local_address.value for local_address in self.local_addresses.all()]
         ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.remote_addresses.all()]
         ike_sa['vips'] = [vip.value for vip in self.vips.all()]
         ike_sa['version'] = self.version
@@ -43,15 +42,18 @@ class Connection(models.Model):
     def start(self):
         vici_wrapper = ViciWrapper()
         vici_wrapper.load_connection(self.subclass().dict())
+
         for local in self.local.all():
             local = local.subclass()
-            local.load_key()
+            if local.has_private_key():
+                vici_wrapper.load_key(local.get_key_dict())
             for secret in Secret.objects.filter(authentication=local):
                 vici_wrapper.load_secret(secret.dict())
 
         for remote in self.remote.all():
             remote = remote.subclass()
-            remote.load_key()
+            if remote.has_private_key():
+                vici_wrapper.load_key(remote.get_key_dict())
             for secret in Secret.objects.filter(authentication=remote):
                 vici_wrapper.load_secret(secret.dict())
 
@@ -107,7 +109,6 @@ def delete_all_connected_models(sender, **kwargs):
         remote.delete()
 
 
-
 class IKEv2Certificate(Connection):
     pass
 
@@ -120,6 +121,10 @@ class IKEv2CertificateEAP(Connection):
     pass
 
 
+class IKEv2EapTls(Connection):
+    pass
+
+
 class Child(models.Model):
     name = models.CharField(max_length=50)
     mode = models.CharField(max_length=50)
@@ -127,8 +132,7 @@ class Child(models.Model):
 
     def dict(self):
         child = OrderedDict()
-        #child['local_ts'] = [local_t.value for local_t in self.local_ts.all()]
-        #child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts.all()]
+        child['remote_ts'] = [remote_t.value for remote_t in self.remote_ts.all()]
         child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.esp_proposals.all()]
         return child
 
@@ -154,10 +158,13 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
+    auth_id = models.CharField(max_length=50, null=True, blank=True, default=None)
     round = models.IntegerField(default=1)
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
+        if self.auth_id is not None:
+            parameters['id'] = self.auth_id
         auth = OrderedDict()
         auth[self.name] = parameters
         return auth
@@ -178,43 +185,76 @@ class Authentication(models.Model):
                 return authentication.first()
         return self
 
-    def load_key(self):
+    def has_private_key(self):
+        return False
+
+    def get_key_dict(self):
         pass
 
 
 class EapAuthentication(Authentication):
     eap_id = models.CharField(max_length=50)
+    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='eap_identity_ca')
 
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         values = auth[self.name]
+        values['id'] = self.eap_id
+        values['certs'] = [self.identity_ca.subclass().certificate.der_container]
         values['eap_id'] = self.eap_id
         return auth
 
 
 class CertificateAuthentication(Authentication):
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None)
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='identity')
+    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='identity_ca')
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
         values = auth[self.name]
-        values['certs'] = [self.identity.subclass().certificate.der_container]
+        values['certs'] = [self.identity.subclass().certificate.der_container,
+                           self.identity_ca.subclass().certificate.der_container]
         return auth
 
-    def load_key(self):
-        vici_wrapper = ViciWrapper()
+    def has_private_key(self):
+        return self.identity.subclass().certificate.subclass().has_private_key
+
+    def get_key_dict(self):
         key = self.identity.subclass().certificate.subclass().private_key
-        vici_wrapper.load_key(OrderedDict(type=str(key.algorithm).upper(), data=key.der_container))
+        return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
+
+
+class EapTlsAuthentication(Authentication):
+    eap_id = models.CharField(max_length=50)
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity')
+    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity_ca')
+
+    def dict(self):
+        auth = super(EapTlsAuthentication, self).dict()
+        values = auth[self.name]
+        values['certs'] = [self.identity.subclass().certificate.der_container,
+                           self.identity_ca.subclass().certificate.der_container]
+        values['id'] = 'eap-tls-only'  # TODO: Ask Tobias for better Idea str(self.identity.subclass().value())
+        values['eap_id'] = str(self.identity.subclass().value())
+        #values['aaa_id'] = str(self.identity_ca.subclass().value())
+        #values['aaa_id'] = 'C=CH, O=Linux strongSwan, CN=moon.strongswan.org'
+        return auth
+
+    def has_private_key(self):
+        return self.identity.subclass().certificate.subclass().has_private_key
+
+    def get_key_dict(self):
+        key = self.identity.subclass().certificate.subclass().private_key
+        return OrderedDict(type=str(key.algorithm).upper(), data=key.der_container)
 
 
 class Secret(models.Model):
     type = models.CharField(max_length=50)
     data = models.CharField(max_length=50)
-    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None, related_name='authentication')
+    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,
+                                       related_name='authentication')
 
     def dict(self):
         eap_id = self.authentication.subclass().eap_id
         secrets = OrderedDict(type=self.type, data=self.data, id=eap_id)
-        #secrets['lers'] = [owner.value for owner in self.connection.remote_addresses.all()]
-        #secrets['owners'] = [owner.value for owner in self.connection.local_addresses.all()]
         return secrets

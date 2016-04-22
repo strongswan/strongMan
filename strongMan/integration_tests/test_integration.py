@@ -36,7 +36,7 @@ class IntegrationTest(TestCase):
         url_create = '/connections/add/'
         self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'EAP',
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
-                                      'username': "eap-test", 'password': "Ar3etTnp", 'form_name': 'Ike2EapForm'})
+                                      'username': "eap-test", 'password': "test", 'form_name': 'Ike2EapForm'})
 
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
@@ -71,10 +71,28 @@ class IntegrationTest(TestCase):
     def test_Ike2EapCertificateIntegration(self):
         url_create = '/connections/add/'
         self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Cert',
-                                      'username': "eap-test", 'password': "Ar3etTnp",
+                                      'username': "eap-test", 'password': "test",
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
                                       'form_name': 'Ike2EapCertificateForm'})
+        self.assertEquals(1, Connection.objects.count())
+        self.assertEquals(1, Child.objects.count())
+
+        connection = Connection.objects.first().subclass()
+        toggle_url = '/connections/toggle/'
+        self.client.post(toggle_url, {'id': connection.id})
+
+        self.assertEqual(self.vici_wrapper.get_connections_names().__len__(), 1)
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
+        self.client.post(toggle_url, {'id': connection.id})
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
+
+    def test_Ike2EapTlsIntegration(self):
+        url_create = '/connections/add/'
+        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Tls',
+                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
+                                      'form_name': 'Ike2EapTlsForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 

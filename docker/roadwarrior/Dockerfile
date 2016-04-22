@@ -29,8 +29,7 @@ RUN mkdir /opt/strongSwan \
 && git clone https://github.com/Sebubu/strongMan.git \
 && cd strongMan \
 && pip install --upgrade pip \
-&& pip install -r requirements.txt \
-&& cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/carol/etc/swanctl/* /etc/swanctl/
+&& pip install -r requirements.txt
 
 ADD strongswan.conf /etc/strongswan.conf
 
