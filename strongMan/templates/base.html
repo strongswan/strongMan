@@ -41,18 +41,27 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    {% if user.is_authenticated %}
-                        <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    {% else %}
-                        <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                    {% endif %}
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><span class="glyphicon glyphicon-user"></span> {{ user.username }} <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Change password</a></li>
+                        <li>
+                            {% if user.is_authenticated %}
+                                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            {% else %}
+                                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                            {% endif %}
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>
     </nav>
-{% vici_checker %}
-<div class="row">
+    {% vici_checker %}
+    <div class="row">
         <div class="col-xs-12 title-area">
             <h1>{% block title %}{% endblock title %}
                 <small> {% block small-title %}{% endblock small-title %}</small>
@@ -64,14 +73,14 @@
     </div>
     {% if messages %}
         <div class="row">
-        <div class="col-xs-12">
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %} fade in">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>{{ message }}</strong>
-                </div>
-            {% endfor %}
-        </div>
+            <div class="col-xs-12">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %} fade in">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <strong>{{ message }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
     <div class="row">
