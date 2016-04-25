@@ -20,35 +20,7 @@
             </div>
         </div>
         <hr>
+    {% else %}
+        <h3>Can't display information without the vici interface.</h3>
     {% endif %}
-        <div id="pw_change" class="row">
-            <div class="col-md-3"></div>
-            <div class="col-xs-12 col-md-6 panel panel-default">
-                <h3>Change your password</h3>
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    <input class="form-control" type="password" name="old_password" id="old_password"
-                           placeholder="Current password">
-                    <input class="form-control" type="password" name="password1" placeholder="New password">
-                    <input class="form-control" type="password" name="password2" id="password2"
-                           placeholder="New password again">
-                <span title="Change your password" class="pull-right">
-                    <button type="submit" class="btn btn-default" name="change_pw_btn"
-                            id="change_pw_btn">
-                        <span class="glyphicon glyphicon-refresh"></span> Change password
-                    </button>
-                </span>
-                </form>
-                <div id="passwordrules">
-                    <h4>Rules</h4>
-                    <ul>
-                        <li>Password needs a minimal length of 8 signs.</li>
-                        <li>The password needs to contain one upper and one lower case sign at least.</li>
-                        <li>Password has to contain one NOT alphabetic sign at least.</li>
-                        <li>Password has to contain at least one digit.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
