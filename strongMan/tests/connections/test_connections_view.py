@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection, IKEv2Certificate
 from strongMan.apps.certificates.models.certificates import Certificate
 from strongMan.apps.connections import views
-
+from django.core.urlresolvers import reverse
 
 class ConnectionViewTest(TestCase):
     fixtures = ['initial_data.json']
@@ -122,9 +122,7 @@ class ConnectionViewTest(TestCase):
         connection = IKEv2Certificate(profile='rw', auth='pubkey', version=1)
         connection.save()
         self.assertEquals(1, Connection.objects.count())
-        request = self.factory.get('/')
-        request.user = self.user
-        views.delete_connection(request, connection.id)
+        self.client.get(reverse("connections:connection_delete", args=(connection.pk,)))
         self.assertEquals(0, Connection.objects.count())
 
 

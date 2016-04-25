@@ -116,7 +116,7 @@ body {
     display: block;
     padding: 5px;
 }
-#connection-overview td a {
+#connection-overview td .namelink {
    display: block;
    padding: 2px;
 }
