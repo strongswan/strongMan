@@ -5,7 +5,7 @@ from django_tables2 import RequestConfig
 from ..models import Connection, Address
 from .. import models
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciExceptoin
+from strongMan.apps.vici.wrapper.exception import ViciExceptoin, ViciSocketException
 from ..tables import ConnectionTable
 
 
@@ -17,6 +17,8 @@ class OverviewHandler:
     def handle(self):
         try:
             self._set_connection_state()
+        except ViciSocketException:
+            pass
         except ViciExceptoin as e:
             messages.warning(self.request, str(e))
 
