@@ -99,10 +99,7 @@ class ViciWrapper:
         return False
 
     def is_connection_established(self, connection_name):
-        for sa in self.get_sas():
-            if connection_name in sa:
-                return True
-        return False
+        return True if self.get_sas_by(connection_name) else False
 
     def get_version(self):
         '''
@@ -131,6 +128,13 @@ class ViciWrapper:
             sas.append(sa)
         return sas
 
+    def get_sas_by(self, connection_name):
+        sas = []
+        for sa in self.get_sas():
+            if connection_name in sa:
+                sas.append(sa)
+        return sas
+
     def initiate(self, child_name, connection_name):
         '''
         :param child_name, connection_name:
@@ -146,7 +150,6 @@ class ViciWrapper:
             for log in logs:
                 report.append(log)
         except Exception as e:
-            print(e)
             raise ViciInitiateException("SA can't be initiated!") from e
         return report
 

@@ -1,12 +1,11 @@
 import os
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection, IKEv2Certificate
 from strongMan.apps.certificates.models.certificates import Certificate
-from strongMan.apps.connections import views
-from django.core.urlresolvers import reverse
+
 
 class ConnectionViewTest(TestCase):
     fixtures = ['initial_data.json']
@@ -23,7 +22,6 @@ class ConnectionViewTest(TestCase):
         certificate = Certificate.objects.first()
         self.certificate = certificate.subclass()
         self.identity = self.certificate.identities.first()
-        self.factory = RequestFactory()
 
     def test_select_post(self):
         response = self.client.post('/connections/add/',
@@ -121,8 +119,9 @@ class ConnectionViewTest(TestCase):
     def test_delete_post(self):
         connection = IKEv2Certificate(profile='rw', auth='pubkey', version=1)
         connection.save()
+        url = '/connections/delete/' + str(connection.id) + '/'
         self.assertEquals(1, Connection.objects.count())
-        self.client.get(reverse("connections:connection_delete", args=(connection.pk,)))
+        self.client.post(url)
         self.assertEquals(0, Connection.objects.count())
 
 

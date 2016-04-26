@@ -26,13 +26,13 @@ class ConnectionModelTest(TestCase):
         manager = UserCertificateManager()
         manager.add_keycontainer(bytes)
 
-        certificate = Certificate.objects.first()
-        certificate = certificate.subclass()
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2)
+        certificate = Certificate.objects.first().subclass().identities.first()
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2,
+                                 identity_ca=certificate)
         auth.save()
         Authentication(name='remote-1', auth='pubkey', remote=connection).save()
-        CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
-                                  local=connection).save()
+        CertificateAuthentication(name='local-1', identity=certificate, auth='pubkey',
+                                  local=connection, identity_ca=certificate).save()
         Secret(type='EAP', data="password", authentication=auth).save()
 
     def test_child_added(self):
@@ -54,7 +54,7 @@ class ConnectionModelTest(TestCase):
         self.assertEquals(1, Secret.objects.count())
 
     def test_connection_dict(self):
-        connection = Connection.objects.first()
+        connection = Connection.objects.filter(profile='rw').first()
         self.assertTrue(isinstance(connection.dict(), OrderedDict))
 
     def test_secret_dict(self):

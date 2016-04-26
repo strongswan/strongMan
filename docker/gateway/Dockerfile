@@ -7,9 +7,7 @@ ENV STRONGSWAN_VERSION 5.4.0
 RUN mkdir /opt/strongSwan \
 && apt-get update \
 
-&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential vim freeradius freeradius-mysql> /dev/null 2>&1 \
-&& export DEBIAN_FRONTEND=noninteractive \
-&& apt-get -q -y install mysql-server \
+&& apt-get install -y libgmp-dev libssl-dev wget iptables xl2tpd bzip2 make git module-init-tools build-essential vim > /dev/null 2>&1 \
 && wget http://download.strongswan.org/strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && tar xjvf strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && cd strongswan-$STRONGSWAN_VERSION \
@@ -37,9 +35,6 @@ RUN mkdir /opt/strongSwan \
 
 ADD swanctl.conf /etc/swanctl/swanctl.conf
 ADD strongswan.conf /etc/strongswan.conf
-ADD radiusd.conf /etc/freeradius/radiusd.conf
-ADD clients.conf /etc/freeradius/clients.conf
-ADD eap-radius.conf /etc/strongswan.d/charon/eap-radius.conf
 
 
 
