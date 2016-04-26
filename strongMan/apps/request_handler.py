@@ -31,9 +31,6 @@ class AboutHandler:
             return self._render_page()
 
 
-
-
-
 class PwChangeHandler:
     def __init__(self, request):
         self.request = request
