@@ -83,6 +83,16 @@ body {
     top: 20px;
     margin-bottom: 50px;
 }
+#certificate-detail table tr td{
+    padding: 5px;
+}
+#certificate-detail table{
+    margin-bottom: 0px;
+}
+#certificate-detail h3{
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
 #certificate-added #nav-btn {
     margin-top: 20px;
     margin-bottom: 30px;
