@@ -89,7 +89,7 @@ body {
 #certificate-detail table{
     margin-bottom: 0px;
 }
-#certificate-detail h3{
+#certificate-detail #cert-header{
     margin-bottom: 30px;
     margin-top: 30px;
 }

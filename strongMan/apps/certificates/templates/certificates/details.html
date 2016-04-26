@@ -10,151 +10,180 @@
 
     <div class="container" id="certificate-detail">
 
-        {% if certificate %}
-            <div class="row">
-                <h3 class="text-center"><span class="glyphicon glyphicon-certificate"
-                                              aria-hidden="false"></span> {{ certificate.subject.cname }}</h3>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>common</b></h4></div>
-                <div class="col-sm-12 col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-
-                            <table class="table">
-                                <colgroup>
-                                    <col style="width:200px">
-                                </colgroup>
-                                <tr>
-                                    <td>issuer</td>
-                                    <td>{{ certificate.issuer.cname }}</td>
-                                </tr>
-                                <tr>
-                                    <td>certificate authority</td>
-                                    {% if certificate.is_CA %}
-                                        <td>Yes</td>
-                                    {% else %}
-                                        <td>No</td>
-                                    {% endif %}
-                                </tr>
-                                <tr>
-                                    <td>has private key</td>
-                                    {% if certificate.private_key %}
-                                        <td>Yes</td>
-                                    {% else %}
-                                        <td>No</td>
-                                    {% endif %}
-                                </tr>
-                                <tr>
-                                    <td>valid (UTC)</td>
-                                    <td>{{ certificate.valid_not_before }} - {{ certificate.valid_not_after }}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>subject</b></h4></div>
-                <div class="col-sm-12 col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <table class="table">
-                                <colgroup>
-                                    <col style="width:200px">
-                                </colgroup>
-                                {% include "certificates/widgets/detailrow.html" with key="Unit" value=certificate.subject.unit %}
-                                {% include "certificates/widgets/detailrow.html" with key="Organization" value=certificate.subject.organization %}
-                                {% include "certificates/widgets/detailrow.html" with key="Location" value=certificate.subject.location %}
-                                {% include "certificates/widgets/detailrow.html" with key="Province" value=certificate.subject.province %}
-                                {% include "certificates/widgets/detailrow.html" with key="Country" value=certificate.subject.country %}
-                                {% include "certificates/widgets/detailrow.html" with key="Email" value=certificate.subject.email %}
-                                {% include "certificates/widgets/detailrow.html" with key="Common Name" value=certificate.subject.cname %}
-
-                                <tr>
-                                    <td>Identities</td>
-                                    <td>
-                                        <ul>{% for identity in certificate.identities.all %}
-                                            <li>{{ identity.subclass }}</li>
-                                        {% endfor %}</ul>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>issuer</b></h4></div>
-                <div class="col-sm-12 col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <table class="table">
-                                <colgroup>
-                                    <col style="width:200px">
-                                </colgroup>
-                                {% include "certificates/widgets/detailrow.html" with key="Unit" value=certificate.issuer.unit %}
-                                {% include "certificates/widgets/detailrow.html" with key="Organization" value=certificate.issuer.organization %}
-                                {% include "certificates/widgets/detailrow.html" with key="Location" value=certificate.issuer.location %}
-                                {% include "certificates/widgets/detailrow.html" with key="Province" value=certificate.issuer.province %}
-                                {% include "certificates/widgets/detailrow.html" with key="Country" value=certificate.issuer.country %}
-                                {% include "certificates/widgets/detailrow.html" with key="Email" value=certificate.issuer.email %}
-                                {% include "certificates/widgets/detailrow.html" with key="Common Name" value=certificate.issuer.cname %}
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>other</b></h4></div>
-                <div class="col-sm-12 col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <table class="table">
-                                <colgroup>
-                                    <col style="width:200px">
-                                </colgroup>
-                                <tr>
-                                    <td>type</td>
-                                    <td>{{ certificate.type }}</td>
-                                </tr>
-                                <tr>
-                                    <td>algorithm</td>
-                                    <td>{{ certificate.algorithm }}</td>
-                                </tr>
-                                <tr>
-                                    <td>hash algorithm</td>
-                                    <td>{{ certificate.hash_algorithm }}</td>
-                                </tr>
-                                <tr>
-                                    <td>serial number</td>
-                                    <td>{{ certificate.serial_number }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
+        <div class="row" id="cert-header">
+            <div id="cert-title">
+                <h2 class="text-center">
+                    <span class="glyphicon glyphicon-certificate" aria-hidden="false"></span>
+                    {{ certificate.nickname }}
                     {% if not readonly %}
-                        <div class="row text-center">
-                            <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
-                                {% csrf_token %}
+                    <button type="button" class="btn btn-default btn-xs" id="cert-title-edit" onclick="editbtn()">
+                        <span>edit</span>
+                    </button>
+                    {% endif %}
+                </h2>
+            </div>
+            <div id="cert-nickname" class="col-xs-12 col-md-6 col-md-offset-3" style="display:none;">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="update_nickname">
+                    <p>Give this certificate a nickname</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="nickname" placeholder="Give this certificate a nickname"
+                               value="{{ certificate.nickname }}">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Save</button>
+                  </span>
+                    </div><!-- /input-group -->
+                </form>
+            </div>
+            <script>
+                function editbtn() {
+                    $("#cert-title").hide();
+                    $("#cert-nickname").show();
+                }
+            </script>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>common</b></h4></div>
+            <div class="col-sm-12 col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        <table class="table">
+                            <colgroup>
+                                <col style="width:200px">
+                            </colgroup>
+                            <tr>
+                                <td>issuer</td>
+                                <td>{{ certificate.issuer.cname }}</td>
+                            </tr>
+                            <tr>
+                                <td>certificate authority</td>
+                                {% if certificate.is_CA %}
+                                    <td>Yes</td>
+                                {% else %}
+                                    <td>No</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td>has private key</td>
+                                {% if certificate.private_key %}
+                                    <td>Yes</td>
+                                {% else %}
+                                    <td>No</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td>valid (UTC)</td>
+                                <td>{{ certificate.valid_not_before }} - {{ certificate.valid_not_after }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>subject</b></h4></div>
+            <div class="col-sm-12 col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <colgroup>
+                                <col style="width:200px">
+                            </colgroup>
+                            {% include "certificates/widgets/detailrow.html" with key="Unit" value=certificate.subject.unit %}
+                            {% include "certificates/widgets/detailrow.html" with key="Organization" value=certificate.subject.organization %}
+                            {% include "certificates/widgets/detailrow.html" with key="Location" value=certificate.subject.location %}
+                            {% include "certificates/widgets/detailrow.html" with key="Province" value=certificate.subject.province %}
+                            {% include "certificates/widgets/detailrow.html" with key="Country" value=certificate.subject.country %}
+                            {% include "certificates/widgets/detailrow.html" with key="Email" value=certificate.subject.email %}
+                            {% include "certificates/widgets/detailrow.html" with key="Common Name" value=certificate.subject.cname %}
+                            <tr>
+                                <td>Identities</td>
+                                <td>
+                                    <ul>{% for identity in certificate.identities.all %}
+                                        <li>{{ identity.subclass }}</li>
+                                    {% endfor %}</ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>issuer</b></h4></div>
+            <div class="col-sm-12 col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <colgroup>
+                                <col style="width:200px">
+                            </colgroup>
+                            {% include "certificates/widgets/detailrow.html" with key="Unit" value=certificate.issuer.unit %}
+                            {% include "certificates/widgets/detailrow.html" with key="Organization" value=certificate.issuer.organization %}
+                            {% include "certificates/widgets/detailrow.html" with key="Location" value=certificate.issuer.location %}
+                            {% include "certificates/widgets/detailrow.html" with key="Province" value=certificate.issuer.province %}
+                            {% include "certificates/widgets/detailrow.html" with key="Country" value=certificate.issuer.country %}
+                            {% include "certificates/widgets/detailrow.html" with key="Email" value=certificate.issuer.email %}
+                            {% include "certificates/widgets/detailrow.html" with key="Common Name" value=certificate.issuer.cname %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-1 col-md-offset-1"><h4><b>other</b></h4></div>
+            <div class="col-sm-12 col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <colgroup>
+                                <col style="width:200px">
+                            </colgroup>
+                            <tr>
+                                <td>type</td>
+                                <td>{{ certificate.type }}</td>
+                            </tr>
+                            <tr>
+                                <td>algorithm</td>
+                                <td>{{ certificate.algorithm }}</td>
+                            </tr>
+                            <tr>
+                                <td>hash algorithm</td>
+                                <td>{{ certificate.hash_algorithm }}</td>
+                            </tr>
+                            <tr>
+                                <td>serial number</td>
+                                <td>{{ certificate.serial_number }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                {% if not readonly %}
+                    <div class="row text-center">
+                        <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
+                            {% csrf_token %}
                             <span title="Remove certificate">
                                 <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
                                         id="remove_cert-btn">
                                     <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove certificate</span>
                                 </button>
                             </span>
-                            </form>
-                        </div>
-                    {% endif %}
-                </div>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
+
         {% if private %}
             <div class="row">
                 <div class="col-xs-12 col-md-8 col-md-offset-2">

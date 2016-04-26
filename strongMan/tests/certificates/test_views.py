@@ -349,6 +349,12 @@ class DetailsViewTest(TestCase):
         self.assertEqual(self.count(Certificate), 2)
         response = self.client.post(reverse('certificates:overview'), {"search_text": "warrior"})
 
-
         self.assertContains(response, '=roadwarrior.hsr.ch')
         self.assertNotContains(response, '=hsr.ch')
+
+    def test_change_nickname(self):
+        self.add_keycontainer(Paths.X509_rsa)
+        self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {"update_nickname": "", "nickname": "hulk"})
+
+        cert = Certificate.objects.first().subclass()
+        self.assertEqual(cert.nickname, "hulk")

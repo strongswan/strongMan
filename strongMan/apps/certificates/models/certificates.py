@@ -92,6 +92,10 @@ class Certificate(KeyContainer, DjangoAbstractBase):
     def identities(self):
         return self.ident_certificates_abstractidentity.all()
 
+    @property
+    def nickname(self):
+        return self.subject.cname
+
 
 @receiver(pre_delete, sender=Certificate)
 def certificate_clean_submodels(sender, **kwargs):
@@ -108,6 +112,7 @@ def certificate_clean_submodels(sender, **kwargs):
 
 class UserCertificate(Certificate):
     private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
+    _nickname = models.TextField()
 
     def set_privatekey_if_exists(self):
         """
@@ -136,6 +141,14 @@ class UserCertificate(Certificate):
     @property
     def has_private_key(self):
         return not self.private_key is None
+
+    @property
+    def nickname(self):
+        return self._nickname
+
+    @nickname.setter
+    def nickname(self, value):
+        self._nickname = value
 
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):
@@ -210,7 +223,10 @@ class CertificateFactory:
                 pass  # No subject_alt_name extension found
 
             DnIdentity.by_cert(public)
-
+            try:
+                public.nickname = public.subject.cname
+            except:
+                pass
             public.save()
             return public
         except Exception as e:
