@@ -35,13 +35,44 @@ class AbstractOverviewHandler:
         raise NotImplementedError()
 
     def _search_for(self, all_certs, search_text):
+        '''
+        Searches for keywords in certificates
+        :param all_certs: prefiltered list of certificates
+        :param search_text: text to search for
+        :return: queryset of filtered certificates
+        '''
+        cert_ids = []
+        cert_ids  += self._search_for_indentities(search_text)
+        cert_ids += self._search_for_nicknames(all_certs, search_text)
+        return all_certs.filter(pk__in=cert_ids)
+
+    def _search_for_indentities(self, search_text):
+        '''
+        Searches for keywords in identities
+        :param search_text: text to search for
+        :return: list of certificate id's
+        '''
         cert_ids = []
         identities = models.identities.AbstractIdentity.objects.all()
         identities = models.identities.AbstractIdentity.subclasses(identities)
         for ident in identities:
             if search_text.lower() in str(ident).lower():
                 cert_ids.append(ident.certificate.pk)
-        return all_certs.filter(pk__in=cert_ids)
+        return cert_ids
+
+    def _search_for_nicknames(self, all_certs, search_text):
+        '''
+        Searches for keywords in nicknames
+        :param all_certs: list of prefiltered certificates
+        :param search_text: text to search for
+        :return: list of certificate id's
+        '''
+        cert_ids = []
+
+        for cert in all_certs:
+            if search_text.lower() in cert.nickname.lower():
+                cert_ids.append(cert.pk)
+        return cert_ids
 
     def _render(self, queryset=UserCertificate.objects.none(), search_pattern=""):
         table = UserCertificateTable(queryset, request=self.request)
