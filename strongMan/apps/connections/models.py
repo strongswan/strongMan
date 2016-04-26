@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 from collections import OrderedDict
 
 from django.db import models
@@ -10,8 +11,20 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.encryption import fields
 
 
+class DjangoEnum(Enum):
+    @classmethod
+    def choices(cls):
+        return [(x.value, x.name) for x in cls]
+
+
+class State(DjangoEnum):
+    DOWN = 'DOWN'
+    CONNECTING = 'CONNECTING'
+    ESTABLISHED = 'ESTABLISHED'
+
+
 class Connection(models.Model):
-    state = models.BooleanField(default=False)
+    state = models.CharField(max_length=15, choices=State.choices())
     profile = models.CharField(max_length=50, unique=True)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()

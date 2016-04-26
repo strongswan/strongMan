@@ -15,7 +15,7 @@ class ViciWrapper:
         try:
             self.socket.connect(self.socket_path)
         except Exception as e:
-            raise ViciSocketException("Vici is not reachable!") from e
+            raise ViciSocketException("Vici is not reachable!")
 
     def load_connection(self, connection):
         '''
@@ -25,7 +25,7 @@ class ViciWrapper:
             self.session.load_conn(connection)
         except Exception as e:
             print(e)
-            raise ViciLoadException("Connection cannot be loaded!") from e
+            raise ViciLoadException("Connection cannot be loaded!")
 
     def unload_connection(self, connection_name):
         '''
@@ -40,7 +40,7 @@ class ViciWrapper:
         try:
             self.session.load_shared(secret)
         except Exception as e:
-            raise ViciLoadException("Secret cannot be loaded!") from e
+            raise ViciLoadException("Secret cannot be loaded!")
 
     def load_key(self, key):
         '''
@@ -49,7 +49,7 @@ class ViciWrapper:
         try:
             self.session.load_key(key)
         except Exception as e:
-            raise ViciLoadException("Private key cannot be loaded!") from e
+            raise ViciLoadException("Private key cannot be loaded!")
 
 
     def load_certificate(self, certificate):
@@ -60,7 +60,7 @@ class ViciWrapper:
         try:
             self.session.load_cert(certificate)
         except Exception as e:
-            raise ViciLoadException("Certificate cannot be loaded!") from e
+            raise ViciLoadException("Certificate cannot be loaded!")
 
     def get_connections_names(self):
         '''
@@ -98,8 +98,11 @@ class ViciWrapper:
                 return True
         return False
 
+    '''
     def is_connection_established(self, connection_name):
+        print(self.get_sas_by(connection_name))
         return True if self.get_sas_by(connection_name) else False
+    '''
 
     def get_version(self):
         '''
@@ -108,13 +111,13 @@ class ViciWrapper:
         try:
             return self.session.version()
         except Exception as e:
-            raise ViciLoadException("Version information cannot be loaded!") from e
+            raise ViciLoadException("Version information cannot be loaded!")
 
     def get_status(self):
         try:
             return self.session.stats()
         except Exception as e:
-            raise ViciLoadException("Status information cannot be loaded!") from e
+            raise ViciLoadException("Status information cannot be loaded!")
 
     def get_plugins(self):
         '''
@@ -150,7 +153,7 @@ class ViciWrapper:
             for log in logs:
                 report.append(log)
         except Exception as e:
-            raise ViciInitiateException("SA can't be initiated!") from e
+            raise ViciInitiateException("SA can't be initiated!")
         return report
 
     def terminate_connection(self, connection_name):
@@ -165,5 +168,62 @@ class ViciWrapper:
             for log in logs:
                 report.append(log)
         except Exception as e:
-            raise ViciTerminateException("Cant't terminate connection " + connection_name + "!") from e
+            raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
         return report
+
+    def get_connection_state(self, connection_name):
+        sa = self.get_sas_by(connection_name)
+        if sa:
+            values = sa[0][connection_name]
+            state = values['state']
+            return state.decode('ascii')
+        else:
+            return 'DOWN'
+
+'''
+[OrderedDict([('cert',
+    OrderedDict([('uniqueid', b'2'),
+        ('version', b'2'),
+        ('state', b'ESTABLISHED'),
+        ('local-host', b'172.17.0.1'),
+        ('local-port', b'4500'),
+        ('local-id', b'C=CH, O=Linux strongSwan, OU=Research, CN=carol@strongswan.org'),
+        ('remote-host', b'172.17.0.2'),
+        ('remote-port', b'4500'),
+        ('remote-id', b'moon.strongswan.org'),
+        ('initiator', b'yes'),
+        ('initiator-spi', b'bfdd33c1a24810e2'),
+        ('responder-spi', b'643537f4c01507e4'),
+        ('encr-alg', b'AES_CBC'),
+        ('encr-keysize', b'128'),
+        ('integ-alg', b'HMAC_SHA2_256_128'),
+        ('prf-alg', b'PRF_HMAC_SHA2_256'),
+        ('dh-group', b'MODP_2048'),
+        ('established', b'16'),
+        ('rekey-time', b'13312'),
+        ('local-vips', [b'10.6.0.1']),
+        ('child-sas',
+            OrderedDict([('cert',
+                OrderedDict([('uniqueid', b'2'),
+                    ('reqid', b'2'),
+                    ('state', b'INSTALLED'),
+                    ('mode', b'TUNNEL'),
+                    ('protocol', b'ESP'),
+                    ('spi-in', b'c46d302e'),
+                    ('spi-out', b'c2125947'),
+                    ('encr-alg', b'AES_GCM_16'),
+                    ('encr-keysize', b'128'),
+                    ('bytes-in', b'0'),
+                    ('packets-in', b'0'),
+                    ('bytes-out', b'0'),
+                    ('packets-out', b'0'),
+                    ('rekey-time', b'3241'),
+                    ('life-time', b'3944'),
+                    ('install-time', b'16'),
+                    ('local-ts', [b'10.6.0.1/32']),
+                    ('remote-ts', [b'172.17.0.2/32'])]))]))]))])]
+
+[OrderedDict([('cert', OrderedDict([('uniqueid', b'1'), ('version', b'2'), ('state', b'CONNECTING'), ('local-host', b'172.17.0.1'), ('local-port', b'500'), ('local-id', b'%any'), ('remote-host', b'172.17.0.2'), ('remote-port', b'500'), ('remote-id', b'%any'), ('initiator', b'yes'), ('initiator-spi', b'10f1339048108561'), ('responder-spi', b'0000000000000000'), ('tasks-active', [b'IKE_VENDOR', b'IKE_INIT', b'IKE_NATD', b'IKE_CERT_PRE', b'IKE_AUTH', b'IKE_CERT_POST', b'IKE_CONFIG', b'CHILD_CREATE', b'IKE_AUTH_LIFETIME', b'IKE_MOBIKE']), ('child-sas', OrderedDict())]))])]
+
+
+'''

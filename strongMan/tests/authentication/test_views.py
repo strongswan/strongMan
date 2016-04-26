@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
 
-from strongMan.apps.request_handler import AboutHandler
+from strongMan.apps.request_handler import PwChangeHandler
 
 
 class AuthenticationViewsTests(TestCase):
@@ -31,34 +31,39 @@ class PwChangeTest(TestCase):
         self.assertNotContains(response, "Password changed successfully!")
 
     def test_pw_change_successfully(self):
-        response = self.client.post(reverse('about'), {"old_password": "1234", "password1": "Newpassword!2",
+        url = '/change_pw'
+        response = self.client.post(url, {"old_password": "1234", "password1": "Newpassword!2",
                                                        "password2": "Newpassword!2"})
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("Newpassword!2"))
 
     def test_send_nothing(self):
-        response = self.client.post(reverse('about'), {})
+        url = '/change_pw'
+        response = self.client.post(url, {})
         self.assert_pw_not_changed(response)
 
     def test_wrong_current_pw(self):
-        response = self.client.post(reverse('about'), {"old_password": "asfasdfa", "password1": "newpassword!",
+        url = '/change_pw'
+        response = self.client.post(url, {"old_password": "asfasdfa", "password1": "newpassword!",
                                                        "password2": "newpassword!"})
         self.assert_pw_not_changed(response)
 
     def test_notequal_pw(self):
-        response = self.client.post(reverse('about'), {"old_password": "1234", "password1": "newpassword!",
+        url = '/change_pw'
+        response = self.client.post(url, {"old_password": "1234", "password1": "newpassword!",
                                                        "password2": "newpassword!2"})
         self.assert_pw_not_changed(response)
 
     def test_pw_rules(self):
-        response = self.client.post(reverse('about'), {"old_password": "1234", "password1": "newpassword",
+        url = '/change_pw'
+        response = self.client.post(url, {"old_password": "1234", "password1": "newpassword",
                                                        "password2": "newpassword"})
         self.assert_pw_not_changed(response)
 
 
 class AboutHandlerTest(TestCase):
     def setUp(self):
-        self.handler = AboutHandler(None)
+        self.handler = PwChangeHandler(None)
 
     def test_has_upper(self):
         self.assertFalse(self.handler._has_upper("123456"))

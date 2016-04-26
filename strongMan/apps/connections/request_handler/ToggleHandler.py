@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
-from ..models import Connection
+from ..models import Connection, State
 
 
 class ChildSA(object):
@@ -24,16 +24,13 @@ class ToggleHandler:
         response = dict(id=self.request.POST['id'], success=False)
         try:
             vici_wrapper = ViciWrapper()
-            if vici_wrapper.is_connection_established(connection.profile):
-                connection.stop()
-            else:
+            state = vici_wrapper.get_connection_state(connection.profile)
+            if state == State.DOWN.value:
                 connection.start()
-                '''
-                sas = vici_wrapper.get_sas_by(connection.profile)
-
-                for sa in sas:
-                    ChildSA(sa, connection.profile)
-                '''
+            elif state == State.ESTABLISHED.value:
+                connection.stop()
+            elif state == State.CONNECTING.value:
+                connection.stop()
             response['success'] = True
         except ViciExceptoin as e:
             response['message'] = str(e)

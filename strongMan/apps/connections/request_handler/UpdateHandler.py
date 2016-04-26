@@ -1,4 +1,3 @@
-
 from ..models import Connection
 from .. import forms
 from django.shortcuts import render, redirect

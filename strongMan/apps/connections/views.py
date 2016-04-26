@@ -7,6 +7,7 @@ from .request_handler.UpdateHandler import UpdateHandler
 from .request_handler.OverviewHandler import OverviewHandler
 from .request_handler.DeleteHandler import DeleteHandler
 from .request_handler.ToggleHandler import ToggleHandler
+from .request_handler.StateHandler import StateHandler
 
 
 @require_http_methods('GET')
@@ -42,6 +43,11 @@ def delete_connection(request, id):
     handler = DeleteHandler(request, id)
     return handler.handle()
 
+
+@login_required
+def get_state(request, id):
+    handler = StateHandler(request, id)
+    return handler.handle()
 
 
 def _get_title(form):
