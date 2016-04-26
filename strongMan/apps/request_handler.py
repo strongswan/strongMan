@@ -29,6 +29,24 @@ class AboutHandler:
     def handle(self):
         if self.request.method == "GET":
             return self._render_page()
+
+
+
+
+
+class PwChangeHandler:
+    def __init__(self, request):
+        self.request = request
+
+    def _render_page(self, form=PasswordChangeForm(), success=False):
+        context = OrderedDict()
+        context["pw_form"] = form
+        context["success"] = success
+        return render(self.request, 'widgets/pw_change.html', context)
+
+    def handle(self):
+        if self.request.method == "GET":
+            return self._render_page()
         if self.request.method == "POST":
             form = PasswordChangeForm(self.request.POST)
             if not form.is_valid():
@@ -37,7 +55,7 @@ class AboutHandler:
                 return self._render_page()
             try:
                 self._change_password(form)
-                messages.info(self.request, "Password changed successfully!")
+                return self._render_page(success=True)
             except AboutException as e:
                 messages.error(self.request, str(e))
             return self._render_page()
@@ -97,6 +115,8 @@ class AboutHandler:
             if letter.isdigit():
                 return True
         return False
+
+
 
 
 class AboutException(Exception):

@@ -83,6 +83,16 @@ body {
     top: 20px;
     margin-bottom: 50px;
 }
+#certificate-detail table tr td{
+    padding: 5px;
+}
+#certificate-detail table{
+    margin-bottom: 0px;
+}
+#certificate-detail #cert-header{
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
 #certificate-added #nav-btn {
     margin-top: 20px;
     margin-bottom: 30px;
@@ -116,7 +126,7 @@ body {
     display: block;
     padding: 5px;
 }
-#connection-overview td a {
+#connection-overview td .namelink {
    display: block;
    padding: 2px;
 }
@@ -154,26 +164,27 @@ body {
     margin-bottom: 30px;
 }
 
-#about #pw_change .panel{
+#pw_change{
     padding: 20px;
+    padding-top: 0px;
 }
 
-#about #pw_change .panel h3{
+#pw_change  h3{
     margin-top: 10px;
 }
 
-#about #pw_change .panel input{
+#pw_change  input{
     margin-bottom: 3px;
 }
 
-#about #pw_change .panel #old_password{
+#pw_change #old_password{
     margin-bottom: 10px;
 }
 
-#about #pw_change .panel #password2{
+#pw_change  #password2{
     margin-bottom: 10px;
 }
-#about #pw_change .panel #passwordrules{
+#pw_change #passwordrules{
     margin-top: 60px;
 }
 

@@ -41,18 +41,28 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    {% if user.is_authenticated %}
-                        <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    {% else %}
-                        <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                    {% endif %}
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false"><span
+                                class="glyphicon glyphicon-user"></span> {{ user.username }} <span
+                                class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a data-toggle="modal" data-target="#myModal"><span
+                                    class="glyphicon glyphicon-refresh"></span> Change password</a></li>
+                            <li>
+                            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
-{% vici_checker %}
-<div class="row">
+    {% vici_checker %}
+    <div class="row">
         <div class="col-xs-12 title-area">
             <h1>{% block title %}{% endblock title %}
                 <small> {% block small-title %}{% endblock small-title %}</small>
@@ -60,18 +70,17 @@
             <hr>
 
         </div>
-
     </div>
     {% if messages %}
         <div class="row">
-        <div class="col-xs-12">
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %} fade in">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>{{ message }}</strong>
-                </div>
-            {% endfor %}
-        </div>
+            <div class="col-xs-12">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %} fade in">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <strong>{{ message }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
     <div class="row">
@@ -80,5 +89,27 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Change your password</h4>
+            </div>
+            <div class="modal-body">
+                {% include "widgets/pw_change.html" %}
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#old_password').focus()
+        })
+    </script>
+</div>
+
 </body>
 </html>

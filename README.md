@@ -26,7 +26,7 @@ Run the following commands to make the server ready to run.
 git clone https://github.com/Sebubu/strongMan.git
 cd strongMan
 sudo pip3 install -r requirements.txt
-sudo ./migrate.sh python3 y
+sudo ./migrate.sh -i python3
 ```
 We have installed strongMan with all it's requirements and loaded a default user into the database.
 Let's run the server.

@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from strongMan.apps.certificates.models.certificates import UserCertificate, ViciCertificate
+from ..forms import ChangeNicknameForm
 
 
 class DetailsHandler:
@@ -38,6 +39,14 @@ class DetailsHandler:
                 self._usercert.remove_privatekey()
                 messages.add_message(self.request, messages.INFO, "Private key has been removed.")
                 return self._render_user_details()
+            elif "update_nickname" in self.request.POST:
+                if not self._is_usercert():
+                    return self._render_user_details()
+                form = ChangeNicknameForm(self.request.POST)
+                if form.is_valid():
+                    self._usercert.nickname = form.cleaned_data["nickname"]
+                    self._usercert.save()
+                    return self._render_user_details()
         return self._render_user_details()
 
     def _certificate_subclass(self, classe):

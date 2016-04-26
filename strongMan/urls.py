@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^certificates/', include(certificates_url)),
     url(r'^login/?$', views.login, name='login'),
     url(r'^logout/?$', views.logout, name='logout'),
+    url(r'change_pw$', views.pw_change, name='pw_change'),
     url(r'^about/?$', views.about, name='about'),
 ]

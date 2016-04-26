@@ -85,6 +85,17 @@ class ConnectionModelTest(TestCase):
         self.assertEquals(2, Child.objects.count())
         self.assertEquals(1, Connection.objects.count())
 
+    def test_secrets_encrypted_field(self):
+        Secret.objects.all().delete()
+        password = "adsfasdfasdf"
+        secret = Secret()
+        secret.type = "as"
+        secret.data = password
+        secret.save()
+
+        data = Secret.objects.first().data
+        self.assertEqual(data, password)
+
 
 class TestCert:
     def __init__(self, path):
