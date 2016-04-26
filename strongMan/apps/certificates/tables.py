@@ -1,6 +1,5 @@
 import django_tables2 as tables
 from django.template.loader import render_to_string
-from .models import UserCertificate, ViciCertificate
 
 class UserCertificateTable(tables.Table):
     name = tables.Column(accessor="subject.cname", verbose_name='Name')

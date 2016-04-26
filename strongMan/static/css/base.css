@@ -154,26 +154,27 @@ body {
     margin-bottom: 30px;
 }
 
-#about #pw_change .panel{
+#pw_change{
     padding: 20px;
+    padding-top: 0px;
 }
 
-#about #pw_change .panel h3{
+#pw_change  h3{
     margin-top: 10px;
 }
 
-#about #pw_change .panel input{
+#pw_change  input{
     margin-bottom: 3px;
 }
 
-#about #pw_change .panel #old_password{
+#pw_change #old_password{
     margin-bottom: 10px;
 }
 
-#about #pw_change .panel #password2{
+#pw_change  #password2{
     margin-bottom: 10px;
 }
-#about #pw_change .panel #passwordrules{
+#pw_change #passwordrules{
     margin-top: 60px;
 }
 

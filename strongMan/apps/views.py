@@ -5,7 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
-from .request_handler import AboutHandler
+from .request_handler import AboutHandler, PwChangeHandler
 
 @login_required
 @require_http_methods(['GET', 'POST'])
@@ -41,3 +41,11 @@ def logout(request):
 def about(request):
     handler = AboutHandler(request)
     return handler.handle()
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def pw_change(request):
+    handler = PwChangeHandler(request)
+    return handler.handle()
+
+
