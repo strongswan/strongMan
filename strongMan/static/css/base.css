@@ -130,7 +130,9 @@ body {
    display: block;
    padding: 2px;
 }
-
+#connection-add .form-holder{
+    padding:30px;
+}
 #connection-configuration .panel{
     padding-bottom: 30px;
     padding-left: 20px;

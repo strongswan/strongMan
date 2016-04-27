@@ -1,0 +1,19 @@
+{% load connections_extras %}
+<div id="TypeChoose-form">
+    <p>Choose your authentification method. The authentification method should be given you by your network
+        administrator.</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <label class="control-label col-sm-2" for="label_form_name">Method</label>
+        <div class="controls col-sm-10">
+            <select class="form-control" name="form_name" id="select_form_name"
+                    onchange="this.form.submit()">
+                <option>Choose authentification method</option>
+                {% for key, value in form.fields.form_name.choices %}
+                    <option value={{ key }}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+</div>

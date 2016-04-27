@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from strongMan.apps.certificates.models.identities import AbstractIdentity
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.encryption import fields
+from ..certificates.models import UserCertificate
 
 
 class Connection(models.Model):
@@ -86,6 +87,10 @@ class Connection(models.Model):
                 return connection.first()
         return self
 
+    @classmethod
+    def choice_name(cls):
+        raise NotImplementedError
+
 
 @receiver(pre_delete, sender=Connection)
 def delete_all_connected_models(sender, **kwargs):
@@ -111,19 +116,27 @@ def delete_all_connected_models(sender, **kwargs):
 
 
 class IKEv2Certificate(Connection):
-    pass
+    @classmethod
+    def choice_name(cls):
+        return "IKEv2 Certificate"
 
 
 class IKEv2EAP(Connection):
-    pass
+    @classmethod
+    def choice_name(cls):
+        return "IKEv2 EAP (Username/Password)"
 
 
 class IKEv2CertificateEAP(Connection):
-    pass
+    @classmethod
+    def choice_name(cls):
+        return "IKEv2 Certificate + EAP (Username/Password)"
 
 
 class IKEv2EapTls(Connection):
-    pass
+    @classmethod
+    def choice_name(cls):
+        return "IKEv2 EAP-TLS (Certificate)"
 
 
 class Child(models.Model):
@@ -161,13 +174,17 @@ class Authentication(models.Model):
     auth = models.CharField(max_length=50)
     auth_id = models.CharField(max_length=50, null=True, blank=True, default=None)
     round = models.IntegerField(default=1)
+    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_%(app_label)s_%(class)s')
+    ca_identity = models.TextField()
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
         if self.auth_id is not None:
             parameters['id'] = self.auth_id
+        parameters['certs'] = [self.ca_cert.der_container]
         auth = OrderedDict()
         auth[self.name] = parameters
+
         return auth
 
     @classmethod
@@ -195,26 +212,22 @@ class Authentication(models.Model):
 
 class EapAuthentication(Authentication):
     eap_id = models.CharField(max_length=50)
-    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='eap_identity_ca')
 
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         values = auth[self.name]
         values['id'] = self.eap_id
-        values['certs'] = [self.identity_ca.subclass().certificate.der_container]
         values['eap_id'] = self.eap_id
         return auth
 
 
 class CertificateAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='identity')
-    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='identity_ca')
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
         values = auth[self.name]
-        values['certs'] = [self.identity.subclass().certificate.der_container,
-                           self.identity_ca.subclass().certificate.der_container]
+        values['certs'].append(self.identity.subclass().certificate.der_container)
         return auth
 
     def has_private_key(self):
@@ -228,13 +241,11 @@ class CertificateAuthentication(Authentication):
 class EapTlsAuthentication(Authentication):
     eap_id = models.CharField(max_length=50)
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity')
-    identity_ca = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity_ca')
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
         values = auth[self.name]
-        values['certs'] = [self.identity.subclass().certificate.der_container,
-                           self.identity_ca.subclass().certificate.der_container]
+        values['certs'].append(self.identity.subclass().certificate.der_container)
         values['id'] = 'eap-tls-only'  # TODO: Ask Tobias for better Idea str(self.identity.subclass().value())
         values['eap_id'] = str(self.identity.subclass().value())
         #values['aaa_id'] = str(self.identity_ca.subclass().value())

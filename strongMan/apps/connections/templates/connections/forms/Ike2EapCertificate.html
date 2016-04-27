@@ -1,0 +1,35 @@
+{% extends "connections/forms/ConnectionForm.html" %}
+{% load connections_extras %}
+{% block form_content %}
+    <div class="row">
+        <label class="control-label col-sm-3">Username</label>
+        <div class="controls col-sm-9">
+            <input type="text" class="form-control" name="username" value="{{ form.username.value }}"
+                   placeholder="Your username"/>
+            {% include "connections/forms/errormsg.html" with field=form.username %}
+        </div>
+        <label class="control-label col-sm-3">Password</label>
+        <div class="controls col-sm-9">
+            <input type="password" class="form-control" name="password" value="{{ form.password.value }}"
+                   placeholder="Your password"/>
+            {% include "connections/forms/errormsg.html" with field=form.password %}
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Choose your certificate which authenticates you. Only certificates with private key's are shown. Add
+                new certificates in the certificates section of strongMan.</p>
+        </div>
+    </div>
+    {% include "connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
+    <hr>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Choose the ca certificate which authenticates the server. Add new certificates in the certificates
+                section of strongMan if needed.</p>
+        </div>
+    </div>
+    {% include "connections/forms/CaPicker.html" with certificate=form.certificate_ca identity=form.identity_ca %}
+    <hr>
+{% endblock form_content %}

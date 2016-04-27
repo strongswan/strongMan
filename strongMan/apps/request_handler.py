@@ -2,6 +2,8 @@ from collections import OrderedDict
 
 from django.contrib import messages
 from django.shortcuts import render
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate
 
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
@@ -68,6 +70,11 @@ class PwChangeHandler:
 
         user.set_password(form.pw1)
         user.save()
+        self._relogin(form.pw1)
+
+    def _relogin(self, pw):
+        user = authenticate(username=self.request.user.username, password=pw)
+        auth_login(self.request, user)
 
     def _is_password_hard(self, password):
         '''

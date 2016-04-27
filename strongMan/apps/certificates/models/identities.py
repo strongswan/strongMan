@@ -58,3 +58,4 @@ class DnIdentity(AbstractIdentity):
         ident.certificate = certificate
         ident.save()
         return ident
+

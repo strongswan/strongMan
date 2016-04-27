@@ -216,13 +216,14 @@ class CertificateFactory:
             public.save()
             public.issuer = cls.distinguishedName_factory(reader.asn1.issuer)
             public.subject = cls.distinguishedName_factory(reader.asn1.subject)
+            DnIdentity.by_cert(public)
             try:
                 for san in cls.extract_subject_alt_names(reader):
                     TextIdentity.by_san(san, public)
             except CertificateException as e:
                 pass  # No subject_alt_name extension found
 
-            DnIdentity.by_cert(public)
+
             try:
                 public.nickname = public.subject.cname
             except:
