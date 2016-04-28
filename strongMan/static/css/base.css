@@ -219,3 +219,11 @@ body {
   border-radius: 4px;
   color: #c09853;
 }
+
+
+#div-table-content {
+    overflow:scroll;
+    overflow:auto;
+    height: 100px;
+    font-size: 80%;"
+}

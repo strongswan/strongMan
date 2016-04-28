@@ -98,11 +98,6 @@ class ViciWrapper:
                 return True
         return False
 
-    '''
-    def is_connection_established(self, connection_name):
-        print(self.get_sas_by(connection_name))
-        return True if self.get_sas_by(connection_name) else False
-    '''
 
     def get_version(self):
         '''
@@ -149,12 +144,12 @@ class ViciWrapper:
         sa = OrderedDict(ike=connection_name, child=child_name)
         try:
             logs = self.session.initiate(sa)
-            report = []
             for log in logs:
-                report.append(log)
+                level = log['level'].decode('ascii')
+                message = log['msg'].decode('ascii')
+                yield OrderedDict(level=level, message=message)
         except Exception as e:
             raise ViciInitiateException("SA can't be initiated!")
-        return report
 
     def terminate_connection(self, connection_name):
         '''

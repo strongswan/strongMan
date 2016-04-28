@@ -72,8 +72,10 @@ class Connection(models.Model):
                 vici_wrapper.load_secret(secret.dict())
 
         for child in self.children.all():
-            reports = vici_wrapper.initiate(child.name, self.profile)
-        self.state = True
+            logs = vici_wrapper.initiate(child.name, self.profile)
+            for log in logs:
+                LogMessage(connection=self, message=log['message'], level=log['level']).save()
+        self.state = State.ESTABLISHED.value
         self.save()
 
     def stop(self):
@@ -271,3 +273,13 @@ class Secret(models.Model):
         eap_id = self.authentication.subclass().eap_id
         secrets = OrderedDict(type=self.type, data=self.data, id=eap_id)
         return secrets
+
+
+class LogMessage(models.Model):
+    connection = models.ForeignKey(Connection, null=True, blank=True, default=None)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    level = models.CharField(max_length=2)
+    message = models.CharField(max_length=50)
+
+
+
