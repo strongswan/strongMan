@@ -1,6 +1,6 @@
 <div class="row certificate_picker">
     <label class="control-label col-sm-3">{{ certificate.label }}</label>
-    <div class="col-sm-9">
+    <div class="col-sm-8 col-xs-10">
         <select class="selectpicker " data-live-search="true"
                 name="{{ certificate.name }}"
                 id="id_{{ certificate.name }}" data-show-subtext="True">
@@ -14,12 +14,15 @@
                         data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
             {% endfor %}
         </select>
-        {% include "connections/forms/errormsg.html" with field=certificate %}
+        {% include "connections/forms/../widgets/errormsg.html" with field=certificate %}
+    </div>
+    <div class="col-sm-1 col-xs-2">
+        {% include "connections/widgets/QuestionPopover.html" with title="User certificate help" content="Select a certificate which authenticates yourself. Only certificate with a private key are shown." %}
     </div>
 </div>
 <div class="row identity_picker">
     <label class="control-label col-sm-3">{{ identity.label }}</label>
-    <div class="col-sm-9">
+    <div class="col-sm-8 col-xs-10">
         <select class="selectpicker" data-live-search="true" name="{{ identity.name }}"
                 id="id_{{ identity.name }}" data-show-subtext="True"
                 {% if identity.field.choices|length == 0 %}disabled="True"{% endif %}>
@@ -34,7 +37,10 @@
             {% endfor %}
 
         </select>
-        {% include "connections/forms/errormsg.html" with field=identity %}
+        {% include "connections/forms/../widgets/errormsg.html" with field=identity %}
+    </div>
+    <div class="col-sm-1 col-xs-2">
+        {% include "connections/widgets/QuestionPopover.html" with title="Identity help" content="Select one of the available identities. Use the distinguishedName in doubt. This field will be enabled as soon as the certificate is selected." %}
     </div>
 </div>
 <script>

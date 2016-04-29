@@ -160,6 +160,13 @@ body {
     padding-bottom: 20px;
 }
 
+#connection-add .question{
+    font-size:1.5em;
+    vertical-align: middle;
+    text-align: center;
+    color: #333;
+}
+
 
 .title-area hr{
     margin-top: 10px;
@@ -195,3 +202,6 @@ body {
     padding-bottom: 20px;
 }
 
+.popover{
+    max-width: 300px;
+}

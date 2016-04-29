@@ -16,21 +16,27 @@
         <input type="hidden" name="current_form" value="{{ form|classname }}"/>
         <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
         <div class="row">
-            <p class="col-xs-12">Name your connection thus you rereconized it and type in the gateway.</p>
+            <p class="col-xs-12">Name your connection thus you rereconized it and type in the server.</p>
             <label class="control-label col-sm-3">Name</label>
-            <div class="controls col-sm-9">
+            <div class="controls col-sm-8 col-xs-10">
                 <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
                        placeholder="Name your connection"/>
-                {% include "connections/forms/errormsg.html" with field=form.profile %}
+                {% include "connections/forms/../widgets/errormsg.html" with field=form.profile %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "connections/widgets/QuestionPopover.html" with title="Name help" content="This is the name of the connection. The name appears as the main identifier in strongMan and also in strongSwan." %}
             </div>
 
         </div>
         <div class="row">
             <label class="control-label col-sm-3">Server</label>
-            <div class="controls col-sm-9">
+            <div class="controls col-sm-8 col-xs-2">
                 <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
                        placeholder="Hostname or IP" id="gateway"/>
-                {% include "connections/forms/errormsg.html" with field=form.gateway %}
+                {% include "connections/forms/../widgets/errormsg.html" with field=form.gateway %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "connections/widgets/QuestionPopover.html" with title="Server help" content="The server is the opposite endpoint of the vpn connection. Enter either a fqdn like 'vpn.myenterprise.com' or a ip like '86.12.24.212'." %}
             </div>
         </div>
         <hr>
@@ -63,6 +69,7 @@
                 return true;
             }
         });
+
     </script>
 
 </div>
