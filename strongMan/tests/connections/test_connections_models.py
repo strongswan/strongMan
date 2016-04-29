@@ -26,13 +26,13 @@ class ConnectionModelTest(TestCase):
         manager = UserCertificateManager()
         manager.add_keycontainer(bytes)
 
-        certificate = Certificate.objects.first().subclass().identities.first()
+        certificate = Certificate.objects.first().subclass()
         auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2,
-                                 identity_ca=certificate)
+                                 ca_cert=certificate, ca_identity="adsfasdf")
         auth.save()
         Authentication(name='remote-1', auth='pubkey', remote=connection).save()
-        CertificateAuthentication(name='local-1', identity=certificate, auth='pubkey',
-                                  local=connection, identity_ca=certificate).save()
+        CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
+                                  local=connection, ca_cert=certificate, ca_identity="asdfasdf").save()
         Secret(type='EAP', data="password", authentication=auth).save()
 
     def test_child_added(self):

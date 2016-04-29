@@ -181,7 +181,8 @@ class Authentication(models.Model):
         parameters = OrderedDict(auth=self.auth, round=self.round)
         if self.auth_id is not None:
             parameters['id'] = self.auth_id
-        parameters['certs'] = [self.ca_cert.der_container]
+        if self.ca_cert is not None:
+            parameters['certs'] = [self.ca_cert.der_container]
         auth = OrderedDict()
         auth[self.name] = parameters
 

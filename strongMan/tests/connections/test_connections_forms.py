@@ -20,12 +20,12 @@ class ConnectionFormsTest(TestCase):
         self.identity = self.certificate.identities.first()
 
     def test_ChooseTypeForm(self):
-        form_data = {'form_name':  "Ike2CertificateForm"}
+        form_data = {'current_form':"ChooseTypeForm", 'form_name':  "Ike2CertificateForm"}
         form = ChooseTypeForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_ChooseTypeForm_invalid(self):
-        form_data = {'form_name':  "sting"}
+        form_data = {'current_form':"ChooseTypeForm", 'form_name':  "sting"}
         form = ChooseTypeForm(data=form_data)
         self.assertFalse(form.is_valid())
 
@@ -47,8 +47,8 @@ class ConnectionFormsTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapForm(self):
-        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password',
-                     'profile': 'profile', 'certificate': self.certificate.pk, 'identity': self.identity.pk}
+        form_data = {'current_form':"Ike2EapForm", 'gateway': "gateway", 'username': "username", 'password': 'password',
+                     'profile': 'profile', 'certificate_ca': self.certificate.pk, 'identity_ca': "yolo"}
         form = Ike2EapForm(data=form_data)
         form.update_certificates()
         valid = form.is_valid()

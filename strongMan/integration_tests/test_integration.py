@@ -34,10 +34,11 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'EAP',
-                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
-                                      'username': "eap-test", 'password': "test", 'form_name': 'Ike2EapForm'})
+        response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': 'gateway', 'profile': 'EAP',
+                                      'certificate_ca': self.carol_cert.pk, 'identity_ca': "carol@strongswan.org",
+                                      'username': "eap-test", 'password': "test"})
 
+        print(response.content.decode('utf-8'))
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -52,10 +53,10 @@ class IntegrationTest(TestCase):
 
     def test_Ike2CertificateIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Cert',
+        self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Cert',
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
-                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
-                                      'form_name': 'Ike2CertificateForm'})
+                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': "carol@strongswan.org",
+                                      'current_form': 'Ike2CertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -70,11 +71,11 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapCertificateIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Cert',
+        self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Cert',
                                       'username': "eap-test", 'password': "test",
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
-                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
-                                      'form_name': 'Ike2EapCertificateForm'})
+                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': "carol@strongswan.org",
+                                      'current_form': 'Ike2EapCertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
@@ -89,10 +90,10 @@ class IntegrationTest(TestCase):
 
     def test_Ike2EapTlsIntegration(self):
         url_create = '/connections/add/'
-        self.client.post(url_create, {'wizard_step': 'configure', 'gateway': 'gateway', 'profile': 'Eap+Tls',
+        self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Tls',
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
-                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': self.ca_cert.identities.first().pk,
-                                      'form_name': 'Ike2EapTlsForm'})
+                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': "carol@strongswan.org",
+                                      'current_form': 'Ike2EapTlsForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
