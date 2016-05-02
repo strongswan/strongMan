@@ -29,6 +29,10 @@ class IntegrationTest(TestCase):
                 self.carol_cert = c
             else:
                 self.ca_cert = c
+
+        for i in self.carol_cert.identities:
+            if str(i.subclass()) == 'carol@strongswan.org':
+               self.carol_ident = i.subclass()
         self.vici_wrapper = ViciWrapper()
         self.vici_wrapper.unload_all_connections()
 
@@ -53,14 +57,16 @@ class IntegrationTest(TestCase):
 
     def test_Ike2CertificateIntegration(self):
         url_create = '/connections/add/'
+
         self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Cert',
-                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate': self.carol_cert.pk, 'identity': self.carol_ident.pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "carol@strongswan.org",
                                       'current_form': 'Ike2CertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
+
         toggle_url = '/connections/toggle/'
         self.client.post(toggle_url, {'id': connection.id})
 
@@ -68,6 +74,7 @@ class IntegrationTest(TestCase):
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
+
 
     def test_Ike2EapCertificateIntegration(self):
         url_create = '/connections/add/'
@@ -80,6 +87,8 @@ class IntegrationTest(TestCase):
         self.assertEquals(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
+
+
         toggle_url = '/connections/toggle/'
         self.client.post(toggle_url, {'id': connection.id})
 

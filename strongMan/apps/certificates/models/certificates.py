@@ -223,7 +223,6 @@ class CertificateFactory:
             except CertificateException as e:
                 pass  # No subject_alt_name extension found
 
-
             try:
                 public.nickname = public.subject.cname
             except:

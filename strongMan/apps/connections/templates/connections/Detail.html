@@ -1,14 +1,11 @@
 {% extends "base.html" %}
-{% comment %}
-
-{% endcomment %}
-
 {% load i18n %}
 {% load connections_extras %}
+{% load staticfiles %}
 {% block title %}Connection{% endblock title %}
 {% block small-title %}Add a new connection{% endblock small-title %}
 {% block content %}
-    <div id="connection-add">
+    <div id="connection-details">
         <div class="row">
             <div class="col-sm-offset-2 col-sm-8 panel panel-default form-holder">
                 {% include form.template with form=form %}

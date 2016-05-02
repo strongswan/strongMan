@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     'strongMan.apps.vici',
     'strongMan.apps.connections',
     'strongMan.apps.certificates',
-    'django_tables2'
+    'django_tables2',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -87,4 +87,10 @@ STATICFILES_DIRS = (
 )
 LOGIN_URL = (
     '/login/'
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
 )

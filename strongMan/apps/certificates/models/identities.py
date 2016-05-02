@@ -47,7 +47,7 @@ class DnIdentity(AbstractIdentity):
         return str(self.certificate.subject)
 
     def value(self):
-        return self.certificate.subject
+        return self.certificate.subject.blob
 
     def type(self):
         return "distinguishedName"

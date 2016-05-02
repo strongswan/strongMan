@@ -5,10 +5,12 @@
 {% block content %}
     <div class="container" id="certificate-added">
         <div class="row" id="nav-btn">
-            <div class="col-xs-offset-10 col-xs-2">
-                <div class="btn-group text-center" role="group" aria-label="...">
-                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
-                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+            <div class="col-xs-12">
+                <div class="pull-right">
+                    <div class="btn-group text-center" role="group" aria-label="...">
+                        <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -39,10 +41,12 @@
         {% endif %}
 
         <div class="row" id="nav-btn">
-            <div class="col-xs-offset-10 col-xs-2">
-                <div class="btn-group text-center" role="group" aria-label="...">
-                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
-                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+            <div class="col-xs-12">
+                <div class="pull-right">
+                    <div class="btn-group text-center" role="group" aria-label="...">
+                        <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                    </div>
                 </div>
             </div>
         </div>

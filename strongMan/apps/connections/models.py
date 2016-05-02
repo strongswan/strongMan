@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
-from strongMan.apps.certificates.models.identities import AbstractIdentity
+from strongMan.apps.certificates.models.identities import AbstractIdentity, DnIdentity
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.encryption import fields
 from ..certificates.models import UserCertificate
@@ -172,17 +172,15 @@ class Authentication(models.Model):
     remote = models.ForeignKey(Connection, null=True, blank=True, default=None, related_name='remote')
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
-    auth_id = models.CharField(max_length=50, null=True, blank=True, default=None)
     round = models.IntegerField(default=1)
     ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_%(app_label)s_%(class)s')
     ca_identity = models.TextField()
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
-        if self.auth_id is not None:
-            parameters['id'] = self.auth_id
         if self.ca_cert is not None:
             parameters['certs'] = [self.ca_cert.der_container]
+            parameters['id'] = self.ca_identity
         auth = OrderedDict()
         auth[self.name] = parameters
 
@@ -217,7 +215,6 @@ class EapAuthentication(Authentication):
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         values = auth[self.name]
-        values['id'] = self.eap_id
         values['eap_id'] = self.eap_id
         return auth
 
@@ -228,6 +225,9 @@ class CertificateAuthentication(Authentication):
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
         values = auth[self.name]
+        ident = self.identity.subclass()
+        if not isinstance(ident, DnIdentity):
+            values['id'] = ident.value()
         values['certs'].append(self.identity.subclass().certificate.der_container)
         return auth
 
@@ -247,10 +247,10 @@ class EapTlsAuthentication(Authentication):
         auth = super(EapTlsAuthentication, self).dict()
         values = auth[self.name]
         values['certs'].append(self.identity.subclass().certificate.der_container)
-        values['id'] = 'eap-tls-only'  # TODO: Ask Tobias for better Idea str(self.identity.subclass().value())
-        values['eap_id'] = str(self.identity.subclass().value())
-        #values['aaa_id'] = str(self.identity_ca.subclass().value())
-        #values['aaa_id'] = 'C=CH, O=Linux strongSwan, CN=moon.strongswan.org'
+        ident = self.identity.subclass()
+        if not isinstance(ident, DnIdentity):
+            values['id'] = ident.value()
+        values['eap_id'] = self.eap_id
         return auth
 
     def has_private_key(self):

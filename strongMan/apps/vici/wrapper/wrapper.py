@@ -167,3 +167,5 @@ class ViciWrapper:
         except Exception as e:
             raise ViciTerminateException("Cant't terminate connection " + connection_name + "!") from e
         return report
+
+
