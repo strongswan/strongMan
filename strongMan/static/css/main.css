@@ -1,10 +1,40 @@
-body {
-  padding-top: 20px;
-  padding-bottom: 20px; }
+html {
+  height: 100%; }
+  html body {
+    padding-top: 20px;
+    height: 100%; }
 
-#base .title-area hr {
-  margin-top: 10px;
-  margin-bottom: 30px; }
+#base {
+  min-height: 90%; }
+  #base .title-area hr {
+    margin-top: 10px;
+    margin-bottom: 30px; }
+
+#base-footer {
+  margin-top: 50px;
+  width: 100%;
+  height: 200px;
+  background-color: #101010; }
+  #base-footer .footer-content {
+    height: 100%;
+    position: relative;
+    padding: 40px 20px 20px 40px; }
+    #base-footer .footer-content p, #base-footer .footer-content h1, #base-footer .footer-content h2, #base-footer .footer-content h3, #base-footer .footer-content h4, #base-footer .footer-content h5, #base-footer .footer-content span {
+      color: #EDEDED; }
+    #base-footer .footer-content .logo {
+      display: inline-block;
+      text-align: center; }
+      #base-footer .footer-content .logo .fa {
+        font-size: 3em;
+        color: #EDEDED;
+        margin-right: 25px; }
+      #base-footer .footer-content .logo .fa:hover {
+        color: #bababa; }
+    #base-footer .footer-content .copyright {
+      margin-top: 50px; }
+
+.table-container {
+  width: 100%; }
 
 #pw_change {
   padding: 20px;
@@ -24,8 +54,16 @@ body {
   padding-top: 20px;
   padding-bottom: 20px; }
 
-.navbar {
+.navbar-inverse {
   margin-bottom: 20px; }
+  .navbar-inverse .navbar-brand {
+    color: #EDEDED; }
+  .navbar-inverse .navbar-brand:hover {
+    color: #bababa; }
+  .navbar-inverse .navbar-nav > li > a {
+    color: #EDEDED; }
+  .navbar-inverse .navbar-nav > li > a:hover {
+    color: #bababa; }
 
 .navbar-nav.navbar-right:last-child {
   margin-right: 0; }

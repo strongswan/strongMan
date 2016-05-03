@@ -1,14 +1,58 @@
-body {
+$black: #333;
+$nav-font-color-hover: #bababa;
+$nav-font-color: #EDEDED;
+
+html {
+  height: 100%;
+  body {
     padding-top: 20px;
-    padding-bottom: 20px;
+    height: 100%;
+  }
 }
 
 #base {
-    .title-area hr{
-      margin-top: 10px;
-      margin-bottom: 30px;
+  min-height: 90%;
+  .title-area hr {
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+}
+
+#base-footer {
+  $padding: 20px;
+  margin-top: 50px;
+  width: 100%;
+  height: 200px;
+  background-color: #101010;
+
+  .footer-content {
+    height: 100%;
+    position: relative;
+    padding: 40px $padding $padding 40px;
+    p, h1, h2, h3, h4, h5, span {
+      color: $nav-font-color;
+    }
+    .logo {
+      display: inline-block;
+      text-align: center;
+      .fa {
+        font-size: 3em;
+        color: $nav-font-color;
+        margin-right: 25px;
+      }
+      .fa:hover {
+        color: $nav-font-color-hover;
+      }
+    }
+    .copyright {
+      margin-top: 50px;
+    }
   }
 
+}
+
+.table-container {
+  width: 100%;
 }
 
 #pw_change {
@@ -34,44 +78,57 @@ body {
 }
 
 #main-page .jumbotron {
-    padding-top: 20px;
-    padding-bottom: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-
-.navbar {
-    margin-bottom: 20px;
+.navbar-inverse {
+  margin-bottom: 20px;
+  .navbar-brand {
+    color: $nav-font-color;
+  }
+  .navbar-brand:hover {
+    color: $nav-font-color-hover;
+  }
+  .navbar-nav > li > a {
+    color: $nav-font-color;
+  }
+  .navbar-nav > li > a:hover {
+    color: $nav-font-color-hover;
+  }
 }
 
 .navbar-nav.navbar-right:last-child {
-    margin-right: 0;
+  margin-right: 0;
 }
 
 .black-background {
-    background-color: #333;
+  background-color: $black;
 }
 
 .white-background {
-    background-color: white;
-    border-color: black;
+  background-color: white;
+  border-color: black;
 }
 
 .white {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 .black {
-    color: #333;
-}
-.btn-orange{
-    color: #fff;
-    background-color: #DE9B33;
-    border-color: #AA7539;
-}
-.inline-form{
-    display: inline-block
+  color: $black;
 }
 
-#logout_button{
-    float: right;
+.btn-orange {
+  color: #fff;
+  background-color: #DE9B33;
+  border-color: #AA7539;
+}
+
+.inline-form {
+  display: inline-block
+}
+
+#logout_button {
+  float: right;
 }
