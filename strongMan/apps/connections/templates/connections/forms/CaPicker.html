@@ -1,0 +1,47 @@
+<div class="row ca_picker">
+    <label class="control-label col-sm-3">{{ certificate.label }}</label>
+    <div class="col-sm-8 col-xs-10">
+        <select class="selectpicker " data-live-search="true"
+                name="{{ certificate.name }}"
+                id="id_{{ certificate.name }}" data-show-subtext="True">
+            {% if certificate.value == None or certificate.value == '-1' %}
+                <option value="-1" selected>Nothing selected!</option>
+            {% endif %}
+            {% for choise in certificate.field.queryset %}
+                <option value="{{ choise.id }}"
+                        {% if certificate.value|slugify == choise.id|slugify %}
+                        selected{% endif %}
+                        data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
+            {% endfor %}
+        </select>
+        {% include "connections/forms/../widgets/errormsg.html" with field=certificate %}
+    </div>
+    <div class="col-sm-1 col-xs-2">
+        {% include "connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the ca certificate." %}
+    </div>
+</div>
+<div class="row identity_picker">
+    <label class="control-label col-sm-3">{{ identity.label }}</label>
+    <div class="col-sm-8 col-xs-10">
+        <input type="text" class="form-control" name="{{ identity.name }}" id="{{ identity.name }}"
+               {% if certificate.value == None or certificate.value == '-1' %}disabled{% endif %}
+               placeholder="Hostname or IP" value="{{ identity.value }}"/>
+        {% include "connections/forms/../widgets/errormsg.html" with field=identity %}
+    </div>
+    <div class="col-sm-1 col-xs-2">
+        {% include "connections/widgets/QuestionPopover.html" with title="CA identity help" content="Enter the server identity either as a fqdn like 'vpn.myenterprise.com' or as a ip like '213.56.143.8'. The ca identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
+    </div>
+</div>
+<script>
+    //Take the server as identity if identity is empty
+    $("#id_{{ certificate.name }}").change(function () {
+        var gateway = $("#gateway").val();
+        var identity = $("#{{ identity.name }}");
+        if (gateway !== '') {
+            if (identity.val() === '') {
+                identity.val(gateway);
+            }
+        }
+        identity.prop('disabled', false);
+    });
+</script>

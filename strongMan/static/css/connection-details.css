@@ -1,0 +1,9 @@
+#connection-details .question{
+    font-size:1.5em;
+    vertical-align: middle;
+    text-align: center;
+    color: #333;
+}
+#connection-details .form-holder{
+    padding:30px;
+}

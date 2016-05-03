@@ -37,6 +37,8 @@ class ToggleHandler:
             response['success'] = True
         except ViciExceptoin as e:
             response['message'] = str(e)
+        except Exception as e:
+            print(e)
         finally:
             return JsonResponse(response)
 

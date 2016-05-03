@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
 
-from .request_handler.CreateHandler import CreateHandler
+from .request_handler.CreateHandler import AddHandler
 from .request_handler.UpdateHandler import UpdateHandler
 from .request_handler.OverviewHandler import OverviewHandler
 from .request_handler.DeleteHandler import DeleteHandler
@@ -19,7 +19,7 @@ def overview(request):
 @login_required
 @require_http_methods(['POST', 'GET'])
 def create(request):
-    handler = CreateHandler(request)
+    handler = AddHandler(request)
     return handler.handle()
 
 

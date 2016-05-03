@@ -1,0 +1,75 @@
+{% load connections_extras %}
+<div id="ConnectionForm">
+    <div class="row">
+        <p class="col-xs-12">Your choosen authentification method.</p>
+        <label class="control-label col-sm-3" for="label_form_name">Method</label>
+        <div class="controls col-sm-9">
+            <select class="form-control" name="form_name" id="select_form_name" disabled="True">
+                <option>{{ form.model.choice_name }}</option>
+            </select>
+        </div>
+    </div>
+    <hr>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
+        <div class="row">
+            <p class="col-xs-12">Name your connection thus you rereconized it and type in the server.</p>
+            <label class="control-label col-sm-3">Name</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
+                       placeholder="Name your connection"/>
+                {% include "connections/forms/../widgets/errormsg.html" with field=form.profile %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "connections/widgets/QuestionPopover.html" with title="Name help" content="This is the name of the connection. The name appears as the main identifier in strongMan and also in strongSwan." %}
+            </div>
+
+        </div>
+        <div class="row">
+            <label class="control-label col-sm-3">Server</label>
+            <div class="controls col-sm-8 col-xs-2">
+                <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
+                       placeholder="Hostname or IP" id="gateway"/>
+                {% include "connections/forms/../widgets/errormsg.html" with field=form.gateway %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "connections/widgets/QuestionPopover.html" with title="Server help" content="The server is the opposite endpoint of the vpn connection. Enter either a fqdn like 'vpn.myenterprise.com' or a ip like '86.12.24.212'." %}
+            </div>
+        </div>
+        <hr>
+        {% block form_content %}{% endblock form_content %}
+        <div class="pull-right">
+            {% if connection %}
+                <span title="Remove connection">
+                <a href="{% url 'connections:connection_delete' connection.id %}"
+                   id="delete-{{ connection.id }}"
+                   class="btn btn-default white-background black remove-btn">
+                    <span class="glyphicon glyphicon-remove"></span> <span
+                        class="removebtn-text">Remove</span>
+                </a>
+            </span>
+            {% endif %}
+            <button type="submit" name="save" id="configuration"
+                    class="btn black-background white"><span
+                    class="glyphicon glyphicon-floppy-disk"></span> Save
+            </button>
+        </div>
+    </form>
+    <script>
+        $(".remove-btn").click(function () {
+            btn = $(this);
+            if (btn.hasClass('btn-default')) {
+                btn.removeClass('btn-default').addClass('btn-danger');
+                btn.children('.removebtn-text').text('Remove connection');
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+    </script>
+
+</div>

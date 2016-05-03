@@ -12,3 +12,11 @@ def field_type(field):
 @register.filter(name='get_choice')
 def get_choice(text):
     return text[-1:]
+
+@register.filter(name='classname')
+def classname(value):
+    return value.__class__.__name__
+
+
+
+
