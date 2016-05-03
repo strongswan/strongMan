@@ -15,8 +15,12 @@ class ConnectionFormsTest(TestCase):
         bytes = Paths.X509_googlecom.read()
         manager = UserCertificateManager()
         manager.add_keycontainer(bytes)
+        manager.add_keycontainer(Paths.X509_rsa_ca.read())
+        manager.add_keycontainer(Paths.PKCS1_rsa_ca.read())
 
         self.certificate = Certificate.objects.first().subclass()
+        self.usercert = Certificate.objects.get(pk=2)
+
         self.identity = self.certificate.identities.first()
 
     def test_ChooseTypeForm(self):
@@ -27,6 +31,27 @@ class ConnectionFormsTest(TestCase):
     def test_ChooseTypeForm_invalid(self):
         form_data = {'current_form':"ChooseTypeForm", 'form_name':  "sting"}
         form = ChooseTypeForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_ConnectionForm_server_as_caidentity(self):
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'is_server_identity': True}
+        form = Ike2CertificateForm(data=form_data)
+        form.update_certificates()
+        self.assertTrue(form.is_valid())
+
+    def test_ConnectionForm_server_as_caidentity_unchecked(self):
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'identity_ca': "gateway"}
+        form = Ike2CertificateForm(data=form_data)
+        form.update_certificates()
+        self.assertTrue(form.is_valid())
+
+    def test_ConnectionForm_server_as_caidentity_empty_identity_ca(self):
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk}
+        form = Ike2CertificateForm(data=form_data)
+        form.update_certificates()
         self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm(self):

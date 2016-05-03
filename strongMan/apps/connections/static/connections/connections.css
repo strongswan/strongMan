@@ -47,4 +47,7 @@
   border-radius: 4px;
   color: #c09853; }
 
+#ConnectionForm input, #ConnectionForm .bootstrap-select {
+  margin-bottom: 10px; }
+
 /*# sourceMappingURL=connections.css.map */

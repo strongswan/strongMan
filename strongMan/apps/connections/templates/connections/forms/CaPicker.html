@@ -20,28 +20,50 @@
         {% include "connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the ca certificate." %}
     </div>
 </div>
-<div class="row identity_picker">
+<div class="row is_server_identity">
     <label class="control-label col-sm-3">{{ identity.label }}</label>
     <div class="col-sm-8 col-xs-10">
+        <span>
+        <input type="checkbox" class="" name="{{ is_server_identity.name }}" id="{{ is_server_identity.name }}"
+               placeholder="Hostname or IP" {% if is_server_identity.value %}checked{% endif %}>
+        Use server as identity</span>
+    </div>
+</div>
+<div class="row identity_picker">
+    <label class="control-label col-sm-3"></label>
+    <div class="col-sm-8 col-xs-10">
         <input type="text" class="form-control" name="{{ identity.name }}" id="{{ identity.name }}"
-               {% if certificate.value == None or certificate.value == '-1' %}disabled{% endif %}
-               placeholder="Hostname or IP" value="{{ identity.value }}"/>
+               placeholder="Hostname or IP" {% if identity.value %}value="{{ identity.value }}"{% else %}value=""{% endif %}/>
         {% include "connections/forms/../widgets/errormsg.html" with field=identity %}
     </div>
     <div class="col-sm-1 col-xs-2">
         {% include "connections/widgets/QuestionPopover.html" with title="CA identity help" content="Enter the server identity either as a fqdn like 'vpn.myenterprise.com' or as a ip like '213.56.143.8'. The ca identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
     </div>
 </div>
+
 <script>
-    //Take the server as identity if identity is empty
-    $("#id_{{ certificate.name }}").change(function () {
-        var gateway = $("#gateway").val();
-        var identity = $("#{{ identity.name }}");
-        if (gateway !== '') {
-            if (identity.val() === '') {
-                identity.val(gateway);
-            }
+    //Take the server as identity if checked
+    var checkbox = $("#{{ is_server_identity.name }}");
+    var identity = $("#{{ identity.name }}");
+
+    function check_identity_ca_disable(){
+        var checked = checkbox.is(':checked');
+        identity.prop('disabled', checked);
+        if(checked){
+            identity.hide();
+        } else {
+            identity.show();
         }
-        identity.prop('disabled', false);
+    }
+
+    checkbox.change(function () {
+        check_identity_ca_disable();
     });
+
+    $(document).ready(function(){
+        check_identity_ca_disable();
+    });
+
+
+
 </script>
