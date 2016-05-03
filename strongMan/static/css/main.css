@@ -1,0 +1,57 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px; }
+
+#base .title-area hr {
+  margin-top: 10px;
+  margin-bottom: 30px; }
+
+#pw_change {
+  padding: 20px;
+  padding-top: 0px; }
+  #pw_change h3 {
+    margin-top: 10px; }
+  #pw_change input {
+    margin-bottom: 3px; }
+  #pw_change #old_password {
+    margin-bottom: 10px; }
+  #pw_change #password2 {
+    margin-bottom: 10px; }
+  #pw_change #passwordrules {
+    margin-top: 60px; }
+
+#main-page .jumbotron {
+  padding-top: 20px;
+  padding-bottom: 20px; }
+
+.navbar {
+  margin-bottom: 20px; }
+
+.navbar-nav.navbar-right:last-child {
+  margin-right: 0; }
+
+.black-background {
+  background-color: #333; }
+
+.white-background {
+  background-color: white;
+  border-color: black; }
+
+.white {
+  color: #ffffff; }
+
+.black {
+  color: #333; }
+
+.btn-orange {
+  color: #fff;
+  background-color: #DE9B33;
+  border-color: #AA7539; }
+
+.inline-form {
+  display: inline-block; }
+
+#logout_button {
+  float: right; }
+
+/*# sourceMappingURL=main.css.map */

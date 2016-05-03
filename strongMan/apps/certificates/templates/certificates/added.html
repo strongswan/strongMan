@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load staticfiles %}
+{% block html-head %}
+    <link href="{% static 'certificates/certificates.css' %}" rel="stylesheet">
+{% endblock html-head %}
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}You have successfully added a container{% endblock small-title %}
 {% block content %}
