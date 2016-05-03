@@ -40,17 +40,6 @@ body {
     float: right;
 }
 
-#certificate-overview > #header {
-    margin-bottom: 20px;
-}
-
-#certificate-overview > #search {
-    margin-bottom: 10px;
-    margin-top: 30px;
-}
-#certificate-overview > #header > #add-btn {
-    padding-right: 15px;
-}
 #certificate-add .form-row {
     margin-bottom: 10px;
     margin-top: 5px;
