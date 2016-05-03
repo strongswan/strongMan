@@ -11,7 +11,6 @@ function handler(event) {
         url: '/connections/toggle/' // the file to call
     });
     lock(connectionId, this.csrfmiddlewaretoken.value);
-    logger(connectionId, this.csrfmiddlewaretoken.value);
     return false;
 }
 
@@ -47,6 +46,7 @@ function getState(connectionId, csrf) {
                     case 'ESTABLISHED':
                         $('#toggle_input' + response.id).bootstrapToggle('on');
                         unlock(response.id);
+                        getConnectionInfo(csrf, response.id)
                         break;
                     default:
                         $('#toggle_input' + response.id).bootstrapToggle('off');
@@ -67,29 +67,20 @@ function setAlert(response) {
         '<strong>' + response.message + '</strong></div>');
 }
 
-function logger(connectionId, csrf) {
-    $.ajax({ // create an AJAX call...
-        data: {'csrfmiddlewaretoken': csrf},
-        type: 'POST', // GET or POST
-        url: '/connections/log/' + connectionId + '/', // the file to call
+
+function getConnectionInfo(csrf, connectionId) {
+    $.ajax({
+        data: {'csrfmiddlewaretoken': csrf, 'id': connectionId},
+        type: 'POST',
+        url: '/connections/info/',
         success: function (response) { // on success..
-            if (response.has_log) {
-                if (response.level == "1") {
-                    setTimeout(function () {
-                        logger(connectionId, csrf)
-                    }, 200);
-                }
-                addRowToLog(response)
-            } else {
-                setTimeout(function () {
-                    logger(connectionId, csrf)
-                }, 1000);
-            }
+            console.log(response)
         }
     });
+    addRowToConnections();
 }
 
-function addRowToLog(log) {
-    $('#log_table tbody').append('<tr class="child"><td>' + log.timestamp + '</td><td>' + log.name + '</td><td>' + log.message + '</td></tr>');
-    $('#div-table-content').scrollTop($('#log_table').height());
+function addRowToConnections(id) {
+    var tr = $('#span-' + id).parent().parent();
+    tr.after('<tr id="info-' + id + '" class="child_sa"><td>child_sa</td></tr>')
 }

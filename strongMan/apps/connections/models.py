@@ -82,7 +82,9 @@ class Connection(models.Model):
     def stop(self):
         vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
-        vici_wrapper.terminate_connection(self.profile)
+        logs = vici_wrapper.terminate_connection(self.profile)
+        for log in logs:
+                LogMessage(connection=self, message=log['message'], level=log['level']).save()
         self.state = False
         self.save()
 
@@ -292,6 +294,5 @@ class LogMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     level = models.CharField(max_length=2)
     message = models.CharField(max_length=50)
-
 
 

@@ -31,6 +31,7 @@
                                         {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
                             {% endfor %}
                         </tr>
+                        <tr class="child-{{record.id}}"><td>hallo</td></tr>
                     {% endblock table.tbody.row %}
                     {% empty %}
                     {% if table.empty_text %}
@@ -55,12 +56,12 @@
             {% with table.page.object_list|length as count %}
                 {% block pagination %}
                     <div class="text-center">
-                            {% block pagination.previous %}
-                                <a class="btn btn-default" name="next" {% if not table.page.has_previous %} disabled="True"
-                                   {% else %}href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"{% endif %}>
-                                    <span class="glyphicon glyphicon-chevron-left"></span> Previous
-                                </a>
-                            {% endblock pagination.previous %}
+                        {% block pagination.previous %}
+                            <a class="btn btn-default" name="next" {% if not table.page.has_previous %} disabled="True"
+                               {% else %}href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"{% endif %}>
+                                <span class="glyphicon glyphicon-chevron-left"></span> Previous
+                            </a>
+                        {% endblock pagination.previous %}
 
 
                         {% if table.page.has_previous or table.page.has_next %}
@@ -74,13 +75,13 @@
                         {% endif %}
 
 
-                            {% block pagination.next %}
-                                <a {% if table.page.has_next %}href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
-                                    {% else %} disabled="True" {% endif %}"
-                                   class="btn btn-default" name="next">
-                                    Next <span class="glyphicon glyphicon-chevron-right"></span>
-                                </a>
-                            {% endblock pagination.next %}
+                        {% block pagination.next %}
+                            <a {% if table.page.has_next %}href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                               {% else %} disabled="True" {% endif %}"
+                            class="btn btn-default" name="next">
+                            Next <span class="glyphicon glyphicon-chevron-right"></span>
+                            </a>
+                        {% endblock pagination.next %}
 
                         {% block pagination.cardinality %}
                             <div class="cardinality">

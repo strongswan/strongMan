@@ -1,24 +1,43 @@
+import json
+import time
+from datetime import timedelta
+from django.utils import timezone
+
 from django.http import JsonResponse
 
-from ..models import Connection, LogMessage
+from ..models import LogMessage
 
 
 class LogHandler:
-    def __init__(self, request, id):
-        self.request = request
-        self.id = id
-
-    @property
-    def connection(self):
-        return Connection.objects.get(pk=self.id).subclass()
+    def __init__(self, request):
+        self.newest_log = None
+        self.id = int(request.POST.get('id'))
 
     def handle(self):
-        response = dict(id=self.connection.id, name=self.connection.profile, has_log=False)
-        log_message = LogMessage.objects.filter(connection=self.connection).order_by('timestamp').first()
-        if log_message is not None:
-            response['level'] = log_message.level
-            response['message'] = log_message.message
-            response['timestamp'] = log_message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-            response['has_log'] = True
-            log_message.delete()
+        response = dict(logs=[])
+        self._delete_old_logs()
+        if self.id < 0:
+            logs = self._get_logs()
+        else:
+            logs = self._get_new_logs()
+        for log in logs:
+            log_dict = dict(id=log.id, message=log.message, name=log.connection.profile)
+            log_dict['timestamp'] = log.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            response['logs'].append(log_dict)
         return JsonResponse(response)
+
+    def _delete_old_logs(self):
+        time_threshold = timezone.now() - timedelta(minutes=5)
+        LogMessage.objects.filter(timestamp__lt=time_threshold).delete()
+
+    def _get_logs(self):
+        while LogMessage.objects.all().count() == 0:
+            time.sleep(1)
+        return LogMessage.objects.all().order_by('timestamp')
+
+    def _get_new_logs(self):
+        logs = LogMessage.objects.filter(pk__gt=self.id).order_by('timestamp')
+        while logs.count() == 0:
+            time.sleep(1)
+            logs = LogMessage.objects.filter(pk__gt=self.id).order_by('timestamp')
+        return logs
