@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 from collections import OrderedDict
 
 from django.db import models
@@ -11,8 +12,20 @@ from strongMan.apps.encryption import fields
 from ..certificates.models import UserCertificate
 
 
+class DjangoEnum(Enum):
+    @classmethod
+    def choices(cls):
+        return [(x.value, x.name) for x in cls]
+
+
+class State(DjangoEnum):
+    DOWN = 'DOWN'
+    CONNECTING = 'CONNECTING'
+    ESTABLISHED = 'ESTABLISHED'
+
+
 class Connection(models.Model):
-    state = models.BooleanField(default=False)
+    state = models.CharField(max_length=15, choices=State.choices())
     profile = models.CharField(max_length=50, unique=True)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()
@@ -60,8 +73,10 @@ class Connection(models.Model):
                 vici_wrapper.load_secret(secret.dict())
 
         for child in self.children.all():
-            reports = vici_wrapper.initiate(child.name, self.profile)
-        self.state = True
+            logs = vici_wrapper.initiate(child.name, self.profile)
+            for log in logs:
+                LogMessage(connection=self, message=log['message'], level=log['level']).save()
+        self.state = State.ESTABLISHED.value
         self.save()
 
     def stop(self):
@@ -270,3 +285,13 @@ class Secret(models.Model):
         eap_id = self.authentication.subclass().eap_id
         secrets = OrderedDict(type=self.type, data=self.data, id=eap_id)
         return secrets
+
+
+class LogMessage(models.Model):
+    connection = models.ForeignKey(Connection, null=True, blank=True, default=None)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    level = models.CharField(max_length=2)
+    message = models.CharField(max_length=50)
+
+
+

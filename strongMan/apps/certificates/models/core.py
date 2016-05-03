@@ -1,12 +1,3 @@
-from enum import Enum
-
-
-class DjangoEnum(Enum):
-    @classmethod
-    def choices(cls):
-        # This method converts a Python enum to Django Choises used in the database models
-        return [(x.value, x.name) for x in cls]
-
 
 class DjangoAbstractBase:
     @classmethod
