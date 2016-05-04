@@ -17,6 +17,7 @@
 </head>
 <body>
 <div class="container" id="base">
+
     <nav class="navbar navbar-inverse">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -57,6 +58,7 @@
         </div>
     </nav>
     {% vici_checker %}
+
     <div class="row">
         <div class="col-xs-12 title-area">
             <h1>{% block title %}{% endblock title %}
@@ -78,6 +80,7 @@
             </div>
         </div>
     {% endif %}
+
     <div class="row">
         <div class="col-xs-12">
             {% block content %}{% endblock content %}

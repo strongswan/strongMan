@@ -10,8 +10,8 @@
 {% block title %}Connection{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-    <div id="connection-overview">
-        <div id="add-btn">
+    <div id="connection-overview" class="row col-xs-12 col-md-10 col-md-offset-1">
+        <div id="add-btn" class="row col-xs-12">
         <span title="Add a new connection">
             <a href="{% url "connections:connections_choose" %}" id="add" class="btn btn-orange btn-lg pull-right">
                 <span class="glyphicon glyphicon-plus"></span> Add
@@ -30,7 +30,7 @@
         </div>
 
         <div class="row form-row">
-            <div class="col-md-10 col-md-offset-1 col-xs-12">
+            <div class="col-xs-12">
                 <div id="log">
                     <h4>Logs</h4>
                     <div class="bs-callout bs-callout-default" style="margin: 0; padding: 0;">

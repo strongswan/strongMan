@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="{% static "django_tables2/themes/paleblue/css/screen.css" %}" />
 {% endblock %} html-header %}
 {% block content %}
-    <div id="certificate-overview">
+    <div id="certificate-overview" class="row col-xs-12 col-md-10 col-md-offset-1">
         <div class="row" id="header">
             <div class="col-md-10 col-xs-9 btn-group" role="group">
                 <a href="{% url "certificates:overview" %}" {% if view == "all" %}disabled="True" {% endif %}
@@ -55,7 +55,7 @@
             <form action="" method="POST" >
                 {% csrf_token %}
                 <input type="hidden" name="page" value="1">
-                <div class="col-lg-6">
+                <div class="col-xs-12">
                     <div class="input-group">
                         <input class="form-control" type="text" name="search_text" value="{{ search_pattern }}"
                                placeholder="Filter your certificates by domain names">

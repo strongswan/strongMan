@@ -25,7 +25,7 @@
     <div class="col-sm-8 col-xs-10">
         <span>
         <input type="checkbox" class="" name="{{ is_server_identity.name }}" id="{{ is_server_identity.name }}"
-               placeholder="Hostname or IP" {% if is_server_identity.value %}checked{% endif %}>
+               placeholder="Hostname or IP" {% if is_server_identity.value or is_server_ientity.value == None %}checked{% endif %}>
         Use server as identity</span>
     </div>
 </div>
