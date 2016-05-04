@@ -1,8 +1,12 @@
+@font-face {
+  font-family: Ubuntu;
+  src: url(static/fonts/Ubuntu-Regular.ttf); }
 html {
   height: 100%; }
   html body {
     padding-top: 20px;
-    height: 100%; }
+    height: 100%;
+    font-family: 'Ubuntu', sans-serif; }
     html body .container {
       height: 100%; }
 

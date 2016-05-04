@@ -2,11 +2,17 @@ $black: #333;
 $nav-font-color-hover: #bababa;
 $nav-font-color: #EDEDED;
 
+@font-face {
+    font-family: Ubuntu;
+    src: url(static/fonts/Ubuntu-Regular.ttf);
+}
+
 html {
   height: 100%;
   body {
     padding-top: 20px;
     height: 100%;
+    font-family: 'Ubuntu', sans-serif;
     .container{
       height: 100%;
     }
