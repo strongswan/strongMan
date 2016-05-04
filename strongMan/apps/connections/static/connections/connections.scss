@@ -28,6 +28,9 @@
   }
 
   .table-container {
+    .connection-info-row div{
+      display: inline-block;
+    }
     td a.profilelink {
       display: block;
       padding: 5px;

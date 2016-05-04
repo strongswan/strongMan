@@ -10,12 +10,18 @@
                 <input id="toggle_input{{ record.id }}" type="checkbox" data-toggle="toggle"
                        data-onstyle="success"
                        data-offstyle="default"
-                       {% if record.state == 'ESTABLISHED' %}checked{% endif %} onclick="this.form.click()">
+                       {% if record.state == 'ESTABLISHED' %}checked{% endif %} >
             </div>
         </form>
     </div>
 </span>
 {% if record.state == 'CONNECTING' %}
     <script type="text/javascript"> $(function() {lock({{ record.id }}, '{{ csrf_token }}');});</script>
+{% endif %}
+{% if record.state == 'ESTABLISHED' %}
+    <script type="text/javascript"> $(function() {showConnectionInfoRow({{ record.id }}, '{{ csrf_token }}');});</script>
+{% endif %}
+{% if record.state == 'DOWN' %}
+    <script type="text/javascript"> $(function() {hideConnectionInfoRow({{ record.id }});});</script>
 {% endif %}
 

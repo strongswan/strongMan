@@ -94,3 +94,6 @@ target/
 *.out
 *.synctex.gz
 *.sqlite3
+
+#SASS
+*.map

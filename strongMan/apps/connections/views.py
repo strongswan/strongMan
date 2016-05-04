@@ -9,6 +9,7 @@ from .request_handler.DeleteHandler import DeleteHandler
 from .request_handler.ToggleHandler import ToggleHandler
 from .request_handler.StateHandler import StateHandler
 from .request_handler.LogHandler import LogHandler
+from .request_handler.SaInfoHandler import SaInfoHandler
 
 @require_http_methods('GET')
 @login_required
@@ -52,9 +53,16 @@ def get_state(request, id):
 
 @login_required
 @require_http_methods('POST')
-def get_log(request, id):
-    handler = LogHandler(request, id)
+def get_log(request):
+    handler = LogHandler(request)
     return handler.handle()
+
+@login_required
+@require_http_methods('POST')
+def get_sa_info(request):
+    handler = SaInfoHandler(request)
+    return handler.handle()
+
 
 
 def _get_title(form):
