@@ -1,6 +1,6 @@
 {% load django_tables2 %}
 {% load i18n %}
-<div class="oldtable-container">
+<div class="old table-container">
     {% block table %}
         <table{% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
             {% block table.thead %}
@@ -62,6 +62,7 @@
                                 <span class="glyphicon glyphicon-chevron-left"></span> Previous
                             </a>
                         {% endblock pagination.previous %}
+                        </div>
                     {% endif %}
 
                 {% if table.page.has_previous or table.page.has_next %}
@@ -90,7 +91,6 @@
                             {{ table.data.verbose_name_plural }}{% endif %}
                     </div>
                 {% endblock pagination.cardinality %}
-                </div>
                 {% endblock pagination %}
             {% endwith %}
         {% endwith %}

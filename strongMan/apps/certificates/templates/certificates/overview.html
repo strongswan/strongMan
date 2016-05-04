@@ -16,7 +16,8 @@
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
 {% block html-head %}
-<link rel="stylesheet" href="{% static "django_tables2/themes/paleblue/css/screen.css" %}" />
+    <link href="{% static 'certificates/certificates.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "django_tables2/themes/paleblue/css/screen.css" %}" />
 {% endblock %} html-header %}
 {% block content %}
     <div id="certificate-overview">

@@ -1,0 +1,75 @@
+#connection-details .form-holder {
+  padding: 30px;
+  .popover {
+    max-width: 300px;
+  }
+  .question{
+    font-size:1em;
+    vertical-align: middle;
+    text-align: center;
+    color: #333;
+  }
+}
+
+#connection-overview {
+  #add {
+    margin-bottom: 10px;
+  }
+  #log {
+    margin-top:100px;
+
+    #log-content {
+      overflow: scroll;
+      overflow: auto;
+      height: 100px;
+      font-size: 80%;
+    }
+  }
+
+  .table-container {
+    td a.profilelink {
+      display: block;
+      padding: 5px;
+    }
+    td .namelink {
+      display: block;
+      padding: 2px;
+    }
+    .glyphicon.spinning {
+      animation: spin 1s infinite linear;
+      -webkit-animation: spin2 1s infinite linear;
+    }
+
+    @keyframes spin {
+      from {
+        transform: scale(1) rotate(0deg);
+      }
+      to {
+        transform: scale(1) rotate(360deg);
+      }
+    }
+
+    @-webkit-keyframes spin2 {
+      from {
+        -webkit-transform: rotate(0deg);
+      }
+      to {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    .my_alert {
+      padding: 4px 14px 4px 14px;
+      margin-bottom: 0px;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+      background-color: #fcf8e3;
+      border: 1px solid #fbeed5;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      color: #c09853;
+    }
+
+  }
+}
+

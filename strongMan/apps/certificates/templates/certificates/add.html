@@ -4,7 +4,10 @@
 {% block title %}Certificates{% endblock title %}
 {% block small-title %}Upload a key container{% endblock small-title %}
 {% block html-head %}
-    <script src="{% static 'js/fileinput.min.js' %}"></script>
+    <script src="{% static 'certificates/fileinput.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'certificates/fileinput.min.css' %}">
+    <link href="{% static 'certificates/certificates.css' %}" rel="stylesheet">
+
 {% endblock html-head %}
 {% block content %}
     <div class="container" id="certificate-add">
