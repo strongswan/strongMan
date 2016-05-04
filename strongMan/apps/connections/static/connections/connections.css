@@ -17,6 +17,8 @@
     overflow: auto;
     height: 100px;
     font-size: 80%; }
+#connection-overview .table-container .connection-info-row div {
+  display: inline-block; }
 #connection-overview .table-container td a.profilelink {
   display: block;
   padding: 5px; }

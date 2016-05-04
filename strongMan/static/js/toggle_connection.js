@@ -46,11 +46,12 @@ function getState(connectionId, csrf) {
                     case 'ESTABLISHED':
                         $('#toggle_input' + response.id).bootstrapToggle('on');
                         unlock(response.id);
-                        getConnectionInfo(csrf, response.id)
+                        showConnectionInfoRow(response.id, csrf);
                         break;
                     default:
                         $('#toggle_input' + response.id).bootstrapToggle('off');
                         unlock(response.id);
+                        hideConnectionInfoRow(response.id);
                         break;
                 }
             } else {
@@ -68,19 +69,36 @@ function setAlert(response) {
 }
 
 
-function getConnectionInfo(csrf, connectionId) {
+function setConnectionInfo(connectionId, csrf) {
     $.ajax({
         data: {'csrfmiddlewaretoken': csrf, 'id': connectionId},
         type: 'POST',
         url: '/connections/info/',
-        success: function (response) { // on success..
-            console.log(response)
+        success: function (response) {
+            if (response.success) {
+                fillConnectionInfo(connectionId, response.child);
+                setTimeout(function () {
+                    setConnectionInfo(connectionId, csrf)
+                }, 10000);
+            }
         }
     });
-    addRowToConnections();
 }
 
-function addRowToConnections(id) {
-    var tr = $('#span-' + id).parent().parent();
-    tr.after('<tr id="info-' + id + '" class="child_sa"><td>child_sa</td></tr>')
+function fillConnectionInfo(id, child) {
+    $('#local-ts-' + id).text(child.local_ts);
+    $('#remote-ts-' + id).text(child.remote_ts);
+    $('#packets-in-' + id).text(child.packets_in);
+    $('#packets-out-' + id).text(child.packets_out);
+    $('#bytes-out-' + id).text(child.bytes_out);
+    $('#bytes-in-' + id).text(child.bytes_in);
+}
+
+function showConnectionInfoRow(id, csrf) {
+    setConnectionInfo(id, csrf);
+    $('#connection-info-row-' + id).toggle(true)
+}
+
+function hideConnectionInfoRow(id) {
+    $('#connection-info-row-' + id).toggle(false)
 }

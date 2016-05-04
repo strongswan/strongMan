@@ -17,5 +17,5 @@ function logger(csrf, logId) {
 
 function addRowToLog(log) {
     $('#log_table tbody').append('<tr class="child"><td>' + log.timestamp + '</td><td>' + log.name + '</td><td>' + log.message + '</td></tr>');
-    $('#div-table-content').scrollTop($('#log_table').height());
+    $('#log-content').scrollTop($('#log_table').height());
 }
