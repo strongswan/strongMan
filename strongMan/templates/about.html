@@ -4,23 +4,24 @@
 {% block title %}About{% endblock title %}
 {% block content %}
     <div id="about">
-    {% vici_reachable as reachable %}
-    {% if reachable %}
-        <div id="daemon_info" class="row">
-            <div class="col-xs-12">
-                Daemon: {{ daemon }} <br>
-                Version: {{ version }} <br>
-                System name: {{ sysname }} <br>
-                Release: {{ release }} <br>
-                Machine: {{ machine }} <br>
-                <h2>Installed plugins</h2>
-                {% for plugin in plugins %}
-                    {{ plugin }}
-                {% endfor %}
+        {% vici_reachable as reachable %}
+        {% if reachable %}
+            <div id="daemon_info" class="row">
+                <div class="col-xs-12">
+                    Daemon: {{ daemon }} <br>
+                    Version: {{ version }} <br>
+                    System name: {{ sysname }} <br>
+                    Release: {{ release }} <br>
+                    Machine: {{ machine }} <br>
+                    <h2>Installed plugins</h2>
+                    {% for plugin in plugins %}
+                        {{ plugin }}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-        <hr>
-    {% else %}
-        <h3>Can't display information without the vici interface.</h3>
-    {% endif %}
+            <hr>
+        {% else %}
+            <h3>Can't display information without the vici interface.</h3>
+        {% endif %}
+    </div>
 {% endblock %}

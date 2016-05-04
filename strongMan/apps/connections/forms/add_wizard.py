@@ -262,7 +262,7 @@ class Ike2EapCertificateForm(ConnectionForm):
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
         Authentication(name='remote-eap', auth='pubkey', remote=connection).save()
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'], round=2, ca_cert=ca_cert, ca_identity=identity_ca)
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'], round=2, ca_cert=ca_cert, ca_identity=self.ca_identity)
         CertificateAuthentication(name='local-cert', auth='pubkey', local=connection, identity=identity, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
         auth.save()
         Secret(type='EAP', data=self.cleaned_data['password'], authentication=auth).save()

@@ -33,6 +33,20 @@ html {
     #base-footer .footer-content .copyright {
       margin-top: 50px; }
 
+#login {
+  margin-top: 50px; }
+  #login .panel {
+    padding-top: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 50px; }
+    #login .panel #submit {
+      display: inline-block; }
+  #login #strongimg {
+    text-align: center; }
+    #login #strongimg img {
+      width: 70%; }
+
 .table-container {
   width: 100%; }
 

@@ -51,6 +51,26 @@ html {
 
 }
 
+#login {
+  margin-top: 50px;
+  .panel {
+    padding-top: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 50px;
+    #submit{
+      display: inline-block;
+    }
+  }
+  #strongimg {
+    text-align: center;
+    img{
+      width: 70%;
+    }
+  }
+
+}
+
 .table-container {
   width: 100%;
 }
