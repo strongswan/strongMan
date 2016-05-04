@@ -53,3 +53,33 @@ class CertificateModel:
 
 class CertificateException(Exception):
     pass
+
+class CertificateDoNotDelete(CertificateException):
+    def     __init__(self, message_obj):
+        self.message_obj = message_obj
+
+    def __str__(self):
+        message = self.message_obj.__str__()
+        return message
+
+    @property
+    def has_html(self):
+        return self.message_obj.is_html
+
+    @property
+    def html(self):
+        return self.message_obj.html
+
+
+class MessageObj:
+    @property
+    def has_html(self):
+        return False
+
+    @property
+    def html(self):
+        raise NotImplementedError()
+
+    def __str__(self):
+        return ""
+

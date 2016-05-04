@@ -1,10 +1,9 @@
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import pre_delete
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 
 from ..container_reader import X509Reader
-from .core import CertificateException, CertificateModel, DjangoAbstractBase
+from .core import CertificateException, CertificateModel, DjangoAbstractBase, CertificateDoNotDelete
 from .identities import TextIdentity, DnIdentity
 from strongMan.apps.encryption import fields
 
@@ -28,6 +27,9 @@ class KeyContainer(CertificateModel, models.Model):
 
 
 class PrivateKey(KeyContainer):
+    should_prevent_delete_signal = Signal(providing_args=["instance"])
+
+
     @classmethod
     def by_reader(cls, reader):
         key = cls()
@@ -114,6 +116,8 @@ class UserCertificate(Certificate):
     private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
     _nickname = models.TextField()
 
+    should_prevent_delete_signal = Signal(providing_args=["usercertificate", "private_key"])
+
     def set_privatekey_if_exists(self):
         """
         Searches for a private key with the same public key
@@ -129,6 +133,7 @@ class UserCertificate(Certificate):
         return count > 0
 
     def remove_privatekey(self):
+        PrivateKey.should_prevent_delete_signal.send(PrivateKey, usercertificate=self, private_key=self.private_key)
         privatekey = self.private_key
         self.private_key = None
         self.save()
@@ -153,6 +158,8 @@ class UserCertificate(Certificate):
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):
     cert = kwargs['instance']
+    UserCertificate.should_prevent_delete_signal.send(sender=UserCertificate, instance=cert)
+
     if cert.private_key is not None:
         key = cert.private_key
         cert.private_key = None

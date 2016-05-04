@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from strongMan.apps.certificates.models.identities import AbstractIdentity, DnIdentity
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.encryption import fields
-from ..certificates.models import UserCertificate
+from ..certificates.models import UserCertificate, PrivateKey, CertificateDoNotDelete, MessageObj
 
 
 class DjangoEnum(Enum):
@@ -22,6 +22,43 @@ class State(DjangoEnum):
     DOWN = 'DOWN'
     CONNECTING = 'CONNECTING'
     ESTABLISHED = 'ESTABLISHED'
+
+class CertConDoNotDeleteMessage(MessageObj):
+    def __init__(self, connection):
+        self.connection = connection
+
+    def __str__(self):
+        return "Certificate is in use by the connection named '" + self.connection.profile + "'."
+
+class KeyConDoNotDeleteMessage(MessageObj):
+    def __init__(self, connection):
+        self.connection = connection
+
+    def __str__(self):
+        return "Private key is in use by the connection named '" + self.connection.profile + "'."
+
+
+
+@receiver(UserCertificate.should_prevent_delete_signal, sender=UserCertificate)
+def prevent_cert_delete_if_cert_is_in_use(sender, **kwargs):
+    cert = kwargs['instance']
+    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in cert.identities] + [cert.ca_cert_authentication]
+
+    for auth in authentications:
+        if auth.count() > 0:
+            raise CertificateDoNotDelete(CertConDoNotDeleteMessage(auth.first().connection))
+    return False, ""
+
+@receiver(PrivateKey.should_prevent_delete_signal, sender=PrivateKey)
+def prevent_key_delete_if_cert_is_in_use(sender, **kwargs):
+    cert = kwargs['usercertificate']
+    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in
+                                                                           cert.identities]
+    for auth in authentications:
+        if auth.count() > 0:
+            raise CertificateDoNotDelete(KeyConDoNotDeleteMessage(auth.first().connection))
+    return False, ""
+
 
 
 class Connection(models.Model):
@@ -188,8 +225,17 @@ class Authentication(models.Model):
     name = models.CharField(max_length=50)  # starts with remote-* or local-*
     auth = models.CharField(max_length=50)
     round = models.IntegerField(default=1)
-    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_%(app_label)s_%(class)s')
+    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_authentication')
     ca_identity = models.TextField()
+
+    @property
+    def connection(self):
+        if self.local is not None:
+            return self.local
+        elif self.remote is not None:
+            return self.remote
+        else:
+            return None
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
@@ -235,7 +281,7 @@ class EapAuthentication(Authentication):
 
 
 class CertificateAuthentication(Authentication):
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='identity')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='cert_identity')
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()

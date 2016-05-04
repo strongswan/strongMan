@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from strongMan.apps.certificates.models.certificates import UserCertificate, ViciCertificate
+from ..models import UserCertificate, ViciCertificate, CertificateDoNotDelete
 from ..forms import ChangeNicknameForm
 
 
@@ -31,14 +31,9 @@ class DetailsHandler:
             return self._render_user_details()
         elif self.request.method == "POST":
             if "remove_cert" in self.request.POST:
-                cname = self.certificate.subject.cname
-                self.certificate.delete()
-                messages.add_message(self.request, messages.INFO, "Certificate " + cname + " has been removed.")
-                return HttpResponseRedirect(reverse('certificates:overview'))
+                return self._delete_cert()
             elif "remove_privatekey" in self.request.POST:
-                self._usercert.remove_privatekey()
-                messages.add_message(self.request, messages.INFO, "Private key has been removed.")
-                return self._render_user_details()
+                return self._delete_private_key()
             elif "update_nickname" in self.request.POST:
                 if not self._is_usercert():
                     return self._render_user_details()
@@ -60,3 +55,22 @@ class DetailsHandler:
 
     def _is_usercert(self):
         return not self._usercert is None
+
+    def _delete_cert(self):
+        cname = self.certificate.subject.cname
+        try:
+            self.certificate.delete()
+            messages.add_message(self.request, messages.INFO, "Certificate '" + cname + "' has been removed.")
+            return HttpResponseRedirect(reverse('certificates:overview'))
+        except CertificateDoNotDelete as e:
+            messages.add_message(self.request, messages.ERROR, "Can't delete certificate. " + str(e))
+            return self._render_user_details()
+
+    def _delete_private_key(self):
+        try:
+            self._usercert.remove_privatekey()
+            messages.add_message(self.request, messages.INFO, "Private key has been removed.")
+        except CertificateDoNotDelete as e:
+            messages.add_message(self.request, messages.ERROR, "Can't delete private key. " + str(e))
+
+        return self._render_user_details()

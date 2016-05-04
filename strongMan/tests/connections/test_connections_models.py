@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django.test import TestCase
 from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, \
     CertificateAuthentication, EapAuthentication, IKEv2EAP
-from strongMan.apps.certificates.models import Certificate
+from strongMan.apps.certificates.models import Certificate, UserCertificate, CertificateDoNotDelete
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
 
@@ -95,6 +95,17 @@ class ConnectionModelTest(TestCase):
 
         data = Secret.objects.first().data
         self.assertEqual(data, password)
+
+    def test_prevent_certificate_delete(self):
+        cert = UserCertificate.objects.first()
+        with self.assertRaises(CertificateDoNotDelete):
+            cert.delete()
+
+    def test_prevent_certificate_delete(self):
+        UserCertificateManager.add_keycontainer(Paths.X509_rsa_ca_der.read())
+        cert = UserCertificate.objects.get(pk=2)
+        cert.delete()
+
 
 
 class TestCert:
