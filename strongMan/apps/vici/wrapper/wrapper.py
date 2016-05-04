@@ -1,7 +1,7 @@
 import socket
+import vici
 from collections import OrderedDict
 from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException
-from strongMan.apps.vici import vici
 
 
 class ViciWrapper:
@@ -156,15 +156,15 @@ class ViciWrapper:
         :param connection_name:
         :type connection_name: str
         '''
-        ike = OrderedDict(ike=connection_name)
+        sa = OrderedDict(ike=connection_name)
         try:
-            logs = self.session.terminate(ike)
-            report = []
+            logs = self.session.terminate(sa)
             for log in logs:
-                report.append(log)
+                level = log['level'].decode('ascii')
+                message = log['msg'].decode('ascii')
+                yield OrderedDict(level=level, message=message)
         except Exception as e:
             raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
-        return report
 
 
     def get_connection_state(self, connection_name):

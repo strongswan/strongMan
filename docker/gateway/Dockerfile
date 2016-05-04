@@ -31,7 +31,9 @@ RUN mkdir /opt/strongSwan \
 && pip install --upgrade pip \
 && pip install -r requirements.txt \
 && cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/swanctl/* /etc/swanctl/ \
-&& cp /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/ipsec.secrets /etc/
+&& cp /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/ipsec.secrets /etc/ \
+&& cd /strongswan-$STRONGSWAN_VERSION/src/libcharon/plugins/vici/python/ \
+&& python setup.py install
 
 ADD swanctl.conf /etc/swanctl/swanctl.conf
 ADD strongswan.conf /etc/strongswan.conf

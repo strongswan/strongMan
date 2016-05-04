@@ -21,7 +21,7 @@
         <div id="con-table">
             {% if table %}
                 <div class="col-xs-12">
-                    {% render_table table 'certificates/widgets/table.html' %}
+                    {% render_table table 'connections/widgets/table.html' %}
                 </div>
             {% else %}
                 <h3 id="no_certs_to_show">No connections to show</h3>
@@ -44,5 +44,5 @@
             </div>
         </div>
     </div>
-
+    <script type="text/javascript"> $(function() {logger('{{ csrf_token }}');});</script>
 {% endblock %}

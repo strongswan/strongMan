@@ -11,7 +11,6 @@ function handler(event) {
         url: '/connections/toggle/' // the file to call
     });
     lock(connectionId, this.csrfmiddlewaretoken.value);
-    logger(connectionId, this.csrfmiddlewaretoken.value);
     return false;
 }
 
@@ -47,10 +46,12 @@ function getState(connectionId, csrf) {
                     case 'ESTABLISHED':
                         $('#toggle_input' + response.id).bootstrapToggle('on');
                         unlock(response.id);
+                        showConnectionInfoRow(response.id, csrf);
                         break;
                     default:
                         $('#toggle_input' + response.id).bootstrapToggle('off');
                         unlock(response.id);
+                        hideConnectionInfoRow(response.id);
                         break;
                 }
             } else {
@@ -67,29 +68,37 @@ function setAlert(response) {
         '<strong>' + response.message + '</strong></div>');
 }
 
-function logger(connectionId, csrf) {
-    $.ajax({ // create an AJAX call...
-        data: {'csrfmiddlewaretoken': csrf},
-        type: 'POST', // GET or POST
-        url: '/connections/log/' + connectionId + '/', // the file to call
-        success: function (response) { // on success..
-            if (response.has_log) {
-                if (response.level == "1") {
-                    setTimeout(function () {
-                        logger(connectionId, csrf)
-                    }, 200);
-                }
-                addRowToLog(response)
-            } else {
+
+function setConnectionInfo(connectionId, csrf) {
+    $.ajax({
+        data: {'csrfmiddlewaretoken': csrf, 'id': connectionId},
+        type: 'POST',
+        url: '/connections/info/',
+        success: function (response) {
+            if (response.success) {
+                fillConnectionInfo(connectionId, response.child);
                 setTimeout(function () {
-                    logger(connectionId, csrf)
-                }, 1000);
+                    setConnectionInfo(connectionId, csrf)
+                }, 10000);
             }
         }
     });
 }
 
-function addRowToLog(log) {
-    $('#log_table tbody').append('<tr class="child"><td>' + log.timestamp + '</td><td>' + log.name + '</td><td>' + log.message + '</td></tr>');
-    $('#div-table-content').scrollTop($('#log_table').height());
+function fillConnectionInfo(id, child) {
+    $('#local-ts-' + id).text(child.local_ts);
+    $('#remote-ts-' + id).text(child.remote_ts);
+    $('#packets-in-' + id).text(child.packets_in);
+    $('#packets-out-' + id).text(child.packets_out);
+    $('#bytes-out-' + id).text(child.bytes_out);
+    $('#bytes-in-' + id).text(child.bytes_in);
+}
+
+function showConnectionInfoRow(id, csrf) {
+    setConnectionInfo(id, csrf);
+    $('#connection-info-row-' + id).toggle(true)
+}
+
+function hideConnectionInfoRow(id) {
+    $('#connection-info-row-' + id).toggle(false)
 }

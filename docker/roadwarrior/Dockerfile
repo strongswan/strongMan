@@ -29,7 +29,9 @@ RUN mkdir /opt/strongSwan \
 && git clone https://github.com/Sebubu/strongMan.git \
 && cd strongMan \
 && pip install --upgrade pip \
-&& pip install -r requirements.txt
+&& pip install -r requirements.txt \
+&& cd /strongswan-$STRONGSWAN_VERSION/src/libcharon/plugins/vici/python/ \
+&& python setup.py install
 
 ADD strongswan.conf /etc/strongswan.conf
 
