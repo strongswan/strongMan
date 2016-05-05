@@ -14,6 +14,7 @@
     <form action="" method="post">
         {% csrf_token %}
         <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <input type="hidden" name="connection_id" value="{{ connection.pk }}"/>
         <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
         <div class="row">
             <p class="col-xs-12">Name your connection thus you rereconized it and type in the server.</p>
