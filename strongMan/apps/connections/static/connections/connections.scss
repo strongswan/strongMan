@@ -3,8 +3,8 @@
   .popover {
     max-width: 300px;
   }
-  .question{
-    font-size:1em;
+  .question {
+    font-size: 1em;
     vertical-align: middle;
     text-align: center;
     color: #333;
@@ -17,7 +17,7 @@
   }
 
   #log {
-    margin-top:100px;
+    margin-top: 100px;
 
     #log-content {
       overflow: scroll;
@@ -28,17 +28,23 @@
   }
 
   .table-container {
-    .connection-info-row div{
+    .connection-info-row div {
       display: inline-block;
     }
-    td a.profilelink {
-      display: block;
-      padding: 5px;
+    table {
+      td {
+        padding-left: 5px;
+      }
+      td a.profilelink {
+        display: block;
+        padding: 5px;
+      }
+      td .namelink {
+        display: block;
+        padding: 2px;
+      }
     }
-    td .namelink {
-      display: block;
-      padding: 2px;
-    }
+
     .glyphicon.spinning {
       animation: spin 1s infinite linear;
       -webkit-animation: spin2 1s infinite linear;
@@ -73,13 +79,40 @@
       border-radius: 4px;
       color: #c09853;
     }
+    .connection-info-span {
+      padding-top: 0px;
+
+    }
+    .connection-info {
+      width: 100%;
+      border-top: None;
+      margin-bottom: 20px;
+      .fa-rotate-180 {
+        $degree: 180deg;
+        -webkit-transform: rotate($degree);
+        -moz-transform: rotate($degree);
+        -ms-transform: rotate($degree);
+        -o-transform: rotate($degree);
+        transform: rotate($degree);
+      }
+      .panel-body {
+        width: 100%;
+      }
+      .panel-footer {
+        text-align: center;
+        color: #214321;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+      }
+    }
 
   }
 }
 
-#ConnectionForm{
-  input, .bootstrap-select{
+#ConnectionForm {
+  input, .bootstrap-select {
     margin-bottom: 10px;
   }
 }
+
 

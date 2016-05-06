@@ -19,10 +19,12 @@
     font-size: 80%; }
 #connection-overview .table-container .connection-info-row div {
   display: inline-block; }
-#connection-overview .table-container td a.profilelink {
+#connection-overview .table-container table td {
+  padding-left: 5px; }
+#connection-overview .table-container table td a.profilelink {
   display: block;
   padding: 5px; }
-#connection-overview .table-container td .namelink {
+#connection-overview .table-container table td .namelink {
   display: block;
   padding: 2px; }
 #connection-overview .table-container .glyphicon.spinning {
@@ -48,6 +50,25 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
   color: #c09853; }
+#connection-overview .table-container .connection-info-span {
+  padding-top: 0px; }
+#connection-overview .table-container .connection-info {
+  width: 100%;
+  border-top: None;
+  margin-bottom: 20px; }
+  #connection-overview .table-container .connection-info .fa-rotate-180 {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg); }
+  #connection-overview .table-container .connection-info .panel-body {
+    width: 100%; }
+  #connection-overview .table-container .connection-info .panel-footer {
+    text-align: center;
+    color: #214321;
+    background-color: #dff0d8;
+    border-color: #d6e9c6; }
 
 #ConnectionForm input, #ConnectionForm .bootstrap-select {
   margin-bottom: 10px; }

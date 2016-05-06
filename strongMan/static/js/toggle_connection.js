@@ -96,9 +96,12 @@ function fillConnectionInfo(id, child) {
 
 function showConnectionInfoRow(id, csrf) {
     setConnectionInfo(id, csrf);
-    $('#connection-info-row-' + id).toggle(true)
+    $('#connection-info-row-' + id).toggle(true);
+    $('#connection-row-' + id).addClass("success");
+
 }
 
 function hideConnectionInfoRow(id) {
-    $('#connection-info-row-' + id).toggle(false)
+    $('#connection-info-row-' + id).toggle(false);
+    $('#connection-row-' + id).removeClass("success");
 }
