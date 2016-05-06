@@ -5,6 +5,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from strongMan.apps.connections.models import Connection, IKEv2Certificate
 from strongMan.apps.certificates.models.certificates import Certificate
+from django.core.urlresolvers import reverse
 
 
 class ConnectionViewTest(TestCase):
@@ -123,6 +124,16 @@ class ConnectionViewTest(TestCase):
         self.client.post(url)
         self.assertEquals(0, Connection.objects.count())
 
+    def test_identities_ajax(self):
+        url = reverse("connections:identities")
+        response = self.client.post(url, {"certififcate_id": 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,"hsr.ch")
+
+    def test_identities_ajax_wrong_id(self):
+        url = reverse("connections:identities")
+        response = self.client.post(url, {"certififcate_id": -1})
+        self.assertNotEqual(response.status_code, 200)
 
 class TestCert:
     def __init__(self, path):

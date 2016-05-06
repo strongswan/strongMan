@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'log/$', views.get_log, name='connection_log'),
     url(r'toggle/$', views.toggle_connection, name='connection_toggle'),
     url(r'info/$', views.get_sa_info, name='connection_info'),
+    url(r'identities/$', views.get_identities, name='identities'),
 ]

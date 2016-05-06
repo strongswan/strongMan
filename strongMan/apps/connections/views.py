@@ -10,6 +10,7 @@ from .request_handler.ToggleHandler import ToggleHandler
 from .request_handler.StateHandler import StateHandler
 from .request_handler.LogHandler import LogHandler
 from .request_handler.SaInfoHandler import SaInfoHandler
+from .request_handler.IdentitiesHandler import IdentitiesHandler
 
 @require_http_methods('GET')
 @login_required
@@ -61,6 +62,12 @@ def get_log(request):
 @require_http_methods('POST')
 def get_sa_info(request):
     handler = SaInfoHandler(request)
+    return handler.handle()
+
+@login_required
+@require_http_methods('POST')
+def get_identities(request):
+    handler = IdentitiesHandler(request)
     return handler.handle()
 
 
