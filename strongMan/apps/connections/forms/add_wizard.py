@@ -6,7 +6,7 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
 from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
     IKEv2CertificateEAP, Child, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
-    EapTlsAuthentication
+    EapTlsAuthentication, Connection
 
 class AbstractConForm(forms.Form):
     refresh_choices = forms.CharField(max_length=10, required=False)
@@ -50,6 +50,7 @@ class ChooseTypeForm(AbstractConForm):
 
 
 class ConnectionForm(AbstractConForm):
+    connection_id = forms.IntegerField(required=False)
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
     certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate", required=True)
@@ -66,6 +67,16 @@ class ConnectionForm(AbstractConForm):
             raise forms.ValidationError("This field is required!")
         else:
             return identity_ca
+
+    def clean_profile(self):
+        profile = self.cleaned_data['profile']
+        id = self.cleaned_data['connection_id']
+        if id is not None:
+            if Connection.objects.filter(profile=profile).exclude(pk=id).exists():
+                raise forms.ValidationError("Connection with same name already exists!")
+        elif Connection.objects.filter(profile=profile).exists():
+            raise forms.ValidationError("Connection with same name already exists!")
+        return profile
 
     def __init__(self, *args, **kwargs):
         super(ConnectionForm, self).__init__(*args, **kwargs)
@@ -236,7 +247,6 @@ class Ike2EapForm(ConnectionForm):
     @property
     def template(self):
         return "connections/forms/Ike2EAP.html"
-
 
 class Ike2EapCertificateForm(ConnectionForm):
     username = forms.CharField(max_length=50, initial="")
