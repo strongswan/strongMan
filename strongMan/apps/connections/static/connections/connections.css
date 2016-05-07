@@ -10,13 +10,19 @@
 
 #connection-overview #add {
   margin-bottom: 10px; }
-#connection-overview #log {
+#connection-overview #log_panel {
   margin-top: 100px; }
-  #connection-overview #log #log-content {
-    overflow: scroll;
-    overflow: auto;
-    height: 100px;
-    font-size: 80%; }
+#connection-overview #log #log-content {
+  overflow: scroll;
+  overflow: auto;
+  height: 110px; }
+  #connection-overview #log #log-content .child td {
+    padding: 4px;
+    font-size: 10px; }
+  #connection-overview #log #log-content .child .timestamp {
+    min-width: 105px; }
+  #connection-overview #log #log-content .child .con_name {
+    min-width: 55px; }
 #connection-overview .table-container .connection-info-row div {
   display: inline-block; }
 #connection-overview .table-container table td {

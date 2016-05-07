@@ -36,7 +36,7 @@
                placeholder="Hostname or IP" {% if identity.value %}value="{{ identity.value }}"{% else %}value=""{% endif %}/>
         {% include "connections/forms/../widgets/errormsg.html" with field=identity %}
     </div>
-    <div class="col-sm-1 col-xs-2">
+    <div class="col-sm-1 col-xs-2" id="{{ identity.name }}_questionpopover">
         {% include "connections/widgets/QuestionPopover.html" with title="CA identity help" content="Enter the server identity either as a fqdn like 'vpn.myenterprise.com' or as a ip like '213.56.143.8'. The ca identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
     </div>
 </div>
@@ -45,14 +45,17 @@
     //Take the server as identity if checked
     var checkbox = $("#{{ is_server_identity.name }}");
     var identity = $("#{{ identity.name }}");
+    var questionPopover = $("#{{ identity.name }}_questionpopover");
 
     function check_identity_ca_disable(){
         var checked = checkbox.is(':checked');
         identity.prop('disabled', checked);
         if(checked){
             identity.hide();
+            questionPopover.hide();
         } else {
             identity.show();
+            questionPopover.show();
         }
     }
 
