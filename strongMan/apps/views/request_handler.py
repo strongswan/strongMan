@@ -2,12 +2,11 @@ from collections import OrderedDict
 
 from django.contrib import messages
 from django.shortcuts import render
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login, authenticate
 
 from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from .forms import PasswordChangeForm
+from strongMan.apps.forms import PasswordChangeForm
 
 
 class AboutHandler:
@@ -16,7 +15,6 @@ class AboutHandler:
 
     def _render_page(self, form=PasswordChangeForm()):
         context = OrderedDict()
-
         try:
             vici_wrapper = ViciWrapper()
             context = vici_wrapper.get_version()

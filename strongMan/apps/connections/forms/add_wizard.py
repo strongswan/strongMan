@@ -91,13 +91,12 @@ class ConnectionForm(AbstractConForm):
         local = connection.local.first().subclass()
         self.initial['certificate_ca'] = local.ca_cert.pk
         self.initial['identity_ca'] = local.ca_identity
-        if local.ca_identity == gateway:
-            self.initial["is_server_identity"] = True
+        self.initial["is_server_identity"] = local.ca_identity == gateway
 
     def create_connection(self):
         raise NotImplementedError
 
-    def update_connection(self):
+    def update_connection(self, pk):
         raise NotImplementedError
 
     def model(self):
@@ -194,6 +193,7 @@ class Ike2CertificateForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
+
 
     @property
     def model(self):

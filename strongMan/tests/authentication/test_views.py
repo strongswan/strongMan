@@ -1,8 +1,7 @@
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
 
-from strongMan.apps.request_handler import PwChangeHandler
+from strongMan.apps.views import PwChangeHandler
 
 
 class AuthenticationViewsTests(TestCase):

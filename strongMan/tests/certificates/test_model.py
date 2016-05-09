@@ -4,12 +4,10 @@ import pickle
 from django.test import TestCase, RequestFactory
 
 from strongMan.apps.certificates.container_reader import X509Reader
-from strongMan.apps.certificates.models import Certificate, DistinguishedName, CertificateFactory, \
-    UserCertificate, ViciCertificate, TextIdentity, DnIdentity
 from strongMan.apps.certificates.models.certificates import PrivateKey, DistinguishedName, Certificate, UserCertificate, \
     ViciCertificate, CertificateFactory
 from strongMan.apps.certificates.models.identities import AbstractIdentity, TextIdentity, DnIdentity
-from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.views import AddHandler
 
 
 class CreateRequest:
