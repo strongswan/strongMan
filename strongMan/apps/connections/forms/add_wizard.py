@@ -244,6 +244,7 @@ class Ike2EapForm(ConnectionForm):
     def template(self):
         return "connections/forms/Ike2EAP.html"
 
+
 class Ike2EapCertificateForm(ConnectionForm):
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, initial="")

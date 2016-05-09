@@ -16,26 +16,33 @@
     margin-bottom: 10px;
   }
 
-  #log_panel{
-        margin-top: 100px;
+  #log_panel {
+    margin-top: 100px;
+    .panel-body {
+      padding: 0px;
+      padding-left: 5px
+    }
   }
+
   #log {
     #log-content {
       overflow: scroll;
       overflow: auto;
-      height: 110px;
+      height: 150px;
       .child {
-        td{
-          padding:4px;
+        td {
+          padding: 4px;
           font-size: 10px;
+          p {
+            margin: 0px;
+          }
         }
-        .timestamp{
+        .timestamp {
           min-width: 105px;
         }
-        .con_name{
+        .con_name {
           min-width: 55px;
         }
-
       }
     }
   }
@@ -46,7 +53,7 @@
       display: inline-block;
     }
     table {
-      .success td{
+      .success td {
         background-color: $success-green;
       }
       td {
