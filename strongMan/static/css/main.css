@@ -1,12 +1,15 @@
 @font-face {
-  font-family: Ubuntu;
-  src: url(static/fonts/Ubuntu-Regular.ttf); }
+  font-family: 'strongUbuntu';
+  src: url("../../static/fonts/Ubuntu-Regular.eot");
+  /* IE9 Compat Modes */
+  src: url("../../static/fonts/Ubuntu-Regular.eot?#iefix") format("embedded-opentype"), url("../../static/fonts/Ubuntu-Regular.woff") format("woff"), url("../../static/fonts/Ubuntu-Regular.ttf") format("truetype"), url("../../static/fonts/Ubuntu-Regular.svg#svgFontName") format("svg");
+  /* Legacy iOS */ }
 html {
   height: 100%; }
   html body {
     padding-top: 20px;
     height: 100%;
-    font-family: 'Ubuntu', sans-serif; }
+    font-family: 'strongUbuntu', sans-serif; }
     html body .container {
       height: 100%; }
 

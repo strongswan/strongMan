@@ -3,8 +3,12 @@ $nav-font-color-hover: #bababa;
 $nav-font-color: #EDEDED;
 
 @font-face {
-    font-family: Ubuntu;
-    src: url(static/fonts/Ubuntu-Regular.ttf);
+  font-family: 'strongUbuntu';
+  src: url('../../static/fonts/Ubuntu-Regular.eot'); /* IE9 Compat Modes */
+  src: url('../../static/fonts/Ubuntu-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../../static/fonts/Ubuntu-Regular.woff') format('woff'), /* Pretty Modern Browsers */
+       url('../../static/fonts/Ubuntu-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../../static/fonts/Ubuntu-Regular.svg#svgFontName') format('svg'); /* Legacy iOS */
 }
 
 html {
@@ -12,7 +16,7 @@ html {
   body {
     padding-top: 20px;
     height: 100%;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'strongUbuntu', sans-serif;
     .container{
       height: 100%;
     }
