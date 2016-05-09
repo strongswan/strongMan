@@ -1,8 +1,11 @@
 import os
 from collections import OrderedDict
 from django.test import TestCase
-from strongMan.apps.connections.models import Connection, Proposal, Authentication, Child, Secret, Address, \
+from strongMan.apps.connections.models import Proposal, Secret, Address, \
     CertificateAuthentication, EapAuthentication, IKEv2EAP
+from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
+from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication
+from strongMan.apps.connections.models.connections import Connection, IKEv2EAP
 from strongMan.apps.certificates.models import Certificate, UserCertificate, CertificateDoNotDelete
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager

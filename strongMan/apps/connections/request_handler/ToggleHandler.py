@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
-from ..models import Connection, State
+from strongMan.apps.connections.models.connections import Connection
+from strongMan.apps.connections.models.common import State
 
 
 class ToggleHandler:

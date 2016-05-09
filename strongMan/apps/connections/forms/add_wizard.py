@@ -4,9 +4,15 @@ from django import forms
 
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
-from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
-    IKEv2CertificateEAP, Child, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
-    EapTlsAuthentication, Connection
+from strongMan.apps.connections.models import IKEv2Certificate, Address, IKEv2EAP, Secret, \
+    IKEv2CertificateEAP, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
+    EapTlsAuthentication
+from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
+from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication, \
+    EapTlsAuthentication
+from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
+    IKEv2EapTls
+
 
 class AbstractConForm(forms.Form):
     refresh_choices = forms.CharField(max_length=10, required=False)

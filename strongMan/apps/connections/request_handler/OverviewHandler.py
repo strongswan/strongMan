@@ -2,7 +2,9 @@ from django.contrib import messages
 from django.shortcuts import render
 from django_tables2 import RequestConfig
 
-from ..models import Connection, Address, State
+from strongMan.apps.connections.models.specific import Address
+from strongMan.apps.connections.models.connections import Connection
+from strongMan.apps.connections.models.common import State
 from .. import models
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin, ViciSocketException

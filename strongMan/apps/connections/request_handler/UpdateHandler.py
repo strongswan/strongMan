@@ -1,4 +1,4 @@
-from ..models import Connection
+from strongMan.apps.connections.models.connections import Connection
 from .. import forms
 from django.shortcuts import render, redirect
 from django.contrib import messages

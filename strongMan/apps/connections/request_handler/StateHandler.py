@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from strongMan.apps.vici.wrapper.exception import ViciExceptoin
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
-from ..models import Connection
+from strongMan.apps.connections.models.connections import Connection
 
 
 class StateHandler:
