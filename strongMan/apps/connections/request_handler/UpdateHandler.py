@@ -13,6 +13,12 @@ class UpdateHandler:
     def connection(self):
         return Connection.objects.get(pk=self.id).subclass()
 
+    @property
+    def parameter_dict(self):
+        parameters = self.request.POST.copy()
+        parameters['connection_id'] = self.id
+        return parameters
+
     def _render(self, form=None):
         if form is None:
             form = forms.add_wizard.ConnectionForm().subclass(self.connection)
@@ -24,7 +30,7 @@ class UpdateHandler:
         Intiates and validates the Abstract form
         :return Valid abstract form
         '''
-        form = forms.AbstractConForm(self.request.POST)
+        form = forms.AbstractConForm(self.parameter_dict)
         if not form.is_valid():
             raise Exception("No valid form detected." + str(form.errors))
         return form
@@ -36,12 +42,7 @@ class UpdateHandler:
             abstract_form = self._abstract_form()
             form_class = abstract_form.current_form_class
 
-            if abstract_form.refresh_choices_requested:
-                form = form_class(initial=self.request.POST)
-                form.update_certificates()
-                return self._render(form)
-
-            form = form_class(self.request.POST)
+            form = form_class(self.parameter_dict)
             form.update_certificates()
             if not form.is_valid():
                 return self._render(form)

@@ -13,10 +13,6 @@ class AbstractConForm(forms.Form):
     current_form = forms.CharField(max_length=100, required=True)
 
     @property
-    def refresh_choices_requested(self):
-        return self.cleaned_data["refresh_choices"].lower() == "true"
-
-    @property
     def current_form_class(self):
         current_form_name = self.cleaned_data["current_form"]
         return getattr(sys.modules[__name__], current_form_name)
