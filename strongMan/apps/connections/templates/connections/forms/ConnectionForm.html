@@ -45,7 +45,7 @@
         <div class="pull-right">
             {% if connection %}
                 <span title="Remove connection">
-                <a href="{% url 'connections:connection_delete' connection.id %}"
+                <a href="{% url 'connections:delete' connection.id %}"
                    id="delete-{{ connection.id }}"
                    class="btn btn-default white-background black remove-btn">
                     <span class="glyphicon glyphicon-remove"></span> <span
