@@ -4,8 +4,10 @@ function logger(csrf, logId) {
         data: {'csrfmiddlewaretoken': csrf, 'id': logId},
         type: 'POST',
         url: '/connections/log/',
-        error: function () {
-            logger(csrf);
+        error: function (jqXHR, textStatus) {
+            if (textStatus === 'timeout') {
+                logger(csrf);
+            }
         },
         success: function (response) {
             last_log = -1;
@@ -25,7 +27,7 @@ function addRowToLog(log) {
 
 $(document).ready(function () {
     $('#log_panel').on('shown.bs.collapse', function () {
-            $('#log-content').scrollTop($('#log_table').height());
+        $('#log-content').scrollTop($('#log_table').height());
     });
 });
 
