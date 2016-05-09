@@ -1,16 +1,17 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib import messages
+
 from .request_handler import AboutHandler, PwChangeHandler
+
 
 @login_required
 @require_http_methods(['GET', 'POST'])
 def index(request):
     return render(request, 'index.html')
+
 
 @require_http_methods(('GET', 'POST'))
 def login(request):

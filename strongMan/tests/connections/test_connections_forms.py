@@ -1,6 +1,5 @@
 import os
 from django.test import TestCase
-from django.http import QueryDict
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.connections.forms.add_wizard import ChooseTypeForm, Ike2CertificateForm, Ike2EapForm, \
     Ike2EapCertificateForm

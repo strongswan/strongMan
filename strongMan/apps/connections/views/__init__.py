@@ -2,15 +2,15 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
 
-from .request_handler.CreateHandler import AddHandler
-from .request_handler.UpdateHandler import UpdateHandler
-from .request_handler.OverviewHandler import OverviewHandler
-from .request_handler.DeleteHandler import DeleteHandler
-from .request_handler.ToggleHandler import ToggleHandler
-from .request_handler.StateHandler import StateHandler
-from .request_handler.LogHandler import LogHandler
-from .request_handler.SaInfoHandler import SaInfoHandler
-from .request_handler.IdentitiesHandler import IdentitiesHandler
+from .CreateHandler import AddHandler
+from .UpdateHandler import UpdateHandler
+from .OverviewHandler import OverviewHandler
+from .DeleteHandler import DeleteHandler
+from .ToggleHandler import ToggleHandler
+from .StateHandler import StateHandler
+from .LogHandler import LogHandler
+from .SaInfoHandler import SaInfoHandler
+from .IdentitiesHandler import IdentitiesHandler
 
 @require_http_methods('GET')
 @login_required

@@ -4,9 +4,15 @@ from django import forms
 
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
-from strongMan.apps.connections.models import IKEv2Certificate, Address, Authentication, IKEv2EAP, Secret, \
-    IKEv2CertificateEAP, Child, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
-    EapTlsAuthentication, Connection
+from strongMan.apps.connections.models import IKEv2Certificate, Address, IKEv2EAP, Secret, \
+    IKEv2CertificateEAP, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
+    EapTlsAuthentication
+from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
+from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication, \
+    EapTlsAuthentication
+from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
+    IKEv2EapTls
+
 
 class AbstractConForm(forms.Form):
     refresh_choices = forms.CharField(max_length=10, required=False)
@@ -85,13 +91,12 @@ class ConnectionForm(AbstractConForm):
         local = connection.local.first().subclass()
         self.initial['certificate_ca'] = local.ca_cert.pk
         self.initial['identity_ca'] = local.ca_identity
-        if local.ca_identity == gateway:
-            self.initial["is_server_identity"] = True
+        self.initial["is_server_identity"] = local.ca_identity == gateway
 
     def create_connection(self):
         raise NotImplementedError
 
-    def update_connection(self):
+    def update_connection(self, pk):
         raise NotImplementedError
 
     def model(self):
@@ -188,6 +193,7 @@ class Ike2CertificateForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
+
 
     @property
     def model(self):

@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from django.http import JsonResponse
 
-from ..models import LogMessage
+from strongMan.apps.connections.models.specific import LogMessage
 
 
 class LogHandler:

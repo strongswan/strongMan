@@ -203,7 +203,7 @@ class ViciWrapper:
                 OrderedDict([('uniqueid', b'2'),
                     ('reqid', b'2'),
                     ('state', b'INSTALLED'),
-                    ('mode', b'TUNNEL'),
+                    ('models', b'TUNNEL'),
                     ('protocol', b'ESP'),
                     ('spi-in', b'c46d302e'),
                     ('spi-out', b'c2125947'),

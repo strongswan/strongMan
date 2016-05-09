@@ -3,7 +3,8 @@ from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates.services import UserCertificateManager
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from strongMan.apps.connections.models import Connection, IKEv2Certificate
+from strongMan.apps.connections.models import IKEv2Certificate
+from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate
 from strongMan.apps.certificates.models.certificates import Certificate
 from django.core.urlresolvers import reverse
 

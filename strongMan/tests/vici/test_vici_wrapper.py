@@ -1,7 +1,9 @@
 from django.test import TestCase
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciSocketException
-from strongMan.apps.connections.models import Authentication, Connection, Secret
+from strongMan.apps.connections.models.specific import Secret
+from strongMan.apps.connections.models.authentication import Authentication
+from strongMan.apps.connections.models.connections import Connection
 
 
 class ViciWrapperTest(TestCase):

@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory, Client
 
 from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
-from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.views import AddHandler
 
 
 class TestCert:

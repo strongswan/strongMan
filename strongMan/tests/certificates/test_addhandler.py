@@ -1,10 +1,8 @@
 import os
 
 from django.test import TestCase, RequestFactory
-
-from strongMan.apps.certificates.models import Certificate
 from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
-from strongMan.apps.certificates.request_handler.AddHandler import AddHandler
+from strongMan.apps.certificates.views import AddHandler
 
 
 def create_request(page, context):
