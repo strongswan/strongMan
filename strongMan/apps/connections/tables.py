@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 class ConnectionTable(tables.Table):
     name = tables.Column(accessor="profile", verbose_name='Name')
     gateway = tables.Column(accessor="remote_addresses.first.value", verbose_name="Gateway", orderable=False)
-    typ = tables.Column(accessor="subclass.get_typ", verbose_name="Typ", orderable=False)
+    typ = tables.Column(accessor="subclass.choice_name", verbose_name="Typ", orderable=False)
     state = tables.Column(accessor="state", verbose_name="State", attrs={'th': {'class': "text-right"}, 'td': {'class': "text-right"}})
 
     def __init__(self, *args, **kwargs):
@@ -18,4 +18,4 @@ class ConnectionTable(tables.Table):
         return render_to_string('connections/widgets/state_column.html', {'record': record}, request=self.request)
 
     class Meta:
-        attrs = {"class": "table table-striped"}
+        attrs = {"class": "table"}

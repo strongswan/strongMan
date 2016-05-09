@@ -24,39 +24,74 @@
                 <tbody>
                 {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
                     {% block table.tbody.row %}
-                        <tr class="{% cycle 'even' 'odd' %}">
+                        <tr class="{% cycle 'even' 'odd' %} connection-row" id="connection-row-{{ row.record.id }}">
                             {% for column, cell in row.items %}
                                 <td {{ column.attrs.td.as_html }}>
                                     {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}
                                         {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
                             {% endfor %}
                         </tr>
-                        <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row"
+                        <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row {{ cyclename }}"
                             style="display: none;">
-                            <td colspan="4">
-                                <div class="col-xs-6">
-                                    Local traffic selectors:
-                                    <div id="local-ts-{{ row.record.id }}"></div>
-                                </div>
-                                <div class="col-xs-6">
-                                    Remote traffic selectors:
-                                    <div id="remote-ts-{{ row.record.id }}"></div>
-                                </div>
-                                <div class="col-xs-6">
-                                    Trafic in:
-                                    <div id="packets-in-{{ row.record.id }}"></div>
-                                    Packets totaling
-                                    <div id="bytes-in-{{ row.record.id }}"></div>
-                                    Bytes
-                                </div>
-                                <div class="col-xs-6">
-                                    Trafic out:
-                                    <div id="packets-out-{{ row.record.id }}"></div>
-                                    Packets totaling
-                                    <div id="bytes-out-{{ row.record.id }}"></div>
-                                    Bytes
+
+                            <td colspan="4" class="connection-info-span">
+                                <div class="panel panel-default connection-info">
+                                    <div class="panel-body">
+                                        <div class="col-sm-6">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <i class="fa fa-desktop" aria-hidden="True"></i>
+                                                        Local selectors:
+                                                    </td>
+                                                    <td id="local-ts-{{ row.record.id }}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="min-width: 140px;">
+                                                        <i class="fa fa-server" aria-hidden="true"></i>
+                                                        Remote selectors:
+                                                    </td>
+                                                    <td id="remote-ts-{{ row.record.id }}">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                                                        In:
+                                                    </td>
+                                                    <td>
+                                                        <div id="packets-in-{{ row.record.id }}"></div>
+                                                        Packets totaling
+                                                        <div id="bytes-in-{{ row.record.id }}"></div>
+                                                        Bytes
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="min-width: 50px;">
+                                                       <i class="fa fa-arrow-right" aria-hidden="true"></i> Out:
+                                                    </td>
+                                                    <td>
+                                                        <div id="packets-out-{{ row.record.id }}"></div>
+                                                        Packets totaling
+                                                        <div id="bytes-out-{{ row.record.id }}"></div>
+                                                        Bytes
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer" style="width:100%;background-color: #dff0d8;">
+                                        <i class="fa fa-exchange" aria-hidden="true"></i> Traffic
+                                    </div>
+
                                 </div>
                             </td>
+
                         </tr>
                     {% endblock table.tbody.row %}
                     {% empty %}
