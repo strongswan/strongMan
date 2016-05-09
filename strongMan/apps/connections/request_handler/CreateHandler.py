@@ -27,11 +27,6 @@ class AddHandler:
             abstract_form = self._abstract_form()
             form_class = abstract_form.current_form_class
 
-            if abstract_form.refresh_choices_requested:
-                form = form_class(initial=self.request.POST)
-                form.update_certificates()
-                return self._render(form)
-
             form = form_class(self.request.POST)
             form.update_certificates()
             if not form.is_valid():

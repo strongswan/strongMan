@@ -12,19 +12,26 @@
   margin-bottom: 10px; }
 #connection-overview #log_panel {
   margin-top: 100px; }
+  #connection-overview #log_panel .panel-body {
+    padding: 0px;
+    padding-left: 5px; }
 #connection-overview #log #log-content {
   overflow: scroll;
   overflow: auto;
-  height: 110px; }
+  height: 150px; }
   #connection-overview #log #log-content .child td {
     padding: 4px;
     font-size: 10px; }
+    #connection-overview #log #log-content .child td p {
+      margin: 0px; }
   #connection-overview #log #log-content .child .timestamp {
     min-width: 105px; }
   #connection-overview #log #log-content .child .con_name {
     min-width: 55px; }
 #connection-overview .table-container .connection-info-row div {
   display: inline-block; }
+#connection-overview .table-container table .success td {
+  background-color: #dcf8c6; }
 #connection-overview .table-container table td {
   padding-left: 5px; }
 #connection-overview .table-container table td a.profilelink {
@@ -61,7 +68,9 @@
 #connection-overview .table-container .connection-info {
   width: 100%;
   border-top: None;
-  margin-bottom: 20px; }
+  margin-bottom: 20px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px; }
   #connection-overview .table-container .connection-info .fa-rotate-180 {
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
@@ -73,7 +82,7 @@
   #connection-overview .table-container .connection-info .panel-footer {
     text-align: center;
     color: #214321;
-    background-color: #dff0d8;
+    background-color: #dcf8c6;
     border-color: #d6e9c6; }
 
 #ConnectionForm input, #ConnectionForm .bootstrap-select {
