@@ -16,7 +16,7 @@
         <input type="hidden" name="current_form" value="{{ form|classname }}"/>
         <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
         <div class="row">
-            <p class="col-xs-12">Name your connection thus you rereconized it and type in the server.</p>
+            <p class="col-xs-12">Name your connection so you can recognize it and set the server.</p>
             <label class="control-label col-sm-3">Name</label>
             <div class="controls col-sm-8 col-xs-10">
                 <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
@@ -36,7 +36,7 @@
                 {% include "connections/forms/../widgets/errormsg.html" with field=form.gateway %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "connections/widgets/QuestionPopover.html" with title="Server help" content="The server is the opposite endpoint of the vpn connection. Enter either a fqdn like 'vpn.myenterprise.com' or a ip like '86.12.24.212'." %}
+                {% include "connections/widgets/QuestionPopover.html" with title="Server help" content="The server is the opposite endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
             </div>
         </div>
         <hr>
