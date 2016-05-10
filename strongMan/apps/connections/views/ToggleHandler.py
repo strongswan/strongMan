@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from strongMan.apps.vici.wrapper.exception import ViciExceptoin
+from strongMan.apps.vici.wrapper.exception import ViciException
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 from strongMan.apps.connections.models.connections import Connection
@@ -24,7 +24,7 @@ class ToggleHandler:
             elif state == State.CONNECTING.value:
                 connection.stop()
             response['success'] = True
-        except ViciExceptoin as e:
+        except ViciException as e:
             response['message'] = str(e)
         except Exception as e:
             print(e)
