@@ -1,0 +1,58 @@
+<div class="container" id="certificate-added">
+    <div class="row" id="nav-btn">
+        <div class="col-xs-12">
+            <div class="pull-right">
+                <div class="btn-group text-center" role="group" aria-label="...">
+                    {% if is_form %}
+                    <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
+                    {% else %}
+                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% if public %}
+            <div class="col-sm-6 col-md-6">
+                {% include "certificates/widgets/PublicKey_view.html" with x509=public %}
+            </div>
+        {% endif %}
+        {% if private %}
+            <div class="col-sm-6 col-md-6">
+                {% include "certificates/widgets/PrivateKey_view.html" with private=private %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if further_publics %}
+        <div class="row">
+            <h3>Further certificates</h3>
+            {% for fp in further_publics %}
+                <div class="col-sm-6 col-md-6">
+                    {% include "certificates/widgets/PublicKey_view.html" with x509=fp %}
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+    <div class="row" id="nav-btn">
+        <div class="col-xs-12">
+            <div class="pull-right">
+                <div class="btn-group text-center" role="group" aria-label="...">
+                    {% if is_form %}
+                    <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
+                    {% else %}
+                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

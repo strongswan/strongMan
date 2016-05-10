@@ -6,18 +6,30 @@ from ..services import UserCertificateManager
 
 
 class AddHandler:
-    def __init__(self):
+    def __init__(self, is_add_form=False):
         self.form = None
         self.request = None
+        self.is_add_form = is_add_form
 
     @classmethod
-    def by_request(cls, request):
-        handler = cls()
+    def by_request(cls, request, is_add_form=False):
+        handler = cls(is_add_form)
         handler.request = request
         return handler
 
-    def _render_upload_page(self):
-        return self.request, 'certificates/add.html', {"form": AddForm()}
+    def _render_upload_page(self, form=AddForm()):
+        if self.is_add_form:
+            return self.request, 'certificates/add_form.html', {"form": form}
+        else:
+            return self.request, 'certificates/add.html', {"form": form}
+
+    def _render_added_page(self, result):
+        context = {"private": result.privatekey, "public": result.certificate,
+                                                         "further_publics": result.further_certificates}
+        if self.is_add_form:
+            return self.request, 'certificates/added_form.html', context
+        else:
+            return self.request, 'certificates/added.html', context
 
     def handle(self):
         '''
@@ -28,7 +40,7 @@ class AddHandler:
         if not self.form.is_valid():
             messages.add_message(self.request, messages.ERROR,
                                  'No valid container detected. Maybe your container needs a password?')
-            return self.request, 'certificates/add.html', {"form": self.form}
+            return self._render_upload_page(form=self.form)
 
 
         try:
@@ -44,14 +56,13 @@ class AddHandler:
                 result.certificate = result.privatekey.certificates.all()[0]
 
 
-            return self.request, 'certificates/added.html', {"private": result.privatekey, "public": result.certificate,
-                                                             "further_publics": result.further_certificates}
+            return self._render_added_page(result)
 
         except (ValueError, TypeError, AsymmetricKeyError, OSError) as e:
             messages.add_message(self.request, messages.ERROR,
                                  "Error reading file. Maybe your file is corrupt?")
-            return self.request, 'certificates/add.html', {"form": self.form}
+            return self._render_upload_page(form=self.form)
         except Exception as e:
             messages.add_message(self.request, messages.ERROR,
                                  "Internal error: " + str(e))
-            return self.request, 'certificates/add.html', {"form": self.form}
+            return self._render_upload_page(form=self.form)

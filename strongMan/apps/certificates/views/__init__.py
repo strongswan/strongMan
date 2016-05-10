@@ -45,8 +45,17 @@ def add(request):
         (request, html, context) = handler.handle()
         return render(request, html, context)
     elif request.method == 'GET':
-        form = AddForm()
-        return render(request, 'certificates/add.html', {"form": form})
+        return render(request, 'certificates/add.html', {"form": AddForm()})
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def add_form(request):
+    if request.method == 'POST':
+        handler = AddHandler.by_request(request, True)
+        (request, html, context) = handler.handle()
+        return render(request, html, context)
+    elif request.method == 'GET':
+        return render(request, 'certificates/add_form.html', {"form": AddForm()})
 
 
 @login_required

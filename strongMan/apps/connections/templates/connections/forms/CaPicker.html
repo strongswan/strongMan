@@ -19,6 +19,11 @@
     <div class="col-sm-1 col-xs-2">
         {% include "connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the CA certificate." %}
     </div>
+    <div class="col-sm-11 col-xs-10">
+        <div class="pull-right">
+        <a data-toggle="modal" data-target="#AddCaCertificateModal">Upload new certificate</a>
+            </div>
+    </div>
 </div>
 <div class="row is_server_identity">
     <label class="control-label col-sm-3">{{ identity.label }}</label>
@@ -38,6 +43,24 @@
     </div>
     <div class="col-sm-1 col-xs-2" id="{{ identity.name }}_questionpopover">
         {% include "connections/widgets/QuestionPopover.html" with title="CA identity help" content="Enter the server identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. The CA identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
+    </div>
+</div>
+
+
+    <!-- Modal -->
+<div class="modal fade" id="AddCaCertificateModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Change your password</h4>
+            </div>
+            <div class="modal-body">
+                <iframe src="{% url "certificates:add_form" %}" style="width: 100%; height: 600px;"></iframe>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Finish</button>
+            </div>
+        </div>
     </div>
 </div>
 
