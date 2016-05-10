@@ -7,7 +7,7 @@ from strongMan.apps.connections.models.connections import Connection
 from strongMan.apps.connections.models.common import State
 from .. import models
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciExceptoin, ViciSocketException
+from strongMan.apps.vici.wrapper.exception import ViciException, ViciSocketException
 from ..tables import ConnectionTable
 
 
@@ -21,7 +21,7 @@ class OverviewHandler:
             self._set_connection_state()
         except ViciSocketException:
             pass
-        except ViciExceptoin as e:
+        except ViciException as e:
             messages.warning(self.request, str(e))
 
         return self._render()

@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
-from strongMan.apps.vici.wrapper.exception import ViciExceptoin
+from strongMan.apps.vici.wrapper.exception import ViciException
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 from strongMan.apps.connections.models.connections import Connection
@@ -19,7 +19,7 @@ class DeleteHandler:
             vici_wrapper = ViciWrapper()
             if vici_wrapper.is_connection_loaded(connection.profile) is True:
                 vici_wrapper.unload_connection(connection.profile)
-        except ViciExceptoin as e:
+        except ViciException as e:
             messages.warning(self.request, str(e))
         finally:
             profilname = connection.profile

@@ -1,14 +1,14 @@
-class ViciExceptoin(Exception):
+class ViciException(Exception):
     '''Vici Base Exception'''
 
-class ViciSocketException(ViciExceptoin):
+class ViciSocketException(ViciException):
      '''Raise when socket of vici can't connect'''
 
-class ViciLoadException(ViciExceptoin):
+class ViciLoadException(ViciException):
     '''Raise when load failes'''
 
-class ViciInitiateException(ViciExceptoin):
+class ViciInitiateException(ViciException):
     '''Raise when load failes'''
 
-class ViciTerminateException(ViciExceptoin):
+class ViciTerminateException(ViciException):
     '''Raise when load failes'''
