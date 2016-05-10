@@ -28,6 +28,18 @@ cd strongMan
 sudo pip3 install -r requirements.txt
 sudo ./migrate.sh -i python3
 ```
+
+### Installation of the vici python egg
+Actually it's relatively awkward to install the vici python egg.
+We are working on some improvements with pip. But the bash commands therefore are them:
+```bash
+git clone https://github.com/strongswan/strongswan.git
+cd /strongswan/src/libcharon/plugins/vici/python/
+git checkout vici-python-recv
+sudo python3 setup.py install
+```
+
+
 We have installed strongMan with all it's requirements and loaded a default user into the database.
 Let's run the server.
 ```bash
