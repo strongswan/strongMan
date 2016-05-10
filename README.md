@@ -30,7 +30,7 @@ sudo ./migrate.sh -i python3
 ```
 
 ### Installation of the vici python egg
-Actually it's relatively awkward to install the vici python egg.
+Currently it's relatively awkward to install the vici python egg.
 We are working on some improvements with pip. But the bash commands therefore are them:
 ```bash
 git clone -b vici-python-recv https://github.com/strongswan/strongswan.git
