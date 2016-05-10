@@ -11,6 +11,7 @@ from .StateHandler import StateHandler
 from .LogHandler import LogHandler
 from .SaInfoHandler import SaInfoHandler
 from .IdentitiesHandler import IdentitiesHandler
+from .CertificatePickerHandler import CertificatePickerHandler
 
 @require_http_methods('GET')
 @login_required
@@ -68,6 +69,12 @@ def get_sa_info(request):
 @require_http_methods('POST')
 def get_identities(request):
     handler = IdentitiesHandler(request)
+    return handler.handle()
+
+@login_required
+@require_http_methods(['POST', 'GET'])
+def get_certificatepicker(request):
+    handler = CertificatePickerHandler(request)
     return handler.handle()
 
 
