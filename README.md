@@ -33,10 +33,9 @@ sudo ./migrate.sh -i python3
 Actually it's relatively awkward to install the vici python egg.
 We are working on some improvements with pip. But the bash commands therefore are them:
 ```bash
-git clone https://github.com/strongswan/strongswan.git
-cd /strongswan/src/libcharon/plugins/vici/python/
-git checkout vici-python-recv
-sudo python3 setup.py install
+git clone -b vici-python-recv https://github.com/strongswan/strongswan.git
+cd ./strongswan/src/libcharon/plugins/vici/python/
+sudo python3 setup.py.in install
 ```
 
 
