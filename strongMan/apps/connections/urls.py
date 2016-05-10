@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'toggle/$', views.toggle_connection, name='toggle'),
     url(r'info/$', views.get_sa_info, name='info'),
     url(r'certificatepicker/$', views.get_certificatepicker, name='certificatepicker'),
+    url(r'capicker/$', views.get_capicker, name='capicker'),
 ]

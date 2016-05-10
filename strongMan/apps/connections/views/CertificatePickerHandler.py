@@ -28,5 +28,8 @@ class CertificatePickerHandler:
             return None
 
         id = self.request.POST["certififcate_id"]
+        if id == "-1" or id == '':
+            return None
+
         get_object_or_404(UserCertificate, pk=id)
         return id

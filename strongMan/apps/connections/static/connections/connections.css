@@ -85,7 +85,11 @@
     background-color: #dcf8c6;
     border-color: #d6e9c6; }
 
-#ConnectionForm input, #ConnectionForm .bootstrap-select {
+#ConnectionForm a {
+  cursor: pointer; }
+#ConnectionForm input, #ConnectionForm .identity_picker {
+  margin-bottom: 10px; }
+#ConnectionForm .cert_upload {
   margin-bottom: 10px; }
 
 /*# sourceMappingURL=connections.css.map */

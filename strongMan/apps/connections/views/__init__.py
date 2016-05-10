@@ -11,6 +11,7 @@ from .StateHandler import StateHandler
 from .LogHandler import LogHandler
 from .SaInfoHandler import SaInfoHandler
 from .CertificatePickerHandler import CertificatePickerHandler
+from .CaPickerHandler import CaPickerHandler
 
 @require_http_methods('GET')
 @login_required
@@ -65,9 +66,15 @@ def get_sa_info(request):
     return handler.handle()
 
 @login_required
-@require_http_methods(['POST', 'GET'])
+@require_http_methods(['POST'])
 def get_certificatepicker(request):
     handler = CertificatePickerHandler(request)
+    return handler.handle()
+
+@login_required
+@require_http_methods(['POST'])
+def get_capicker(request):
+    handler = CaPickerHandler(request)
     return handler.handle()
 
 

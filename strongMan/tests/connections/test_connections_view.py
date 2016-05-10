@@ -125,6 +125,16 @@ class ConnectionViewTest(TestCase):
         self.client.post(url)
         self.assertEquals(0, Connection.objects.count())
 
+    def test_certificate_picker_rendering(self):
+        url = reverse("connections:certificatepicker")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_ca_picker_rendering(self):
+        url = reverse("connections:capicker")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+
 class TestCert:
     def __init__(self, path):
         self.path = path
