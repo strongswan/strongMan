@@ -13,7 +13,6 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class Connection(models.Model):
-    state = models.CharField(max_length=15, choices=State.choices())
     profile = models.CharField(max_length=50, unique=True)
     auth = models.CharField(max_length=50)
     version = models.IntegerField()
@@ -64,8 +63,6 @@ class Connection(models.Model):
             logs = vici_wrapper.initiate(child.name, self.profile)
             for log in logs:
                 LogMessage(connection=self, message=log['message'], level=log['level']).save()
-        self.state = State.ESTABLISHED.value
-        self.save()
 
     def stop(self):
         vici_wrapper = ViciWrapper()
@@ -73,8 +70,6 @@ class Connection(models.Model):
         logs = vici_wrapper.terminate_connection(self.profile)
         for log in logs:
                 LogMessage(connection=self, message=log['message'], level=log['level']).save()
-        self.state = False
-        self.save()
 
     @classmethod
     def get_types(cls):
@@ -95,6 +90,17 @@ class Connection(models.Model):
     @classmethod
     def choice_name(cls):
         raise NotImplementedError
+
+    @property
+    def state(self):
+        vici_wrapper = ViciWrapper()
+        state = vici_wrapper.get_connection_state(self.profile)
+        if state == State.DOWN.value:
+            return State.DOWN.value
+        elif state == State.ESTABLISHED.value:
+            return State.ESTABLISHED.value
+        elif state == State.CONNECTING.value:
+            return State.CONNECTING.value
 
 
 class IKEv2Certificate(Connection):
