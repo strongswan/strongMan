@@ -10,48 +10,5 @@
 
 {% endblock html-head %}
 {% block content %}
-    <div class="container" id="certificate-add">
-        <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
-            <div class="panel-body" id="upload-area">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row form-row">
-                        <div class="col-md-3 col-xs-4">
-                            <label class="control-label">Key container:</label>
-                        </div>
-                        <div class="coll-md-9 col-xs-8">
-                            <input id="input-1" type="file" class="file" name="cert" data-show-preview="false"
-                                   data-show-upload="false" , data-show-remove="false">
-                        </div>
-                    </div>
-                    <div class="row form-row">
-                        <div class="col-md-3 col-xs-4">
-                            <label class="control-label">Password:</label>
-                        </div>
-                        <div class="coll-md-9 col-xs-8">
-                            <input type="password" placeholder="Optional" name="password" class="form-control"
-                                   aria-describedby="basic-addon3"></div>
-                    </div>
-                    <div class="row form-row">
-                        <div class="col-md-11 col-xs-12">
-                            <button type="submit" class="btn btn-default pull-right">
-                                <span class="glyphicon glyphicon-upload"></span> Upload
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row form-row" style="margin-top: 350px;">
-            <div class="col-md-8 col-md-offset-2 col-xs-12">
-                <div class="bs-callout bs-callout-default">
-                    <h4>Supported formats</h4>
-                    <span>Container: X509, PKCS1, PKCS8, PKCS12</span><br/>
-                    <span>Encoding: PEM, DER</span><br/>
-                    <span>Algorithm: RSA, ECDSA</span>
-                </div>
-
-            </div>
-        </div>
-    </div>
+    {% include "certificates/widgets/AddCert.html" %}
 {% endblock content %}

@@ -136,7 +136,13 @@
 }
 
 #ConnectionForm {
-  input, .bootstrap-select {
+  a {
+    cursor: pointer;
+  }
+  input, .identity_picker {
+    margin-bottom: 10px;
+  }
+  .cert_upload {
     margin-bottom: 10px;
   }
 }

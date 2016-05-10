@@ -4,23 +4,32 @@ from ...certificates.models import UserCertificate
 from django.shortcuts import get_object_or_404
 
 
-class IdentitiesHandler:
+class CertificatePickerHandler:
     def __init__(self, request):
         self.request = request
 
     def _render(self, form):
-        return render(self.request, 'connections/forms/IdentitiesPicker.html', {"identity": form['identity']})
+        return render(self.request,
+                      'connections/forms/CertificatePicker.html', {"certificate": form['certificate'], "identity": form['identity']})
 
     def handle(self):
         id = self._certificate_id()
-        form = Ike2CertificateForm(initial={'certificate': id})
+
+        if id is None:
+            form = Ike2CertificateForm()
+        else:
+            form = Ike2CertificateForm(initial={'certificate': id})
+
         form.update_certificates()
         return self._render(form)
 
     def _certificate_id(self):
         if "certififcate_id" not in self.request.POST:
-            raise Exception("certififcate_id not found")
+            return None
 
         id = self.request.POST["certififcate_id"]
+        if id == "-1" or id == '':
+            return None
+
         get_object_or_404(UserCertificate, pk=id)
         return id
