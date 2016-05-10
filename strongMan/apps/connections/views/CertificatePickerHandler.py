@@ -9,7 +9,8 @@ class CertificatePickerHandler:
         self.request = request
 
     def _render(self, form):
-        return render(self.request, 'connections/forms/CertificatePicker/CertificatePicker.html', {"certificate": form['certificate'], "identity": form['identity']})
+        return render(self.request,
+                      'connections/forms/CertificatePicker.html', {"certificate": form['certificate'], "identity": form['identity']})
 
     def handle(self):
         id = self._certificate_id()
