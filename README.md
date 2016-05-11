@@ -26,16 +26,13 @@ Run the following commands to make the server ready to run.
 ```bash
 git clone https://github.com/Sebubu/strongMan.git
 cd strongMan
-virtualenv env
-source env/bin/activate
-pip install -r requirements.txt
-./migrate.sh
+./strongMan.sh install # Type in your python interpreter if you get asked.
 ```
 
-We have installed strongMan with all it's requirements and loaded a default user into the database.
+We have installed strongMan with all it's requirements in a virtual environment and loaded a default user into the database.
 Let's run the server.
 ```bash
-python manage.py runserver --settings=strongMan.settings.local
+./strongMan.sh runserver
 ```
 The server is now accessible on http://localhost:8000. 
 Username: John, Password: Lennon

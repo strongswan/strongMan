@@ -14,7 +14,7 @@ readonly ARGNUM="$#"
 usage() {
 	echo "Run's all migrations for strongMan in one script."
 	echo
-	echo "Usage: $PROGNAME -i <python-interpreter> [-dm <y/n>]"
+	echo "Usage: $PROGNAME [-dm <y/n>]"
 	echo
 	echo "Options:"
 	echo
@@ -66,11 +66,11 @@ case $delete_migrations in
 esac
 
 #Migrate
-python manage.py makemigrations certificates --settings=strongMan.settings.local
-python manage.py makemigrations connections --settings=strongMan.settings.local
-python manage.py migrate --settings=strongMan.settings.local
+./env/bin/python manage.py makemigrations certificates --settings=strongMan.settings.local
+./env/bin/python manage.py makemigrations connections --settings=strongMan.settings.local
+./env/bin/python manage.py migrate --settings=strongMan.settings.local
 #Load initial data
-python manage.py loaddata initial_data.json --settings=strongMan.settings.local
+./env/bin/python manage.py loaddata initial_data.json --settings=strongMan.settings.local
 echo
 echo Migratione done!
 
