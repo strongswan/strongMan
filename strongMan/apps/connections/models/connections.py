@@ -43,6 +43,7 @@ class Connection(models.Model):
 
     def start(self):
         vici_wrapper = ViciWrapper()
+        vici_wrapper.unload_connection(self.profile)
         vici_wrapper.load_connection(self.subclass().dict())
 
         for local in self.local.all():
