@@ -20,29 +20,22 @@ The strongMan application implements a persistent connection and asymmetric key 
 Requirements:
 - python3/pip3 or python3.5/pip3.5
 - git
+- virtualenv
 
 Run the following commands to make the server ready to run.
 ```bash
 git clone https://github.com/Sebubu/strongMan.git
 cd strongMan
-sudo pip3 install -r requirements.txt
-sudo ./migrate.sh -i python3
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+./migrate.sh
 ```
-
-### Installation of the vici python egg
-Currently it's relatively awkward to install the vici python egg.
-We are working on some improvements with pip. But the bash commands therefore are them:
-```bash
-git clone -b vici-python-recv https://github.com/strongswan/strongswan.git
-cd ./strongswan/src/libcharon/plugins/vici/python/
-sudo python3 setup.py.in install
-```
-
 
 We have installed strongMan with all it's requirements and loaded a default user into the database.
 Let's run the server.
 ```bash
-python3 manage.py runserver --settings=strongMan.settings.local
+python manage.py runserver --settings=strongMan.settings.local
 ```
 The server is now accessible on http://localhost:8000. 
 Username: John, Password: Lennon
