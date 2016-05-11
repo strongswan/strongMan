@@ -168,14 +168,17 @@ class ViciWrapper:
 
 
     def get_connection_state(self, connection_name):
-        sa = self.get_sas_by(connection_name)
-        if sa:
-            values = sa[0][connection_name]
-            state = values['state']
-            return state.decode('ascii')
-        else:
-            return 'DOWN'
-
+        default_state = 'DOWN'
+        try:
+            sa = self.get_sas_by(connection_name)
+            if sa:
+                values = sa[0][connection_name]
+                state = values['state']
+                return state.decode('ascii')
+            else:
+                return default_state
+        except Exception as e:
+            return default_state
 '''
 [OrderedDict([('cert',
     OrderedDict([('uniqueid', b'2'),
