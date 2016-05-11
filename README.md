@@ -20,7 +20,7 @@ The strongMan application implements a persistent connection and asymmetric key 
 Requirements:
 - python3/pip3 or python3.5/pip3.5
 - git
-- virtualenv
+- [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
 
 Run the following commands to make the server ready to run.
 ```bash
@@ -32,7 +32,7 @@ cd strongMan
 We have installed strongMan with all it's requirements in a virtual environment and loaded a default user into the database.
 Let's run the server.
 ```bash
-./strongMan.sh runserver
+sudo ./strongMan.sh runserver
 ```
 The server is now accessible on http://localhost:8000. 
 Username: John, Password: Lennon
