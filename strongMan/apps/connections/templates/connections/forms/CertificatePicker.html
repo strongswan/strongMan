@@ -59,9 +59,10 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Change your password</h4>
+                    <h4 class="modal-title" id="myModalLabel">Upload certificate</h4>
                 </div>
                 <div class="modal-body text-center">
+                    <p>Upload a certificate first followed by the associated private key.</p>
                     <iframe src="{% url "certificates:add_form" %}" frameborder="0"  style="width: 100%; height: 600px;"></iframe>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" >Finish</button>
                 </div>
