@@ -15,8 +15,7 @@ class ToggleHandler:
         connection = Connection.objects.get(id=self.request.POST['id'])
         response = dict(id=self.request.POST['id'], success=False)
         try:
-            vici_wrapper = ViciWrapper()
-            state = vici_wrapper.get_connection_state(connection.profile)
+            state = connection.state
             if state == State.DOWN.value:
                 connection.start()
             elif state == State.ESTABLISHED.value:

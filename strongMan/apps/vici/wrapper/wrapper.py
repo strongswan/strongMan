@@ -1,19 +1,28 @@
 import socket
 import vici
+import time
 from collections import OrderedDict
 from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException
-
+import errno
+from socket import error as socket_error
 
 class ViciWrapper:
     def __init__(self, socket_path="/var/run/charon.vici"):
-        self.socket = socket.socket(socket.AF_UNIX)
         self.socket_path = socket_path
-        self.session = vici.Session(self.socket)
         self._connect_socket()
+
+    def __del__(self):
+        self._close_socket()
+
+    def _close_socket(self):
+        self.socket.shutdown(2)
+        self.socket.close()
 
     def _connect_socket(self):
         try:
+            self.socket = socket.socket(socket.AF_UNIX)
             self.socket.connect(self.socket_path)
+            self.session = vici.Session(self.socket)
         except Exception as e:
             raise ViciSocketException("Vici is not reachable!")
 
@@ -24,14 +33,14 @@ class ViciWrapper:
         try:
             self.session.load_conn(connection)
         except Exception as e:
-            print(e)
             raise ViciLoadException("Connection cannot be loaded!")
 
     def unload_connection(self, connection_name):
         '''
         :type connection_name: str
         '''
-        self.session.unload_conn(OrderedDict(name=connection_name))
+        if connection_name in self.get_connections_names():
+            self.session.unload_conn(OrderedDict(name=connection_name))
 
     def load_secret(self, secret):
         '''
@@ -168,14 +177,17 @@ class ViciWrapper:
 
 
     def get_connection_state(self, connection_name):
-        sa = self.get_sas_by(connection_name)
-        if sa:
-            values = sa[0][connection_name]
-            state = values['state']
-            return state.decode('ascii')
-        else:
-            return 'DOWN'
-
+        default_state = 'DOWN'
+        try:
+            sa = self.get_sas_by(connection_name)
+            if sa:
+                values = sa[0][connection_name]
+                state = values['state']
+                return state.decode('ascii')
+            else:
+                return default_state
+        except Exception as e:
+            return default_state
 '''
 [OrderedDict([('cert',
     OrderedDict([('uniqueid', b'2'),
