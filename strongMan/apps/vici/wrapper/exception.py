@@ -12,3 +12,6 @@ class ViciInitiateException(ViciException):
 
 class ViciTerminateException(ViciException):
     '''Raise when load failes'''
+
+class ViciPathNotASocketException(ViciException):
+    '''Raise when load failes'''
