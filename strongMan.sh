@@ -11,6 +11,10 @@ readonly ARGS="$@"
 # Arguments number
 readonly ARGNUM="$#"
 
+# Settings files for django
+readonly PRODUCTION_SETTINGS="strongMan.settings.production"
+readonly LOCAL_SETTINGS="strongMan.settings.local"
+
 usage() {
 	echo "Management script for strongMan"
 	echo
@@ -124,16 +128,18 @@ if [ $install ]
 		virtualenv -p $pythonInterpreter --no-site-packages env
 		env/bin/pip install -r requirements.txt
 		./migrate.sh -dm y
+		env/bin/python manage.py collectstatic --settings=$PRODUCTION_SETTINGS --noinput
+
 		echo
 		echo strongMan installed!
 		exit 1
-		
 fi
 
 if [ $uninstall ]
 	then
 		if [ -d "env" ]; then
 		  rm -rf env/
+		  rm -rf strongMan/staticfiles
           deleteSecretKeys
 		  echo "strongMan virtualenv deleted."
 		else
@@ -149,11 +155,11 @@ if [ $runserver ]
 		    if [ $runDebug ]; then
 		        echo "Run strongMan with the debug settings"
 			    echo
-			    ./env/bin/python manage.py runserver --settings=strongMan.settings.local
+			    ./env/bin/python manage.py runserver --settings=$LOCAL_SETTINGS
 			else
 			    echo "Run strongMan"
 			    echo
-			    ./env/bin/python manage.py runserver --settings=strongMan.settings.production
+			    ./env/bin/python manage.py runserver --settings=$PRODUCTION_SETTINGS
 		    fi
             exit
 		else
