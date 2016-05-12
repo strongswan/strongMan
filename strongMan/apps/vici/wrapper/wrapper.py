@@ -1,15 +1,18 @@
+import os, stat
 import socket
 import vici
-import time
 from collections import OrderedDict
-from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException
-import errno
-from socket import error as socket_error
+from .exception import ViciPathNotASocketException, ViciSocketException, ViciTerminateException, ViciLoadException, \
+    ViciInitiateException
+
 
 class ViciWrapper:
     def __init__(self, socket_path="/var/run/charon.vici"):
         self.socket_path = socket_path
-        self._connect_socket()
+        if not self._is_path_a_socket():
+            raise ViciPathNotASocketException("The path '" + self.socket_path + "' is not a Socket!")
+        else:
+            self._connect_socket()
 
     def __del__(self):
         self._close_socket()
@@ -24,7 +27,12 @@ class ViciWrapper:
             self.socket.connect(self.socket_path)
             self.session = vici.Session(self.socket)
         except Exception as e:
+            print(e)
             raise ViciSocketException("Vici is not reachable!")
+
+    def _is_path_a_socket(self):
+        mode = os.stat(self.socket_path).st_mode
+        return stat.S_ISSOCK(mode)
 
     def load_connection(self, connection):
         '''
@@ -59,7 +67,6 @@ class ViciWrapper:
             self.session.load_key(key)
         except Exception as e:
             raise ViciLoadException("Private key cannot be loaded!")
-
 
     def load_certificate(self, certificate):
         '''
@@ -106,7 +113,6 @@ class ViciWrapper:
             if connection == connection_name:
                 return True
         return False
-
 
     def get_version(self):
         '''
@@ -175,7 +181,6 @@ class ViciWrapper:
         except Exception as e:
             raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
 
-
     def get_connection_state(self, connection_name):
         default_state = 'DOWN'
         try:
@@ -188,6 +193,8 @@ class ViciWrapper:
                 return default_state
         except Exception as e:
             return default_state
+
+
 '''
 [OrderedDict([('cert',
     OrderedDict([('uniqueid', b'2'),
@@ -235,4 +242,3 @@ class ViciWrapper:
 
 
 '''
-

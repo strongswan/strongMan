@@ -94,15 +94,17 @@ class Connection(models.Model):
 
     @property
     def state(self):
-        vici_wrapper = ViciWrapper()
-        state = vici_wrapper.get_connection_state(self.profile)
-        if state == State.DOWN.value:
+        try:
+            vici_wrapper = ViciWrapper()
+            state = vici_wrapper.get_connection_state(self.profile)
+            if state == State.DOWN.value:
+                return State.DOWN.value
+            elif state == State.ESTABLISHED.value:
+                return State.ESTABLISHED.value
+            elif state == State.CONNECTING.value:
+                return State.CONNECTING.value
+        except:
             return State.DOWN.value
-        elif state == State.ESTABLISHED.value:
-            return State.ESTABLISHED.value
-        elif state == State.CONNECTING.value:
-            return State.CONNECTING.value
-
 
 class IKEv2Certificate(Connection):
     @classmethod

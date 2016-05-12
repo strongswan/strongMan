@@ -5,58 +5,82 @@ $(document).ready(function () {
 function handler(event) {
     event.preventDefault();
     var connectionId = this.id.value;
-    $.ajax({ // create an AJAX call...
+    var csrf = this.csrfmiddlewaretoken.value;
+    $.ajax({
         data: $(this).serialize(), // get the form data
         type: 'POST', // GET or POST
         url: '/connections/toggle/' // the file to call
     });
-    lock(connectionId, this.csrfmiddlewaretoken.value);
+    stateConnecting(connectionId);
+    setTimeout(function () {
+        getState(connectionId, csrf)
+    }, 900);
     return false;
 }
 
-function lock(connectionId, csrf) {
-    $('#button_div' + connectionId).children().attr("disabled", "disabled");
-    $('#spinner_place' + connectionId).append('<span id="spinner' + connectionId + '" class="glyphicon glyphicon-refresh spinning"></span>');
-    $('#toggle_connection' + connectionId).off('click');
+
+function stateEstablished(connectionId) {
+    $('#toggle_input' + connectionId).prop('checked', true).change();
+    $('#button_div' + connectionId).find('.toggle-on').text("On");
+    $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-success toggle-on");
+    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-success');
+}
+
+function stateDown(connectionId) {
+    $('#toggle_input' + connectionId).prop('checked', false).change();
+    $('#button_div' + connectionId).find('.toggle-off').text("Off");
+    $('#toggle_connection' + connectionId).prop('checked', false).change();
+    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-default off');
+}
+
+function stateConnecting(connectionId) {
+    $('#toggle_input' + connectionId).prop('checked', true).change();
+    $('#button_div' + connectionId).find('.toggle-on').text("");
+    $('#button_div' + connectionId).find('.toggle-on').append("<i class='glyphicon glyphicon-refresh spinning'></i>");
+    $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-warning toggle-on");
+    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-warning');
+    lock(connectionId);
+}
+
+function lock(connectionId) {
+    $('#toggle_connection' + connectionId).unbind('click');
     setTimeout(function () {
-        getState(connectionId, csrf)
+        unlock(connectionId)
     }, 1000);
 }
 
-function unlock(connectionId, csrf) {
-    var spinnerName = '#spinner' + connectionId;
-    $(spinnerName).remove(spinnerName);
-    $('#button_div' + connectionId).children().removeAttr('disabled');
+function unlock(connectionId) {
     $('#toggle_connection' + connectionId).on('click', handler);
 }
 
+
 function getState(connectionId, csrf) {
-    $.ajax({ // create an AJAX call...
+    $.ajax({
         data: {'csrfmiddlewaretoken': csrf},
-        type: 'POST', // GET or POST
-        url: '/connections/state/' + connectionId + '/', // the file to call
-        success: function (response) { // on success..
+        type: 'POST',
+        url: '/connections/state/' + connectionId + '/',
+        success: function (response) {
             if (response.success) {
                 switch (response.state) {
                     case 'CONNECTING':
+                        stateConnecting(response.id);
+                        hideConnectionInfoRow(response.id);
                         setTimeout(function () {
                             getState(connectionId, csrf)
-                        }, 1000);
+                        }, 900);
                         break;
                     case 'ESTABLISHED':
-                        $('#toggle_input' + response.id).bootstrapToggle('on');
-                        unlock(response.id);
+                        stateEstablished(response.id);
                         showConnectionInfoRow(response.id, csrf);
                         break;
                     default:
-                        $('#toggle_input' + response.id).bootstrapToggle('off');
-                        unlock(response.id);
+                        stateDown(response.id);
                         hideConnectionInfoRow(response.id);
                         break;
                 }
             } else {
                 setAlert(response);
-                unlock(response.id);
+                stateDown(response.id);
             }
         }
     });
