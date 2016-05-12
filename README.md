@@ -32,7 +32,7 @@ cd strongMan
 We have installed strongMan with all it's requirements in a virtual environment and loaded a default user into the database.
 Let's run the server.
 ```bash
-./strongMan.sh runserver
+sudo ./strongMan.sh runserver
 ```
 The server is now accessible on http://localhost:8000. 
 Username: John, Password: Lennon
