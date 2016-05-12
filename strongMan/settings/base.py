@@ -1,8 +1,7 @@
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
-DB_SECRET_KEY = 'k*2*d(7%u=yvfc*l^6r(ji010jl9_%a0!-j)e9o0qan7#gon!7'
+
 ALLOWED_HOSTS = []
 
 
@@ -88,3 +87,30 @@ STATICFILES_DIRS = (
 LOGIN_URL = (
     '/login/'
 )
+
+
+def create_read_key(file_path):
+    '''
+    Generates a secure django SECRET_KEY
+    https://gist.github.com/ndarville/3452907
+    :param file_path: Path to the file which persists the key
+    :return: secure secret key 50 bytes long
+    '''
+    SECRET_FILE = file_path
+    try:
+        return open(SECRET_FILE).read().strip()
+    except IOError:
+        try:
+            import random
+            SECRET_KEY = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+            with open(SECRET_FILE,'w') as f:
+                f.write(SECRET_KEY)
+            print("Create a new key in " + SECRET_FILE + ".")
+            return SECRET_KEY
+        except IOError:
+            Exception('Please create a %s file with random characters \
+            to generate your secret key!' % SECRET_FILE)
+
+
+SECRET_KEY = create_read_key('secret_key.txt')
+DB_SECRET_KEY = create_read_key('db_key.txt')

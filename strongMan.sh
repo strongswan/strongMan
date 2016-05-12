@@ -12,9 +12,9 @@ readonly ARGS="$@"
 readonly ARGNUM="$#"
 
 usage() {
-	echo "Run's all migrations for strongMan in one script."
+	echo "Management script for strongMan"
 	echo
-	echo "Usage: $PROGNAME [install] [runserver] [migrate [-dm <y/n>]] [uninstall]"
+	echo "Usage: $PROGNAME [install] [runserver [-d]] [migrate [-dm <y/n>]] [uninstall]"
 	echo
 	echo "Options:"
 	echo
@@ -28,14 +28,16 @@ usage() {
 	echo "      Uninstalls the strongMan application within it's virtualenv."
 	echo
 	echo "  runserver"
-	echo "      Run the server on localhost:8000"
+	echo "      Runs the server on localhost:8000"
+	echo
+	echo "      -d , --debug"
+	echo "          Runs the server in the debug settings"
 	echo
 	echo "  migrate"
-	echo "      Installs the strongMan application within it's own virtualenv."
+	echo "      Makes the django migrations. Developer use."
 	echo
-	echo "  -dm <y/n>, --deletemigration <y/n>"
-	echo "      Make migrations"
-	echo "      Flags if the current migrations and the database are going to be deleted or not."
+	echo "      -dm <y/n>, --deletemigration <y/n>"
+	echo "          Flags if the current migrations and the database are going to be deleted or not."
 	echo
 }
 while [ "$#" -gt 0 ]
@@ -61,6 +63,14 @@ do
 		fi
 		delete_migrations="$2"
 		;;
+	-d|--debug)
+		if [ -z $runserver ]
+			then
+				echo "-d|--debug needs the 'runserver' command"
+				exit 1
+		fi
+		runDebug=1
+		;;
 	install)
 		install=1
 		;;
@@ -83,6 +93,10 @@ do
 	shift
 done
 
+function deleteSecretKeys {
+    rm -f secret_key.txt > /dev/null
+	rm -f db_key.txt > /dev/null
+}
 if [ $migrate ]
 	then
 		if [ $delete_migrations ] 
@@ -105,6 +119,7 @@ if [ $install ]
 
 		echo "Install strongMan"
 		echo
+		deleteSecretKeys
 		read -r -p "${1:-Enter your python interpreter (python3.4 or python3.5):} " pythonInterpreter
 		virtualenv -p $pythonInterpreter --no-site-packages env
 		env/bin/pip install -r requirements.txt
@@ -119,6 +134,7 @@ if [ $uninstall ]
 	then
 		if [ -d "env" ]; then
 		  rm -rf env/
+          deleteSecretKeys
 		  echo "strongMan virtualenv deleted."
 		else
 			echo "No installation found."
@@ -130,9 +146,16 @@ fi
 if [ $runserver ]
 	then
 		if [ -d "env" ]; then
-			echo "Run strongMan"
-			echo
-			./env/bin/python manage.py runserver --settings=strongMan.settings.local
+		    if [ $runDebug ]; then
+		        echo "Run strongMan with the debug settings"
+			    echo
+			    ./env/bin/python manage.py runserver --settings=strongMan.settings.local
+			else
+			    echo "Run strongMan"
+			    echo
+			    ./env/bin/python manage.py runserver --settings=strongMan.settings.production
+		    fi
+            exit
 		else
 			echo "No installation found. Can't run server. "
 			echo "Install strongMan with './strongman.sh install'"
