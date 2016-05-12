@@ -4,3 +4,4 @@ oscrypto==0.15.0
 pyaes==1.3.0
 django-tables2==1.1.6
 vici==5.4.1dev3
+gunicorn==19.5.0

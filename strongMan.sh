@@ -34,8 +34,8 @@ usage() {
 	echo "  runserver"
 	echo "      Runs the server on localhost:8000"
 	echo
-	echo "      -d , --debug"
-	echo "          Runs the server in the debug settings"
+	echo "      -d, --debug"
+	echo "      Runs the server on localhost:8000 in debug mode (standalone mode without a proper webservice."
 	echo
 	echo "  migrate"
 	echo "      Makes the django migrations. Developer use."
@@ -67,22 +67,20 @@ do
 		fi
 		delete_migrations="$2"
 		;;
-	-d|--debug)
-		if [ -z $runserver ]
-			then
-				echo "-d|--debug needs the 'runserver' command"
-				exit 1
-		fi
-		runDebug=1
-		;;
 	install)
 		install=1
 		;;
 	runserver)
 		runserver=1
 		;;
+	-d | --debug)
+		runDebug=1
+		;;
 	uninstall)
 		uninstall=1
+		;;
+	start-gunicorn-socket)
+		gunicornSocket=1
 		;;
 	--)
 		break
@@ -101,6 +99,55 @@ function deleteSecretKeys {
     rm -f secret_key.txt > /dev/null
 	rm -f db_key.txt > /dev/null
 }
+readonly GUNICORN_SERVICE="gunicorn_strongMan"
+
+function start_gunicorn_socket {
+    NAME="strongMan"                                #Name of the application (*)
+    DJANGODIR=$(pwd)                                # Django project directory (*)
+    SOCKFILE=$DJANGODIR/gunicorn.sock               # we will communicate using this unix socket (*)
+    USER=osboxes                                    # the user to run as (*)
+    GROUP=osboxes                                   # the group to run as (*)
+    NUM_WORKERS=4                                   # how many worker processes should Gunicorn spawn (*)
+    DJANGO_SETTINGS_MODULE=strongMan.settings.production             # which settings file should Django use (*)
+    DJANGO_WSGI_MODULE=strongMan.wsgi                                # WSGI module name (*)
+
+    echo "Starting $NAME as `whoami`"
+
+    # Activate the virtual environment
+    cd $DJANGODIR
+    export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+    export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+    # Create the run directory if it doesn't exist
+    RUNDIR=$(dirname $SOCKFILE)
+    test -d $RUNDIR || mkdir -p $RUNDIR
+
+    # Start your Django Unicorn
+    # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
+    exec $DJANGODIR/env/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+      --name $NAME \
+      --workers $NUM_WORKERS \
+      --user $USER \
+      --bind=unix:$SOCKFILE
+
+}
+
+function create_gunicorn_service {
+    service=$(echo "/lib/systemd/system/"$GUNICORN_SERVICE".service")
+    echo $service
+    echo "[Unit]" > ${service}
+    echo "Description=strongMan gunicorn daemon" >> ${service}
+    echo >> ${service}
+    echo "[Service]" >> ${service}
+    echo "Type=simple" >> ${service}
+    echo "User=osboxes" >> ${service}
+    echo "ExecStart=$(pwd)/strongMan.sh start-gunicorn-socket" >> ${service}
+    echo >> ${service}
+    echo "[Install]" >> ${service}
+    echo "WantedBy=multi-user.target" >> ${service}
+}
+
+
 if [ $migrate ]
 	then
 		if [ $delete_migrations ] 
@@ -123,7 +170,6 @@ if [ $install ]
 
 		echo "Install strongMan"
 		echo
-		deleteSecretKeys
 		read -r -p "${1:-Enter your python interpreter (python3.4 or python3.5):} " pythonInterpreter
 		virtualenv -p $pythonInterpreter --no-site-packages env
 		env/bin/pip install -r requirements.txt
@@ -140,7 +186,6 @@ if [ $uninstall ]
 		if [ -d "env" ]; then
 		  rm -rf env/
 		  rm -rf strongMan/staticfiles
-          deleteSecretKeys
 		  echo "strongMan virtualenv deleted."
 		else
 			echo "No installation found."
@@ -153,14 +198,14 @@ if [ $runserver ]
 	then
 		if [ -d "env" ]; then
 		    if [ $runDebug ]; then
-		        echo "Run strongMan with the debug settings"
-			    echo
-			    ./env/bin/python manage.py runserver --settings=$LOCAL_SETTINGS
-			else
-			    echo "Run strongMan"
-			    echo
-			    ./env/bin/python manage.py runserver --settings=$PRODUCTION_SETTINGS
-		    fi
+                echo "Run strongMan standalone debug"
+                echo
+                env/bin/python manage.py runserver --settings=$LOCAL_SETTINGS
+            else
+                echo "Run strongMan"
+                echo
+                create_gunicorn_service
+            fi
             exit
 		else
 			echo "No installation found. Can't run server. "
@@ -168,6 +213,10 @@ if [ $runserver ]
 		  	exit 1
 		fi
 		exit 1
+fi
+
+if [ $gunicornSocket ]; then
+    start_gunicorn_socket
 fi
 
 
