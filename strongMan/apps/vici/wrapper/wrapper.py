@@ -18,8 +18,11 @@ class ViciWrapper:
         self._close_socket()
 
     def _close_socket(self):
-        self.socket.shutdown(2)
-        self.socket.close()
+        try:
+            self.socket.shutdown(2)
+            self.socket.close()
+        except:
+            pass
 
     def _connect_socket(self):
         try:

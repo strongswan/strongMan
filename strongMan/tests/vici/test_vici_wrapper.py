@@ -1,7 +1,6 @@
 from django.test import TestCase
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciSocketException
-from strongMan.apps.connections.models.specific import Secret
+from strongMan.apps.vici.wrapper.exception import ViciPathNotASocketException
 from strongMan.apps.connections.models.authentication import Authentication
 from strongMan.apps.connections.models.connections import Connection
 
@@ -17,7 +16,7 @@ class ViciWrapperTest(TestCase):
         Authentication(name='local-1', auth='pubkey', local=self.connection).save()
 
     def test_vici_socket(self):
-        with self.assertRaises(ViciSocketException):
+        with self.assertRaises(ViciPathNotASocketException):
             ViciWrapper(socket_path="/")
 
     def test_vici_get_verion(self):
