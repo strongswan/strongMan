@@ -32,8 +32,8 @@ def prevent_key_delete_if_cert_is_in_use(sender, **kwargs):
 
 
 class Child(models.Model):
-    name = models.CharField(max_length=50)
-    mode = models.CharField(max_length=50)
+    name = models.TextField()
+    mode = models.TextField()
     connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='children')
 
     def dict(self):
@@ -44,7 +44,7 @@ class Child(models.Model):
 
 
 class Address(models.Model):
-    value = models.CharField(max_length=50)
+    value = models.TextField()
     local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='local_ts')
     remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts')
     remote_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
@@ -54,13 +54,13 @@ class Address(models.Model):
 
 
 class Proposal(models.Model):
-    type = models.CharField(max_length=200)
+    type = models.TextField()
     child = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='esp_proposals')
     connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='proposals')
 
 
 class Secret(models.Model):
-    type = models.CharField(max_length=50)
+    type = models.TextField()
     data = fields.EncryptedCharField(max_length=50)
     authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None, related_name='authentication')
 
@@ -73,5 +73,4 @@ class Secret(models.Model):
 class LogMessage(models.Model):
     connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
-    level = models.CharField(max_length=2)
-    message = models.CharField(max_length=50)
+    message = models.TextField()

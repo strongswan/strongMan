@@ -163,9 +163,8 @@ class ViciWrapper:
         try:
             logs = self.session.initiate(sa)
             for log in logs:
-                level = log['level'].decode('ascii')
                 message = log['msg'].decode('ascii')
-                yield OrderedDict(level=level, message=message)
+                yield OrderedDict(message=message)
         except Exception as e:
             raise ViciInitiateException("SA can't be initiated!")
 
@@ -178,9 +177,8 @@ class ViciWrapper:
         try:
             logs = self.session.terminate(sa)
             for log in logs:
-                level = log['level'].decode('ascii')
                 message = log['msg'].decode('ascii')
-                yield OrderedDict(level=level, message=message)
+                yield OrderedDict(message=message)
         except Exception as e:
             raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
 
@@ -198,7 +196,7 @@ class ViciWrapper:
             return default_state
 
 
-'''
+''' Help to see a SA
 [OrderedDict([('cert',
     OrderedDict([('uniqueid', b'2'),
         ('version', b'2'),
