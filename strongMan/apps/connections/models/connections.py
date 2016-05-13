@@ -131,23 +131,23 @@ class IKEv2EapTls(Connection):
 
 
 @receiver(pre_delete, sender=Connection)
-def delete_all_connected_models(sender, **kwargs):
-    for child in Child.objects.filter(connection=sender):
+def delete_all_connected_models(sender, instance, **kwargs):
+    for child in Child.objects.filter(connection=instance):
         Proposal.objects.filter(child=child).delete()
         Address.objects.filter(local_ts=child).delete()
         Address.objects.filter(remote_ts=child).delete()
         child.delete()
-    Proposal.objects.filter(connection=sender).delete()
-    Address.objects.filter(local_addresses=sender).delete()
-    Address.objects.filter(remote_addresses=sender).delete()
-    Address.objects.filter(vips=sender).delete()
+    Proposal.objects.filter(connection=instance).delete()
+    Address.objects.filter(local_addresses=instance).delete()
+    Address.objects.filter(remote_addresses=instance).delete()
+    Address.objects.filter(vips=instance).delete()
 
-    for local in Authentication.objects.filter(local=sender):
+    for local in Authentication.objects.filter(local=instance):
         for secret in Secret.objects.filter(authentication=local):
             secret.delete()
         local.delete()
 
-    for remote in Authentication.objects.filter(remote=sender):
+    for remote in Authentication.objects.filter(remote=instance):
         for secret in Secret.objects.filter(authentication=remote):
             secret.delete()
         remote.delete()
