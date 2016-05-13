@@ -13,8 +13,8 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class Connection(models.Model):
-    profile = models.CharField(max_length=50, unique=True)
-    auth = models.CharField(max_length=50)
+    profile = models.TextField(unique=True)
+    auth = models.TextField()
     version = models.IntegerField()
 
     def dict(self):
@@ -63,14 +63,14 @@ class Connection(models.Model):
         for child in self.children.all():
             logs = vici_wrapper.initiate(child.name, self.profile)
             for log in logs:
-                LogMessage(connection=self, message=log['message'], level=log['level']).save()
+                LogMessage(connection=self, message=log['message']).save()
 
     def stop(self):
         vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
         logs = vici_wrapper.terminate_connection(self.profile)
         for log in logs:
-                LogMessage(connection=self, message=log['message'], level=log['level']).save()
+                LogMessage(connection=self, message=log['message']).save()
 
     @classmethod
     def get_types(cls):

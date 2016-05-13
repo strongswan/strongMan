@@ -9,8 +9,8 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 class Authentication(models.Model):
     local = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='local')
     remote = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='remote')
-    name = models.CharField(max_length=50)  # starts with remote-* or local-*
-    auth = models.CharField(max_length=50)
+    name = models.TextField()  # starts with remote-* or local-*
+    auth = models.TextField()
     round = models.IntegerField(default=1)
     ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_authentication')
     ca_identity = models.TextField()
@@ -66,7 +66,7 @@ class Authentication(models.Model):
 
 
 class EapAuthentication(Authentication):
-    eap_id = models.CharField(max_length=50)
+    eap_id = models.TextField()
 
     def dict(self):
         auth = super(EapAuthentication, self).dict()
@@ -96,7 +96,7 @@ class CertificateAuthentication(Authentication):
 
 
 class EapTlsAuthentication(Authentication):
-    eap_id = models.CharField(max_length=50)
+    eap_id = models.TextField()
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity')
 
     def dict(self):
