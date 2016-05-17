@@ -119,7 +119,5 @@ class PwChangeHandler:
         return False
 
 
-
-
 class AboutException(Exception):
     pass
