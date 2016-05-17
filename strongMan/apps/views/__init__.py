@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext
 
@@ -52,24 +52,24 @@ def pw_change(request):
 
 
 def bad_request(request):
-    response = render_to_response('400.html', context_instance=RequestContext(request))
+    response = render(request, '400.html')
     response.status_code = 400
     return response
 
 
 def permission_denied(request):
-    response = render_to_response('403.html', context_instance=RequestContext(request))
+    response = render(request, '403.html')
     response.status_code = 403
     return response
 
 
 def page_not_found(request):
-    response = render_to_response('404.html', context_instance=RequestContext(request))
+    response = render(request, '404.html')
     response.status_code = 404
     return response
 
 
 def server_error(request):
-    response = render_to_response('500.html', context_instance=RequestContext(request))
+    response = render(request, '500.html')
     response.status_code = 500
     return response
