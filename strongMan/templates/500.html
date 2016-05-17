@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block title %}500 Internal Server Error{% endblock title %}
+{% block content %}
+The server has an internal error.<br>
+    <a href="{% url 'index' %}">Home</a>
+{% endblock content %}

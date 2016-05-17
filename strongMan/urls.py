@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.conf.urls import url, include, handler400, handler403, handler404, handler500
 from django.contrib import admin
 from .apps import views
 from .apps.certificates import urls as certificates_url
@@ -16,3 +16,8 @@ urlpatterns = [
     url(r'change_pw$', views.pw_change, name='pw_change'),
     url(r'^about/?$', views.about, name='about'),
 ]
+
+handler400 = 'strongMan.apps.views.bad_request'
+handler403 = 'strongMan.apps.views.permission_denied'
+handler404 = 'strongMan.apps.views.page_not_found'
+handler500 = 'strongMan.apps.views.server_error'
