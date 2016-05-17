@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load staticfiles %}
-{% block title %}404{% endblock title %}
+{% block title %}404 Not Found{% endblock title %}
 {% block content %}
-    <h1>404</h1>
+    The requested resource could not be found. <br>
+    <a href="{% url 'index' %}">Home</a>
 {% endblock content %}
