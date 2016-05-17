@@ -64,7 +64,7 @@ class PwChangeHandler:
         if not form.pw1 == form.pw2:
             raise AboutException("New passwords are not equal!")
         if not self._is_password_hard(form.pw1):
-            raise AboutException("Your new password isn't hard enough! Follow the password rules below.")
+            raise AboutException("The password does not meet the password policy requirements! Follow the password rules below.")
 
         user.set_password(form.pw1)
         user.save()

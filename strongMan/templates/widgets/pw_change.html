@@ -42,7 +42,7 @@
                     <li>Password has to contain at least one digit.</li>
                 </ul>
             </div>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
         <script>
             // this is the id of the form
@@ -58,6 +58,17 @@
                 });
                 e.preventDefault(); // avoid to execute the actual submit of the form.
             });
+            $('#myModal').on('hidden.bs.modal', function () {
+                var url = "{% url 'pw_change' %}";
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: $("#pw_change_form").serialize(), // serializes the form's elements.
+                    success: function (data) {
+                        $("#pw_change").replaceWith(data);
+                    }
+                });
+            })
         </script>
     {% endif %}
 </div>
