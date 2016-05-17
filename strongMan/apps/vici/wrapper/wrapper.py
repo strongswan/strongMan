@@ -5,10 +5,13 @@ from collections import OrderedDict
 from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException
 import errno
 from socket import error as socket_error
+import os
 
 class ViciWrapper:
     def __init__(self, socket_path="/var/run/charon.vici"):
         self.socket_path = socket_path
+        if not os.path.exists(self.socket_path):
+            raise ViciSocketException(self.socket_path + " doesn't exist!")
         self._connect_socket()
 
     def __del__(self):
