@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from django.template import RequestContext
 
 from .request_handler import AboutHandler, PwChangeHandler
 
@@ -44,6 +43,7 @@ def about(request):
     handler = AboutHandler(request)
     return handler.handle()
 
+
 @login_required
 @require_http_methods(['GET', 'POST'])
 def pw_change(request):
@@ -52,24 +52,16 @@ def pw_change(request):
 
 
 def bad_request(request):
-    response = render(request, '400.html')
-    response.status_code = 400
-    return response
+    return render(request, '400.html', status=400)
 
 
 def permission_denied(request):
-    response = render(request, '403.html')
-    response.status_code = 403
-    return response
+    return render(request, '403.html', status=403)
 
 
 def page_not_found(request):
-    response = render(request, '404.html')
-    response.status_code = 404
-    return response
+    return render(request, '404.html', status=404)
 
 
 def server_error(request):
-    response = render(request, '500.html')
-    response.status_code = 500
-    return response
+    return render(request, '500.html', status=500)
