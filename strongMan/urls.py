@@ -4,6 +4,8 @@ from .apps import views
 from .apps.certificates import urls as certificates_url
 from .apps.connections import urls as connections_urls
 from .apps.views import index
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf import settings
 
 
 urlpatterns = [
@@ -16,3 +18,6 @@ urlpatterns = [
     url(r'change_pw$', views.pw_change, name='pw_change'),
     url(r'^about/?$', views.about, name='about'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()

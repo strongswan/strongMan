@@ -1,0 +1,9 @@
+[Unit]
+Description=strongMan gunicorn service
+
+[Service]
+ExecStart=${workingDir}/env/bin/python run.py
+WorkingDirectory=${workingDir}
+
+[Install]
+WantedBy=multi-user.target
