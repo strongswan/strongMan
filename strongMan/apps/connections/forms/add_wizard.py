@@ -85,6 +85,10 @@ class ConnectionForm(AbstractConForm):
     def fill(self, connection):
         self.fields['profile'].initial = connection.profile
         self.fields['gateway'].initial = connection.remote_addresses.first().value
+        remote = connection.remote.first().subclass()
+        self.initial['certificate_ca'] = remote.ca_cert.pk
+        self.initial['identity_ca'] = remote.ca_identity
+        self.initial["is_server_identity"] = remote.ca_identity == connection.remote_addresses.first().value
 
     def create_connection(self):
         raise NotImplementedError
@@ -134,13 +138,6 @@ class ConnectionForm(AbstractConForm):
         Address(value='::/0', remote_ts=child).save()
         Address(value='0.0.0.0/0', remote_ts=child).save()
 
-    def _fill_local_ca_cert(self, connection):
-        local = connection.local.first().subclass()
-        self.initial['certificate_ca'] = local.ca_cert.pk
-        self.initial['identity_ca'] = local.ca_identity
-        self.initial["is_server_identity"] = local.ca_identity == connection.remote_addresses.first().value
-
-
     @classmethod
     def get_choices(cls):
         return tuple(
@@ -172,8 +169,8 @@ class Ike2CertificateForm(ConnectionForm):
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
-        Authentication(name='remote', auth='pubkey', remote=connection).save()
-        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
+        Authentication(name='remote-eap', auth='pubkey', remote=connection, ca_identity=self.ca_identity, ca_cert=ca_cert).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity).save()
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)
@@ -182,9 +179,11 @@ class Ike2CertificateForm(ConnectionForm):
         connection.profile = self.cleaned_data['profile']
         local = connection.local.first().subclass()
         local.identity = AbstractIdentity.objects.get(pk=self.cleaned_data['identity'])
-        local.ca_identity = self.ca_identity
-        local.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
         local.save()
+        remote = connection.remote.first().subclass()
+        remote.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
+        remote.ca_identity = self.ca_identity
+        remote.save()
         connection.save()
 
     def fill(self, connection):
@@ -193,7 +192,6 @@ class Ike2CertificateForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
-        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):
@@ -242,10 +240,6 @@ class Ike2EapForm(ConnectionForm):
         self.fields['username'].initial = local.eap_id
         self.fields['password'].initial = Secret.objects.filter(authentication=local).first().data
         self.update_certificates()
-        remote = connection.remote.first().subclass()
-        self.initial['certificate_ca'] = remote.ca_cert.pk
-        self.initial['identity_ca'] = remote.ca_identity
-        self.initial["is_server_identity"] = remote.ca_identity == connection.remote_addresses.first().value
 
 
     @property
@@ -314,7 +308,6 @@ class Ike2EapCertificateForm(ConnectionForm):
         self.initial['certificate'] = local_cert.identity.certificate.pk
         self.initial['identity'] = local_cert.identity.pk
         self.update_certificates()
-        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):
@@ -366,7 +359,6 @@ class Ike2EapTlsForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
-        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):

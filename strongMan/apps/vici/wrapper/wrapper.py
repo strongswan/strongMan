@@ -46,7 +46,7 @@ class ViciWrapper:
             self.session.load_conn(connection)
         except Exception as e:
             raise ViciLoadException("Connection cannot be loaded!")
-        self.print_connection(connection)
+        #self.print_connection(connection)
 
     def unload_connection(self, connection_name):
         '''
@@ -198,10 +198,13 @@ class ViciWrapper:
             return default_state
 
     def print_connection(self, connection):
-        for key in connection:
-            for key2 in connection[key]:
-                if key2.startswith('local-') or key2.startswith('remote-'):
-                    connection[key][key2].pop('certs',[])
-                    connection[key][key2].pop('cacerts',[])
-
-        print(json.dumps(connection, indent=4))
+        try:
+            for con_name in connection:
+                for key in connection[con_name]:
+                    if key.startswith('local-') or key.startswith('remote-'):
+                        connection[con_name][key].pop('certs',[])
+                        connection[con_name][key].pop('cacerts',[])
+            print(json.dumps(connection, indent=4))
+        except Exception as e:
+            print(e)
+            pass
