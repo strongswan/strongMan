@@ -84,12 +84,7 @@ class ConnectionForm(AbstractConForm):
 
     def fill(self, connection):
         self.fields['profile'].initial = connection.profile
-        gateway = connection.remote_addresses.first().value
-        self.fields['gateway'].initial = gateway
-        local = connection.local.first().subclass()
-        self.initial['certificate_ca'] = local.ca_cert.pk
-        self.initial['identity_ca'] = local.ca_identity
-        self.initial["is_server_identity"] = local.ca_identity == gateway
+        self.fields['gateway'].initial = connection.remote_addresses.first().value
 
     def create_connection(self):
         raise NotImplementedError
@@ -139,6 +134,13 @@ class ConnectionForm(AbstractConForm):
         Address(value='::/0', remote_ts=child).save()
         Address(value='0.0.0.0/0', remote_ts=child).save()
 
+    def _fill_local_ca_cert(self, connection):
+        local = connection.local.first().subclass()
+        self.initial['certificate_ca'] = local.ca_cert.pk
+        self.initial['identity_ca'] = local.ca_identity
+        self.initial["is_server_identity"] = local.ca_identity == connection.remote_addresses.first().value
+
+
     @classmethod
     def get_choices(cls):
         return tuple(
@@ -171,7 +173,6 @@ class Ike2CertificateForm(ConnectionForm):
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
         Authentication(name='remote', auth='pubkey', remote=connection).save()
-
         CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=identity, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
 
     def update_connection(self, pk):
@@ -192,7 +193,7 @@ class Ike2CertificateForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
-
+        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):
@@ -215,8 +216,8 @@ class Ike2EapForm(ConnectionForm):
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
         ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
-        Authentication(name='remote-eap', auth='pubkey', remote=connection).save()
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'], ca_identity=self.ca_identity, ca_cert=ca_cert)
+        Authentication(name='remote-eap', auth='pubkey', remote=connection, ca_identity=self.ca_identity, ca_cert=ca_cert).save()
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'])
         auth.save()
         Secret(type='EAP', data=self.cleaned_data['password'], authentication=auth).save()
 
@@ -225,8 +226,10 @@ class Ike2EapForm(ConnectionForm):
         Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         local = connection.local.first().subclass()
-        local.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
-        local.ca_identity = self.ca_identity
+        remote = connection.remote.first().subclass()
+        remote.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
+        remote.ca_identity = self.ca_identity
+        remote.save()
         local.eap_id = self.cleaned_data['username']
         local.save()
         connection.profile = self.cleaned_data['profile']
@@ -239,6 +242,11 @@ class Ike2EapForm(ConnectionForm):
         self.fields['username'].initial = local.eap_id
         self.fields['password'].initial = Secret.objects.filter(authentication=local).first().data
         self.update_certificates()
+        remote = connection.remote.first().subclass()
+        self.initial['certificate_ca'] = remote.ca_cert.pk
+        self.initial['identity_ca'] = remote.ca_identity
+        self.initial["is_server_identity"] = remote.ca_identity == connection.remote_addresses.first().value
+
 
     @property
     def model(self):
@@ -306,6 +314,7 @@ class Ike2EapCertificateForm(ConnectionForm):
         self.initial['certificate'] = local_cert.identity.certificate.pk
         self.initial['identity'] = local_cert.identity.pk
         self.update_certificates()
+        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):
@@ -357,6 +366,7 @@ class Ike2EapTlsForm(ConnectionForm):
         self.initial['certificate'] = local.identity.certificate.pk
         self.initial['identity'] = local.identity.pk
         self.update_certificates()
+        self._fill_local_ca_cert(connection)
 
     @property
     def model(self):

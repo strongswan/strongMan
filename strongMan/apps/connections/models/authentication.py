@@ -27,7 +27,7 @@ class Authentication(models.Model):
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
         if self.ca_cert is not None:
-            parameters['certs'] = [self.ca_cert.der_container]
+            parameters['cacerts'] = [self.ca_cert.der_container]
             parameters['id'] = self.ca_identity
         auth = OrderedDict()
         auth[self.name] = parameters
