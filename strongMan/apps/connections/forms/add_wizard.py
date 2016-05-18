@@ -4,9 +4,6 @@ from django import forms
 
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.connections.forms.core import CertificateChoice, IdentityChoice
-from strongMan.apps.connections.models import IKEv2Certificate, Address, IKEv2EAP, Secret, \
-    IKEv2CertificateEAP, EapAuthentication, Proposal, CertificateAuthentication, IKEv2EapTls, \
-    EapTlsAuthentication
 from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
 from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication, \
     EapTlsAuthentication
@@ -33,6 +30,7 @@ class AbstractConForm(forms.Form):
         :return: None
         '''
         pass
+
 
 class ChooseTypeForm(AbstractConForm):
     form_name = forms.ChoiceField()
@@ -178,6 +176,7 @@ class Ike2CertificateForm(ConnectionForm):
 
     def update_connection(self, pk):
         connection = IKEv2Certificate.objects.get(id=pk)
+        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
         local = connection.local.first().subclass()
@@ -211,7 +210,7 @@ class Ike2EapForm(ConnectionForm):
     def create_connection(self):
         connection = IKEv2EAP(profile=self.cleaned_data['profile'], auth='pubkey', version=2)
         connection.save()
-        child = Child(name=self.cleaned_data['username'], connection=connection)
+        child = Child(name=self.cleaned_data['profile'], connection=connection)
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
@@ -223,12 +222,11 @@ class Ike2EapForm(ConnectionForm):
 
     def update_connection(self, pk):
         connection = IKEv2EAP.objects.get(id=pk)
-        Child.objects.filter(connection=connection).update(name=self.cleaned_data['username'])
+        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         local = connection.local.first().subclass()
         local.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
         local.ca_identity = self.ca_identity
-
         local.eap_id = self.cleaned_data['username']
         local.save()
         connection.profile = self.cleaned_data['profile']
@@ -270,7 +268,7 @@ class Ike2EapCertificateForm(ConnectionForm):
         ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
         connection = IKEv2CertificateEAP(profile=self.cleaned_data['profile'], auth='pubkey', version=2)
         connection.save()
-        child = Child(name=self.cleaned_data['username'], connection=connection)
+        child = Child(name=self.cleaned_data['profile'], connection=connection)
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
@@ -282,6 +280,7 @@ class Ike2EapCertificateForm(ConnectionForm):
 
     def update_connection(self, pk):
         connection = IKEv2CertificateEAP.objects.get(id=pk)
+        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
         local_cert = connection.local.filter(name='local-cert').first().subclass()
@@ -290,7 +289,6 @@ class Ike2EapCertificateForm(ConnectionForm):
         local_cert.ca_cert = ca_cert
         local_cert.ca_identity = self.ca_identity
         local_cert.save()
-
         local_eap = connection.local.filter(name='local-eap').first().subclass()
         local_eap.eap_id = self.cleaned_data['username']
         local_eap.ca_identity = self.ca_identity
@@ -343,6 +341,7 @@ class Ike2EapTlsForm(ConnectionForm):
 
     def update_connection(self, pk):
         connection = IKEv2EapTls.objects.get(id=pk)
+        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
         local = connection.local.first().subclass()
