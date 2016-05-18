@@ -37,6 +37,10 @@ class IntegrationTest(TestCase):
         self.vici_wrapper = ViciWrapper()
         self.vici_wrapper.unload_all_connections()
 
+    def test_certificates_are_loaded(self):
+        certificates = self.vici_wrapper.get_certificates()
+        self.assertTrue(len(certificates) > 0)
+
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
         response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': 'gateway', 'profile': 'EAP',
@@ -115,6 +119,53 @@ class IntegrationTest(TestCase):
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
+
+    def test_logs(self):
+        self._start_connection()
+        logs = self.client.post('/connections/log/', {'id': -1})
+        self.assertTrue(len(logs._container) > 0)
+
+    def test_logs(self):
+        self._start_connection()
+        url = '/connections/log/'
+        logs = self.client.post(url, {'id': -1})
+        self.assertTrue(len(logs._container) > 0)
+
+    def test_sa_info(self):
+        self._start_connection()
+        url = '/connections/info/'
+        connection = Connection.objects.first().subclass()
+
+        info = self.client.post(url, {'id': connection.id})
+        self.assertTrue(len(info._container) > 0)
+
+    def test_overview(self):
+        self._start_connection()
+        url = '/connections/'
+
+        overview = self.client.get(url)
+        self.assertEqual(overview.status_code, 200)
+
+    def test_state(self):
+        self._start_connection()
+        connection = Connection.objects.first().subclass()
+        url = '/connections/state/' + str(connection.id) + '/'
+
+        state = self.client.post(url)
+        self.assertEqual(state.status_code, 200)
+
+    def _start_connection(self):
+        url_create = '/connections/add/'
+        self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Tls',
+                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': "carol@strongswan.org",
+                                      'current_form': 'Ike2EapTlsForm'})
+        self.assertEquals(1, Connection.objects.count())
+        self.assertEquals(1, Child.objects.count())
+
+        connection = Connection.objects.first().subclass()
+        toggle_url = '/connections/toggle/'
+        self.client.post(toggle_url, {'id': connection.id})
 
 
 class TestCert:
