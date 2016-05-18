@@ -274,9 +274,9 @@ class Ike2EapCertificateForm(ConnectionForm):
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
-        Authentication(name='remote-eap', auth='pubkey', remote=connection).save()
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'], round=2, ca_cert=ca_cert, ca_identity=self.ca_identity)
-        CertificateAuthentication(name='local-cert', auth='pubkey', local=connection, identity=identity, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
+        Authentication(name='remote-eap-cert', auth='pubkey', remote=connection, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.cleaned_data['username'], round=2)
+        CertificateAuthentication(name='local-cert', auth='pubkey', local=connection, identity=identity).save()
         auth.save()
         Secret(type='EAP', data=self.cleaned_data['password'], authentication=auth).save()
 
@@ -287,10 +287,12 @@ class Ike2EapCertificateForm(ConnectionForm):
         connection.profile = self.cleaned_data['profile']
         local_cert = connection.local.filter(name='local-cert').first().subclass()
         local_cert.identity = AbstractIdentity.objects.get(pk=self.cleaned_data['identity'])
-        ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
-        local_cert.ca_cert = ca_cert
-        local_cert.ca_identity = self.ca_identity
         local_cert.save()
+        remote = connection.remote.filter(name='remote-eap-cert').first().subclass()
+        ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
+        remote.ca_cert = ca_cert
+        remote.ca_identity = self.ca_identity
+        remote.save()
         local_eap = connection.local.filter(name='local-eap').first().subclass()
         local_eap.eap_id = self.cleaned_data['username']
         local_eap.ca_identity = self.ca_identity
@@ -338,8 +340,8 @@ class Ike2EapTlsForm(ConnectionForm):
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['gateway'])
-        Authentication(name='remote-eap-tls', auth='pubkey', remote=connection).save()
-        EapTlsAuthentication(name='local-eap-tls', auth='eap-tls', local=connection, identity=identity, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
+        Authentication(name='remote-eap-tls', auth='pubkey', remote=connection, ca_cert=ca_cert, ca_identity=self.ca_identity).save()
+        EapTlsAuthentication(name='local-eap-tls', auth='eap-tls', local=connection, identity=identity).save()
 
     def update_connection(self, pk):
         connection = IKEv2EapTls.objects.get(id=pk)
@@ -347,10 +349,12 @@ class Ike2EapTlsForm(ConnectionForm):
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
         local = connection.local.first().subclass()
+        remote = connection.remote.first().subclass()
         local.identity = AbstractIdentity.objects.get(pk=self.cleaned_data['identity'])
-        local.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
-        local.ca_identity = self.ca_identity
+        remote.ca_cert = UserCertificate.objects.get(pk=self.cleaned_data["certificate_ca"])
+        remote.ca_identity = self.ca_identity
         local.save()
+        remote.save()
         connection.save()
 
     def fill(self, connection):

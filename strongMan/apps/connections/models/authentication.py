@@ -84,7 +84,7 @@ class CertificateAuthentication(Authentication):
         ident = self.identity.subclass()
         if not isinstance(ident, DnIdentity):
             values['id'] = ident.value()
-        values['certs']= [self.identity.subclass().certificate.der_container]
+        values['certs'] = [self.identity.subclass().certificate.der_container]
         return auth
 
     def has_private_key(self):
@@ -102,7 +102,7 @@ class EapTlsAuthentication(Authentication):
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
         values = auth[self.name]
-        values['certs'].append(self.identity.subclass().certificate.der_container)
+        values['certs'] = [self.identity.subclass().certificate.der_container]
         ident = self.identity.subclass()
         if not isinstance(ident, DnIdentity):
             values['id'] = ident.value()
