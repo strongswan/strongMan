@@ -1,13 +1,14 @@
-#connection-details .form-holder {
-  padding: 30px;
-  .popover {
-    max-width: 300px;
-  }
-  .question {
-    font-size: 1em;
-    vertical-align: middle;
-    text-align: center;
-    color: #333;
+.back-section {
+  margin-bottom: 15px;
+}
+
+#connection-details {
+
+  .form-holder {
+    padding: 30px;
+    .popover {
+      max-width: 300px;
+    }
   }
 }
 
