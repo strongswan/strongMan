@@ -117,4 +117,10 @@ html {
 #logout_button {
   float: right; }
 
+.question {
+  font-size: 1em;
+  vertical-align: middle;
+  text-align: center;
+  color: #333; }
+
 /*# sourceMappingURL=main.css.map */
