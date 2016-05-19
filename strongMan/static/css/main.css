@@ -123,4 +123,7 @@ html {
   text-align: center;
   color: #333; }
 
+#about #plugin-panel {
+  padding: 10px; }
+
 /*# sourceMappingURL=main.css.map */
