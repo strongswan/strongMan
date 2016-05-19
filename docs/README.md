@@ -7,26 +7,26 @@ Tool to install strongMan comfortably.
 ```
 
 - -v | --verbose
-Sets the output of setup.py verbose.
+    - Sets the output of setup.py verbose.
 
-## install
+### install
 ```bash
 ./setup.py install [-p %python-interpreter%]
 ```
 Makes strongMan ready to run.
 
 - -p | --python %python-interpreter%
-Select a specific python interpreter to run strongMan
-python3 is used as default value for %python-interpreter%
+    - Select a specific python interpreter to run strongMan
+    - python3 is used as default value for %python-interpreter%
 
-## uninstall
+### uninstall
 ```bash
 sudo ./setup.py uninstall
 ```
 Undos the installation.
 Run this command as root to remove the strongMan systemd service.
 
-## add-service
+### add-service
 ```bash
 sudo ./setup.py add-service
 ```
@@ -40,14 +40,14 @@ sudo systemctl start strongMan.service
 
 You need root permissions to run add-service.
 
-## remove-service
+### remove-service
 ```bash
 sudo ./setup.py remove-service
 ```
 Removes the strongMan systemd service.
 You need root permissions to run this command.
 
-## migrate
+### migrate
 ```bash
 ./setup.py migrate [-dm]
 ```
@@ -55,4 +55,4 @@ Runs the django migrations like descripted in [migrations](https://docs.djangopr
 This command is mainly for developers.
 
 - -dm | --delete-migrations
-Deletes all old migrations scripts and also the sqlite database.
+    - Deletes all old migrations scripts and also the sqlite database.
