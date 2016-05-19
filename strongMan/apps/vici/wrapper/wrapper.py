@@ -1,3 +1,4 @@
+import json
 import os, stat
 import socket
 import vici
@@ -45,6 +46,7 @@ class ViciWrapper:
             self.session.load_conn(connection)
         except Exception as e:
             raise ViciLoadException("Connection cannot be loaded!")
+        #self.print_connection(connection)
 
     def unload_connection(self, connection_name):
         '''
@@ -195,51 +197,14 @@ class ViciWrapper:
         except Exception as e:
             return default_state
 
-
-''' Help to see a SA
-[OrderedDict([('cert',
-    OrderedDict([('uniqueid', b'2'),
-        ('version', b'2'),
-        ('state', b'ESTABLISHED'),
-        ('local-host', b'172.17.0.1'),
-        ('local-port', b'4500'),
-        ('local-id', b'C=CH, O=Linux strongSwan, OU=Research, CN=carol@strongswan.org'),
-        ('remote-host', b'172.17.0.2'),
-        ('remote-port', b'4500'),
-        ('remote-id', b'moon.strongswan.org'),
-        ('initiator', b'yes'),
-        ('initiator-spi', b'bfdd33c1a24810e2'),
-        ('responder-spi', b'643537f4c01507e4'),
-        ('encr-alg', b'AES_CBC'),
-        ('encr-keysize', b'128'),
-        ('integ-alg', b'HMAC_SHA2_256_128'),
-        ('prf-alg', b'PRF_HMAC_SHA2_256'),
-        ('dh-group', b'MODP_2048'),
-        ('established', b'16'),
-        ('rekey-time', b'13312'),
-        ('local-vips', [b'10.6.0.1']),
-        ('child-sas',
-            OrderedDict([('cert',
-                OrderedDict([('uniqueid', b'2'),
-                    ('reqid', b'2'),
-                    ('state', b'INSTALLED'),
-                    ('models', b'TUNNEL'),
-                    ('protocol', b'ESP'),
-                    ('spi-in', b'c46d302e'),
-                    ('spi-out', b'c2125947'),
-                    ('encr-alg', b'AES_GCM_16'),
-                    ('encr-keysize', b'128'),
-                    ('bytes-in', b'0'),
-                    ('packets-in', b'0'),
-                    ('bytes-out', b'0'),
-                    ('packets-out', b'0'),
-                    ('rekey-time', b'3241'),
-                    ('life-time', b'3944'),
-                    ('install-time', b'16'),
-                    ('local-ts', [b'10.6.0.1/32']),
-                    ('remote-ts', [b'172.17.0.2/32'])]))]))]))])]
-
-[OrderedDict([('cert', OrderedDict([('uniqueid', b'1'), ('version', b'2'), ('state', b'CONNECTING'), ('local-host', b'172.17.0.1'), ('local-port', b'500'), ('local-id', b'%any'), ('remote-host', b'172.17.0.2'), ('remote-port', b'500'), ('remote-id', b'%any'), ('initiator', b'yes'), ('initiator-spi', b'10f1339048108561'), ('responder-spi', b'0000000000000000'), ('tasks-active', [b'IKE_VENDOR', b'IKE_INIT', b'IKE_NATD', b'IKE_CERT_PRE', b'IKE_AUTH', b'IKE_CERT_POST', b'IKE_CONFIG', b'CHILD_CREATE', b'IKE_AUTH_LIFETIME', b'IKE_MOBIKE']), ('child-sas', OrderedDict())]))])]
-
-
-'''
+    def print_connection(self, connection):
+        try:
+            for con_name in connection:
+                for key in connection[con_name]:
+                    if key.startswith('local-') or key.startswith('remote-'):
+                        connection[con_name][key].pop('certs',[])
+                        connection[con_name][key].pop('cacerts',[])
+            print(json.dumps(connection, indent=4))
+        except Exception as e:
+            print(e)
+            pass

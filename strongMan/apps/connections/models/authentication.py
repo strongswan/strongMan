@@ -27,7 +27,7 @@ class Authentication(models.Model):
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
         if self.ca_cert is not None:
-            parameters['certs'] = [self.ca_cert.der_container]
+            parameters['cacerts'] = [self.ca_cert.der_container]
             parameters['id'] = self.ca_identity
         auth = OrderedDict()
         auth[self.name] = parameters
@@ -84,7 +84,7 @@ class CertificateAuthentication(Authentication):
         ident = self.identity.subclass()
         if not isinstance(ident, DnIdentity):
             values['id'] = ident.value()
-        values['certs'].append(self.identity.subclass().certificate.der_container)
+        values['certs'] = [self.identity.subclass().certificate.der_container]
         return auth
 
     def has_private_key(self):
@@ -102,7 +102,7 @@ class EapTlsAuthentication(Authentication):
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
         values = auth[self.name]
-        values['certs'].append(self.identity.subclass().certificate.der_container)
+        values['certs'] = [self.identity.subclass().certificate.der_container]
         ident = self.identity.subclass()
         if not isinstance(ident, DnIdentity):
             values['id'] = ident.value()
