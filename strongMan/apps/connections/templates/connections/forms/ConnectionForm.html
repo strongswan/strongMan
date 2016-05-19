@@ -57,14 +57,16 @@
             {% block form_content %}{% endblock form_content %}
             <div class="pull-right">
                 {% if connection %}
+                    {% if connection.state == "DOWN" %}
                     <span title="Remove connection">
-                <a href="{% url 'connections:delete' connection.id %}"
-                   id="delete-{{ connection.id }}"
-                   class="btn btn-default white-background black remove-btn">
-                    <span class="glyphicon glyphicon-remove"></span> <span
-                        class="removebtn-text">Remove</span>
-                </a>
-            </span>
+                        <a href="{% url 'connections:delete' connection.id %}"
+                           id="delete-{{ connection.id }}"
+                           class="btn btn-default white-background black remove-btn">
+                            <span class="glyphicon glyphicon-remove"></span> <span
+                                class="removebtn-text">Remove</span>
+                        </a>
+                    </span>
+                        {% endif %}
                 {% endif %}
                 <button type="submit" name="save" id="configuration"
                         class="btn btn-primary"><span

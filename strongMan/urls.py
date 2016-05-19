@@ -4,6 +4,8 @@ from .apps import views
 from .apps.certificates import urls as certificates_url
 from .apps.connections import urls as connections_urls
 from .apps.views import index
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf import settings
 
 
 urlpatterns = [
@@ -21,3 +23,6 @@ handler400 = 'strongMan.apps.views.bad_request'
 handler403 = 'strongMan.apps.views.permission_denied'
 handler404 = 'strongMan.apps.views.page_not_found'
 handler500 = 'strongMan.apps.views.server_error'
+
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()

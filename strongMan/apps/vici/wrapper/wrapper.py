@@ -3,17 +3,17 @@ import os, stat
 import socket
 import vici
 from collections import OrderedDict
-from .exception import ViciPathNotASocketException, ViciSocketException, ViciTerminateException, ViciLoadException, \
-    ViciInitiateException
+from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, ViciPathNotASocketException
 
 
 class ViciWrapper:
     def __init__(self, socket_path="/var/run/charon.vici"):
         self.socket_path = socket_path
+        if not os.path.exists(self.socket_path):
+            raise ViciSocketException(self.socket_path + " doesn't exist!")
         if not self._is_path_a_socket():
             raise ViciPathNotASocketException("The path '" + self.socket_path + "' is not a Socket!")
-        else:
-            self._connect_socket()
+        self._connect_socket()
 
     def __del__(self):
         self._close_socket()

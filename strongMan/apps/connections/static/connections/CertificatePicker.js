@@ -17,7 +17,7 @@ CertificatePicker = function (certificateIdentPickerId, certificatePickerUrl, cs
     var certificateIdentPicker = $_("#" + certificateIdentPickerId);
     var certificateSelect = $_(".certificateselect", certificateIdentPicker);
     var identitySelect = $_(".identityselect", certificateIdentPicker);
-    var previousCertificateValue = null;
+    var previousCertificateValue = certificateSelect.val();
     var addCertificateModal = $_(".modal", certificateIdentPicker);
 
 
