@@ -54,6 +54,7 @@ class ConnectionForm(AbstractConForm):
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
     certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate", required=True)
+    certificate_ca_auto = forms.BooleanField(initial=True, required=False)
     identity_ca = forms.CharField(max_length=200, label="Identity", required=False, initial="")
     is_server_identity = forms.BooleanField(initial=True, required=False)
 
@@ -146,6 +147,11 @@ class ConnectionForm(AbstractConForm):
     @classmethod
     def get_models(cls):
         return tuple(tuple((subclass().model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
+
+    @classmethod
+    def ca_certificate_exists(cls):
+        exists = UserCertificate.objects.filter(is_CA=True).count() != 0
+        return exists
 
 
 class Ike2CertificateForm(ConnectionForm):

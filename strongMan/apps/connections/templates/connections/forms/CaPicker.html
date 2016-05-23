@@ -1,6 +1,17 @@
+{% with certificate=form.certificate_ca identity=form.identity_ca is_server_identity=form.is_server_identity certificate_ca_auto=form.certificate_ca_auto ca_exists=form.ca_certificate_exists %}
 <div id="ca_picker_{{ certificate.name }}">
-    <div class="row ca_picker">
+    <div class="row certificate_ca_auto">
         <label class="control-label col-sm-3">{{ certificate.label }}</label>
+        <div class="col-sm-8 col-xs-10">
+        <span {% if ca_exists == False %}title="Choose automatically has been disabled because strongMan doesn't contains any ca certificate." {% endif %}>
+        <input type="checkbox" class="certificate_ca_auto" name="{{ certificate_ca_auto.name }}" id="{{ certificate_ca_auto.name }}"
+               {% if certificate_ca_auto.value and ca_exists %}checked{% endif %}
+               {% if ca_exists == False %}disabled{% endif %}>
+        Choose automatically</span>
+        </div>
+    </div>
+    <div class="row ca_picker">
+        <label class="control-label col-sm-3"></label>
         <div class="col-sm-8 col-xs-10">
             <select class="selectpicker" data-live-search="true"
                     name="{{ certificate.name }}"
@@ -18,7 +29,7 @@
             {% include "connections/forms/../widgets/errormsg.html" with field=certificate %}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the CA certificate." %}
+            {% include "connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the CA certificate. If no ca certificate is available 'Choose automatically' will be disabled." %}
         </div>
         <div class="col-sm-11 col-xs-10">
             <div class="pull-right cert_upload">
@@ -68,8 +79,9 @@
     </div>
 
     <script>
-        var caPicker = CaPicker("ca_picker_{{ certificate.name }}", "{% url "connections:capicker" %}", "{{ csrf_token }}");
-
+        var caPicker = new CaPicker("ca_picker_{{ certificate.name }}", "{% url "connections:capicker" %}", "{{ csrf_token }}");
+        var caAuto = new CaAuto("ca_picker_{{ certificate.name }}");
 
     </script>
 </div>
+{% endwith %}

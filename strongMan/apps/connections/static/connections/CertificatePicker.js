@@ -167,3 +167,42 @@ CaPicker = function (caPickerId, caPickerUrl, csrf_token) {
     addEventHandler();
 };
 
+CaAuto = function (caPickerId) {
+    var these = this;
+    var $_ = function (selector, base) {
+        if (typeof base !== "undefined") {
+            element = base.find(selector);
+        } else {
+            var element = $(selector);
+        }
+        if (!element.length) {
+            throw select + " not found!"
+        }
+        return element;
+    };
+    var caPicker = $_("#" + caPickerId);
+    var caPickerRow = $_(".ca_picker", caPicker);
+    var caAutoCheckbox = $_("#certificate_ca_auto", caPicker);
+
+
+
+    var addEventHandler = function () {
+        caAutoCheckbox.change(function () {
+            refresh();
+        });
+        $(document).ready(function () {
+            refresh();
+        });
+    };
+
+    var refresh = function () {
+        var checked = caAutoCheckbox.is(':checked');
+        if (checked) {
+            caPickerRow.hide();
+        } else {
+            caPickerRow.show();
+        }
+    };
+    addEventHandler();
+};
+

@@ -75,6 +75,12 @@ class EapAuthentication(Authentication):
         return auth
 
 
+class AutoCaAuthentication(Authentication):
+
+    def dict(self):
+        return {}
+
+
 class CertificateAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='cert_identity')
 

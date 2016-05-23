@@ -13,7 +13,7 @@
             <p>Choose the certification authority (CA) certificate which authenticates the server.</p>
         </div>
     </div>
-    {% include "connections/forms/CaPicker.html" with certificate=form.certificate_ca identity=form.identity_ca is_server_identity=form.is_server_identity %}
+    {% include "connections/forms/CaPicker.html" with form=form %}
     <hr>
 
 {% endblock form_content %}
