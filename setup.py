@@ -92,8 +92,14 @@ class Installer(BaseInstaller):
     def migrate_db(self):
         migrator = Migrator()
         migrator.mute = self.mute
-        migrator.delete_migrations()
-        migrator.delete_db()
+        try:
+            migrator.delete_migrations()
+        except Exception as e:
+            print(e)
+        try:
+            migrator.delete_db()
+        except Exception as e:
+            print(e)
         migrator.migrate()
         migrator.load_fixtures()
 
