@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from strongMan.apps.connections.models.common import State
 
 from .specific import Child, Address, Proposal, Secret, LogMessage
-from .authentication import Authentication
+from .authentication import Authentication, AutoCaAuthentication
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
@@ -106,6 +106,14 @@ class Connection(models.Model):
                 return State.CONNECTING.value
         except:
             return State.DOWN.value
+
+    @property
+    def has_auto_ca_authentication(self):
+        for remote in self.remote.all():
+            sub = remote.subclass()
+            if isinstance(sub, AutoCaAuthentication):
+                return True
+        return False
 
 class IKEv2Certificate(Connection):
     @classmethod

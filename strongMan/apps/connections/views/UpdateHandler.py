@@ -1,3 +1,5 @@
+from ..forms.ConnectionForms import AbstractConnectionForm
+from strongMan.apps.connections.forms.ConnectionForms import AbstractDynamicForm
 from strongMan.apps.connections.models.connections import Connection
 from .. import forms
 from django.shortcuts import render, redirect
@@ -21,7 +23,7 @@ class UpdateHandler:
 
     def _render(self, form=None):
         if form is None:
-            form = forms.add_wizard.ConnectionForm().subclass(self.connection)
+            form = AbstractConnectionForm.subclass(self.connection)
             form.fill(self.connection)
         return render(self.request, 'connections/Detail.html', {"form": form, "connection": self.connection})
 
@@ -30,7 +32,7 @@ class UpdateHandler:
         Intiates and validates the Abstract form
         :return Valid abstract form
         '''
-        form = forms.AbstractConForm(self.parameter_dict)
+        form = AbstractDynamicForm(self.parameter_dict)
         if not form.is_valid():
             raise Exception("No valid form detected." + str(form.errors))
         return form
@@ -43,7 +45,7 @@ class UpdateHandler:
             form_class = abstract_form.current_form_class
 
             form = form_class(self.parameter_dict)
-            form.update_certificates()
+            form.update_certs()
             if not form.is_valid():
                 return self._render(form)
 

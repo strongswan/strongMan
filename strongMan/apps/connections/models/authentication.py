@@ -12,8 +12,7 @@ class Authentication(models.Model):
     name = models.TextField()  # starts with remote-* or local-*
     auth = models.TextField()
     round = models.IntegerField(default=1)
-    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_authentication')
-    ca_identity = models.TextField()
+
 
     @property
     def connection(self):
@@ -26,12 +25,8 @@ class Authentication(models.Model):
 
     def dict(self):
         parameters = OrderedDict(auth=self.auth, round=self.round)
-        if self.ca_cert is not None:
-            parameters['cacerts'] = [self.ca_cert.der_container]
-            parameters['id'] = self.ca_identity
         auth = OrderedDict()
         auth[self.name] = parameters
-
         return auth
 
     @classmethod
@@ -65,6 +60,24 @@ class Authentication(models.Model):
             raise Exception('Algorithm of key is not supported!')
 
 
+class CaCertificateAuthentication(Authentication):
+    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_authentication')
+    ca_identity = models.TextField()
+
+    def dict(self):
+        auth = super(CaCertificateAuthentication, self).dict()
+        parameters = auth[self.name]
+        parameters['cacerts'] = [self.ca_cert.der_container]
+        parameters['id'] = self.ca_identity
+        return auth
+
+
+class AutoCaAuthentication(Authentication):
+
+    def dict(self):
+        return super(CertificateAuthentication, self).dict()
+
+
 class EapAuthentication(Authentication):
     eap_id = models.TextField()
 
@@ -73,12 +86,6 @@ class EapAuthentication(Authentication):
         values = auth[self.name]
         values['eap_id'] = self.eap_id
         return auth
-
-
-class AutoCaAuthentication(Authentication):
-
-    def dict(self):
-        return {}
 
 
 class CertificateAuthentication(Authentication):
