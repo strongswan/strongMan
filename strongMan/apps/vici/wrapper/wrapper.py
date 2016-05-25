@@ -1,6 +1,7 @@
 import json
 import os, stat
 import socket
+import collections
 import vici
 from collections import OrderedDict
 from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, ViciPathNotASocketException
@@ -46,7 +47,7 @@ class ViciWrapper:
             self.session.load_conn(connection)
         except Exception as e:
             raise ViciLoadException("Connection cannot be loaded!")
-        #self.print_connection(connection)
+        self.print_connection(connection)
 
     def unload_connection(self, connection_name):
         '''
@@ -201,10 +202,13 @@ class ViciWrapper:
         try:
             for con_name in connection:
                 for key in connection[con_name]:
-                    if key.startswith('local-') or key.startswith('remote-'):
-                        connection[con_name][key].pop('certs',[])
-                        connection[con_name][key].pop('cacerts',[])
+                    if isinstance(connection[con_name][key], collections.Iterable):
+                        if 'certs' in connection[con_name][key]:
+                            connection[con_name][key].pop('certs', [])
+                        if 'cacerts' in connection[con_name][key]:
+                            connection[con_name][key].pop('cacerts', [])
             print(json.dumps(connection, indent=4))
+            print(connection)
         except Exception as e:
             print(e)
             pass
