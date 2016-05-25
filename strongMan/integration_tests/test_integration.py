@@ -60,6 +60,25 @@ class IntegrationTest(TestCase):
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
 
+    def test_Ike2Eap_auto_ca(self):
+        url_create = '/connections/add/'
+        response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': 'gateway', 'profile': 'EAP',
+                                      'certificate_ca_auto': True, 'identity_ca': "moon.strongswan.org",
+                                      'username': "eap-test", 'password': "test"})
+
+        print(response.content.decode('utf-8'))
+        self.assertEquals(1, Connection.objects.count())
+        self.assertEquals(1, Child.objects.count())
+
+        connection = Connection.objects.first().subclass()
+        toggle_url = '/connections/toggle/'
+        self.client.post(toggle_url, {'id': connection.id})
+
+        self.assertEqual(self.vici_wrapper.get_connections_names().__len__(), 1)
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 1)
+        self.client.post(toggle_url, {'id': connection.id})
+        self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
+
     def test_Ike2CertificateIntegration(self):
         url_create = '/connections/add/'
 

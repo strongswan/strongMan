@@ -1,3 +1,6 @@
+from ..forms.SubForms import HeaderForm
+from strongMan.apps.connections.forms.ConnectionForms import AbstractDynamicForm
+from ..forms import ChooseTypeForm
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 
@@ -7,7 +10,7 @@ class AddHandler:
     def __init__(self, request):
         self.request = request
 
-    def _render(self, form=forms.ChooseTypeForm()):
+    def _render(self, form=ChooseTypeForm()):
         return render(self.request, 'connections/Detail.html', {"form": form})
 
     def _abstract_form(self):
@@ -15,7 +18,7 @@ class AddHandler:
         Intiates and validates the Abstract form
         :return Valid abstract form
         '''
-        form = forms.AbstractConForm(self.request.POST)
+        form = AbstractDynamicForm(self.request.POST)
         if not form.is_valid():
             raise Exception("No valid form detected." + str(form.errors))
         return form
@@ -28,14 +31,14 @@ class AddHandler:
             form_class = abstract_form.current_form_class
 
             form = form_class(self.request.POST)
-            form.update_certificates()
+            form.update_certs()
             if not form.is_valid():
                 return self._render(form)
 
             if form_class == forms.ChooseTypeForm:
                 return self._render(form=form.selected_form_class())
 
-            if isinstance(form, forms.ConnectionForm):
+            if isinstance(form, HeaderForm):
                 form.create_connection()
                 return redirect(reverse("connections:index"))
 

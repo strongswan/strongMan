@@ -167,3 +167,47 @@ CaPicker = function (caPickerId, caPickerUrl, csrf_token) {
     addEventHandler();
 };
 
+CaAuto = function (caPickerId) {
+    var these = this;
+    var $_ = function (selector, base) {
+        if (typeof base !== "undefined") {
+            element = base.find(selector);
+        } else {
+            var element = $(selector);
+        }
+        if (!element.length) {
+            throw selector + " not found!"
+        }
+        return element;
+    };
+    var caPicker = $_("#" + caPickerId);
+    var caPickerRow = $_(".ca_picker", caPicker);
+    var caSelectPicker = $_(".selectpicker", caPickerRow);
+    var caAutoCheckbox = $_("#certificate_ca_auto", caPicker);
+
+
+
+    var addEventHandler = function () {
+        caAutoCheckbox.change(function () {
+            refresh();
+        });
+        $(document).ready(function () {
+            refresh();
+        });
+    };
+
+    var refresh = function () {
+        var checked = caAutoCheckbox.is(':checked');
+        if (checked) {
+            caPickerRow.hide();
+            caSelectPicker.prop('disabled', true);
+        } else {
+            caPickerRow.show();
+            caSelectPicker.prop('disabled', false);
+            console.log(caSelectPicker.prop('disabled'));
+        }
+        caSelectPicker.selectpicker('refresh');
+    };
+    addEventHandler();
+};
+

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..forms.add_wizard import Ike2CertificateForm
+from ..forms import Ike2CertificateForm
 from ...certificates.models import UserCertificate
 from django.shortcuts import get_object_or_404
 
@@ -33,3 +33,4 @@ class CertificatePickerHandler:
 
         get_object_or_404(UserCertificate, pk=id)
         return id
+

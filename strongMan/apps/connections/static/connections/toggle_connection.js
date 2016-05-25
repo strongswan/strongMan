@@ -7,9 +7,15 @@ function handler(event) {
     var connectionId = this.id.value;
     var csrf = this.csrfmiddlewaretoken.value;
     $.ajax({
-        data: $(this).serialize(), // get the form data
-        type: 'POST', // GET or POST
-        url: '/connections/toggle/' // the file to call
+        data: $(this).serialize(),
+        type: 'POST', 
+        url: '/connections/toggle/',
+                success: function (response) {
+            if (!response.success) {
+                setAlert(response);
+                stateDown(response.id);
+            }
+        }
     });
     stateConnecting(connectionId);
     setTimeout(function () {

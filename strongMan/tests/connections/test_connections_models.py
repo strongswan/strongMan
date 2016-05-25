@@ -1,10 +1,8 @@
 import os
 from collections import OrderedDict
 from django.test import TestCase
-from strongMan.apps.connections.models import Proposal, Secret, Address, \
-    CertificateAuthentication, EapAuthentication, IKEv2EAP
 from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
-from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication
+from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication, CaCertificateAuthentication
 from strongMan.apps.connections.models.connections import Connection, IKEv2EAP
 from strongMan.apps.certificates.models import Certificate, UserCertificate, CertificateDoNotDelete
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
@@ -30,12 +28,12 @@ class ConnectionModelTest(TestCase):
         manager.add_keycontainer(bytes)
 
         certificate = Certificate.objects.first().subclass()
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2,
-                                 ca_cert=certificate, ca_identity="adsfasdf")
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2)
         auth.save()
-        Authentication(name='remote-1', auth='pubkey', remote=connection).save()
+        CaCertificateAuthentication(name='remote-1', auth='pubkey',
+                                 ca_cert=certificate, ca_identity="adsfasdf", remote=connection).save()
         CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
-                                  local=connection, ca_cert=certificate, ca_identity="asdfasdf").save()
+                                  local=connection).save()
         Secret(type='EAP', data="password", authentication=auth).save()
 
     def test_child_added(self):
