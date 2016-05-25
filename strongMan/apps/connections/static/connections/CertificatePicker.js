@@ -176,12 +176,13 @@ CaAuto = function (caPickerId) {
             var element = $(selector);
         }
         if (!element.length) {
-            throw select + " not found!"
+            throw selector + " not found!"
         }
         return element;
     };
     var caPicker = $_("#" + caPickerId);
     var caPickerRow = $_(".ca_picker", caPicker);
+    var caSelectPicker = $_(".selectpicker", caPickerRow);
     var caAutoCheckbox = $_("#certificate_ca_auto", caPicker);
 
 
@@ -199,9 +200,13 @@ CaAuto = function (caPickerId) {
         var checked = caAutoCheckbox.is(':checked');
         if (checked) {
             caPickerRow.hide();
+            caSelectPicker.prop('disabled', true);
         } else {
             caPickerRow.show();
+            caSelectPicker.prop('disabled', false);
+            console.log(caSelectPicker.prop('disabled'));
         }
+        caSelectPicker.selectpicker('refresh');
     };
     addEventHandler();
 };

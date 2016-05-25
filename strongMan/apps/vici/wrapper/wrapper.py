@@ -1,4 +1,3 @@
-import json
 import os, stat
 import socket
 import vici
@@ -45,7 +44,7 @@ class ViciWrapper:
         try:
             self.session.load_conn(connection)
         except Exception as e:
-            raise ViciLoadException("Connection cannot be loaded!")
+            raise ViciLoadException("Connection cannot be loaded! " + str(e.decode("utf-8")))
         #self.print_connection(connection)
 
     def unload_connection(self, connection_name):
@@ -168,7 +167,7 @@ class ViciWrapper:
                 message = log['msg'].decode('ascii')
                 yield OrderedDict(message=message)
         except Exception as e:
-            raise ViciInitiateException("SA can't be initiated!")
+            raise ViciInitiateException("SA can't be initiated! " + str(e))
 
     def terminate_connection(self, connection_name):
         '''
@@ -197,14 +196,3 @@ class ViciWrapper:
         except Exception as e:
             return default_state
 
-    def print_connection(self, connection):
-        try:
-            for con_name in connection:
-                for key in connection[con_name]:
-                    if key.startswith('local-') or key.startswith('remote-'):
-                        connection[con_name][key].pop('certs',[])
-                        connection[con_name][key].pop('cacerts',[])
-            print(json.dumps(connection, indent=4))
-        except Exception as e:
-            print(e)
-            pass

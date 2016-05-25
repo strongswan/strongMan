@@ -72,10 +72,6 @@ class CaCertificateForm(forms.Form):
         super(CaCertificateForm, self).__init__(*args, **kwargs)
         self.fields['certificate_ca'].queryset = UserCertificate.objects.all()
 
-    def is_valid(self):
-        valid = super(CaCertificateForm, self).is_valid()
-        return True
-
     def clean_certificate_ca(self):
         if "certificate_ca_auto" in self.data:
             return ""
@@ -124,9 +120,9 @@ class CaCertificateForm(forms.Form):
 
     def create_connection(self, connection):
         if self.is_auto_choose:
-            AutoCaAuthentication(remote=connection).save()
+            AutoCaAuthentication(name='remote-cert', auth='pubkey', remote=connection).save()
         else:
-            CaCertificateAuthentication(name='remote-eap', auth='pubkey', remote=connection,
+            CaCertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection,
                        ca_cert=self.chosen_certificate).save()
 
     def update_connection(self, connection):
@@ -137,9 +133,9 @@ class CaCertificateForm(forms.Form):
             if isinstance(sub, AutoCaAuthentication):
                 sub.delete()
         if self.is_auto_choose:
-            AutoCaAuthentication(remote=connection).save()
+            AutoCaAuthentication(name='remote-cert', auth='pubkey' ,remote=connection).save()
         else:
-            CaCertificateAuthentication(name='remote-eap', auth='pubkey', remote=connection,
+            CaCertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection,
                                         ca_cert=self.chosen_certificate).save()
 
 
@@ -188,10 +184,7 @@ class ServerIdentityForm(forms.Form):
     def fill(self, connection):
         for remote in connection.remote.all():
             sub = remote.subclass()
-            if isinstance(sub, AutoCaAuthentication):
-                self.is_server_identity_checked = True
-                return
-            if isinstance(sub, CaCertificateAuthentication):
+            if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
                 is_server_identity_checked = sub.ca_identity == connection.remote_addresses.first().value
                 self.is_server_identity_checked = is_server_identity_checked
                 if not is_server_identity_checked:
@@ -200,18 +193,16 @@ class ServerIdentityForm(forms.Form):
     def create_connection(self, connection):
         for remote in connection.remote.all():
             sub = remote.subclass()
-            if isinstance(sub,AutoCaAuthentication):
-                return
-            if isinstance(sub, CaCertificateAuthentication):
+            if isinstance(sub, AutoCaAuthentication) or isinstance(sub, CaCertificateAuthentication):
                 sub.ca_identity = self.ca_identity
                 sub.save()
                 return
-        raise Exception("No CaCertificateAuthentication found that can be used to insert identity.")
+        raise Exception("No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
 
     def update_connection(self, connection):
         for remote in connection.remote.all():
             sub = remote.subclass()
-            if isinstance(sub, CaCertificateAuthentication):
+            if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
                 sub.ca_identity = self.ca_identity
                 sub.save()
 
@@ -326,7 +317,7 @@ class EapForm(forms.Form):
                 self.fields['password'].initial = Secret.objects.filter(authentication=subclass).first().data
 
     def create_connection(self, connection):
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username)
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round="2")
         auth.save()
         Secret(type='EAP', data=self.my_password, authentication=auth).save()
 

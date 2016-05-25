@@ -1,8 +1,7 @@
 from ..forms.ConnectionForms import AbstractConnectionForm
 from strongMan.apps.connections.forms.ConnectionForms import AbstractDynamicForm
 from strongMan.apps.connections.models.connections import Connection
-from .. import forms
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib import messages
 
 

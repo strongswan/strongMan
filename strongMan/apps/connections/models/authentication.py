@@ -73,9 +73,14 @@ class CaCertificateAuthentication(Authentication):
 
 
 class AutoCaAuthentication(Authentication):
+    ca_identity = models.TextField()
 
     def dict(self):
-        return super(CertificateAuthentication, self).dict()
+        auth = super(AutoCaAuthentication, self).dict()
+        parameters = auth[self.name]
+        parameters['cacerts'] = [cert.der_container for cert in UserCertificate.objects.filter(is_CA=True)]
+        parameters['id'] = self.ca_identity
+        return auth
 
 
 class EapAuthentication(Authentication):

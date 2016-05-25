@@ -1,4 +1,5 @@
 import sys
+import json
 from collections import OrderedDict
 
 from django.db import models
@@ -10,6 +11,7 @@ from strongMan.apps.connections.models.common import State
 from .specific import Child, Address, Proposal, Secret, LogMessage
 from .authentication import Authentication, AutoCaAuthentication
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from collections import Iterable
 
 
 class Connection(models.Model):
@@ -114,6 +116,17 @@ class Connection(models.Model):
             if isinstance(sub, AutoCaAuthentication):
                 return True
         return False
+
+    def __str__(self):
+        connection = self.dict()
+        for con_name in connection:
+            for key in connection[con_name]:
+                if isinstance(connection[con_name][key], Iterable):
+                    if 'certs' in connection[con_name][key]:
+                        connection[con_name][key].pop('certs', [])
+                    if 'cacerts' in connection[con_name][key]:
+                        connection[con_name][key].pop('cacerts', [])
+        return str(json.dumps(connection, indent=4))
 
 class IKEv2Certificate(Connection):
     @classmethod
