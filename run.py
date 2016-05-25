@@ -2,8 +2,6 @@
 import subprocess
 import os
 
-
-
 DJANGO_DIR = os.path.dirname(os.path.realpath(__file__))
 PORT = 1515
 if __name__ == "__main__":
