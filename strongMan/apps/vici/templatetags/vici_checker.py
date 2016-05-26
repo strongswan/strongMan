@@ -9,9 +9,10 @@ register = template.Library()
 def vici_reachable(context):
     try:
         ViciWrapper()
-        return True
+
+        return {'reachable': True}
     except ViciSocketException as e:
-        return False
+        return {'reachable': False, 'message': str(e)}
 
 @register.assignment_tag(takes_context=True, name="vici_version_supported")
 def vici_version_supported(context):

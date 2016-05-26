@@ -123,7 +123,8 @@ html {
   text-align: center;
   color: #333; }
 
-#about #plugin-panel {
-  padding: 10px; }
+#about #plugins {
+  padding: 10px;
+  margin-bottom: 40px; }
 
 /*# sourceMappingURL=main.css.map */
