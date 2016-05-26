@@ -3,7 +3,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_HOSTS = []
-STRONGMAN_INCLUDE_STATIC=False
 
 # Application definition
 
@@ -18,6 +17,7 @@ INSTALLED_APPS = [
     'strongMan.apps.connections',
     'strongMan.apps.certificates',
     'django_tables2',
+    'dj_static',
 ]
 
 MIDDLEWARE_CLASSES = [

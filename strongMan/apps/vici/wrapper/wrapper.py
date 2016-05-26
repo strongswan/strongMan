@@ -2,7 +2,8 @@ import os, stat
 import socket
 import vici
 from collections import OrderedDict
-from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, ViciPathNotASocketException
+from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, \
+    ViciPathNotASocketException
 
 
 class ViciWrapper:
@@ -44,8 +45,7 @@ class ViciWrapper:
         try:
             self.session.load_conn(connection)
         except Exception as e:
-            raise ViciLoadException("Connection cannot be loaded! " + str(e.decode("utf-8")))
-        #self.print_connection(connection)
+            raise ViciLoadException("Connection cannot be loaded! " + str(e))
 
     def unload_connection(self, connection_name):
         '''
@@ -195,4 +195,3 @@ class ViciWrapper:
                 return default_state
         except Exception as e:
             return default_state
-
