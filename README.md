@@ -21,13 +21,13 @@ Run the following commands to install strongMan.
 ```bash
 git clone https://github.com/Sebubu/strongMan.git
 cd strongMan
-./setup.py install
+sudo ./setup.py install
 ```
 We have installed strongMan with all it's requirements in a virtual environment and loaded a default user into the database.
 
 Now we can start the strongMan server.
 ```bash
-./run.py
+sudo ./run.py
 ```
 The server is now accessible on http://localhost:1515
 Username: John, Password: Lennon
