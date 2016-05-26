@@ -154,7 +154,10 @@ class ServerIdentityForm(forms.Form):
             return ""
         if not "identity_ca" in self.data:
             raise forms.ValidationError("This field is required!", code='invalid')
-        return self.data["identity_ca"]
+        ident =  self.data["identity_ca"]
+        if ident == "":
+            raise forms.ValidationError("This field is required!", code='invalid')
+        return ident
 
     @property
     def is_server_identity_checked(self):
