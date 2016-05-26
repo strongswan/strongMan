@@ -14,9 +14,22 @@
                     Release: {{ release }} <br>
                     Machine: {{ machine }} <br>
                     <h2>Installed plugins</h2>
-                    {% for plugin in plugins %}
-                        {{ plugin }}
-                    {% endfor %}
+
+                    <div class="" id="plugins">
+                        <div class="row">
+                            {% for plugin in plugins %}
+                                <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                                {{ plugin }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                                    <p> The strongSwan distribution ships with an ever growing list of plugins. This allows us to add
+                        extended and specialized features, but keep the core as small as possible. Have a look on all available <a target="_blank"
+                                                       href="https://wiki.strongswan.org/projects/strongswan/wiki/Pluginlist">strongSwan
+                        plugins</a>.</p>
+
+
                 </div>
             </div>
             <hr>

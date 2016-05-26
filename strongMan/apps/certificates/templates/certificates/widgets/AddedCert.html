@@ -4,10 +4,10 @@
             <div class="pull-right">
                 <div class="btn-group text-center" role="group" aria-label="...">
                     {% if is_form %}
-                    <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
                     {% else %}
-                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
-                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                        <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url "certificates:overview" %}" class="btn btn-primary">Back to overview</a>
                     {% endif %}
                 </div>
             </div>
@@ -44,10 +44,10 @@
             <div class="pull-right">
                 <div class="btn-group text-center" role="group" aria-label="...">
                     {% if is_form %}
-                    <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url 'certificates:add_form' %}" class="btn btn-default">Add another</a>
                     {% else %}
-                    <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
-                    <a href="{% url "certificates:overview" %}" class="btn btn-primary">Finish</a>
+                        <a href="{% url 'certificates:add' %}" class="btn btn-default">Add another</a>
+                        <a href="{% url "certificates:overview" %}" class="btn btn-primary">Back to overview</a>
                     {% endif %}
                 </div>
             </div>

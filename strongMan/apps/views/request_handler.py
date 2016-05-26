@@ -18,7 +18,9 @@ class AboutHandler:
         try:
             vici_wrapper = ViciWrapper()
             context = vici_wrapper.get_version()
-            context['plugins'] = vici_wrapper.get_plugins()
+            plugins = vici_wrapper.get_plugins()
+            plugins.sort()
+            context['plugins'] = plugins
         except ViciLoadException as e:
             messages.warning(self.request, str(e))
         except ViciSocketException as e:

@@ -31,8 +31,7 @@ class ViciWrapper:
             self.socket.connect(self.socket_path)
             self.session = vici.Session(self.socket)
         except Exception as e:
-            print(e)
-            raise ViciSocketException("Vici is not reachable!")
+            raise ViciSocketException("Vici is not reachable! " + str(e))
 
     def _is_path_a_socket(self):
         mode = os.stat(self.socket_path).st_mode

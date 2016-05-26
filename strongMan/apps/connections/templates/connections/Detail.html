@@ -5,13 +5,20 @@
 {% block html-head %}
     <link href="{% static 'connections/connections.css' %}" rel="stylesheet">
     <script src="{% static 'connections/bootstrap-select.min.js' %}"></script>
-    <script src="{% static 'connections/bootbox.min.js' %}"></script>
     <script src="{% static 'connections/CertificatePicker.js' %}"></script>
     <link rel="stylesheet" href="{% static 'connections/bootstrap-select.min.css' %}">
 {% endblock html-head %}
 {% block title %}Connection{% endblock title %}
-{% block small-title %}{% if connection %}Edit connection{% else %}Add a new connection{% endif %}{% endblock small-title %}
+{% block small-title %}{% if connection %}Edit connection{% else %}Add a new connection
+{% endif %}{% endblock small-title %}
 {% block content %}
+
+    <div class="row back-section">
+        <div class="col-xs-1 col-md-1 col-md-offset-1">
+            <a class="btn btn-default" href="javascript:history.go(-1);">
+                <i class="fa fa-chevron-left fa-lg"></i> Back</a>
+        </div>
+    </div>
     <div id="connection-details">
         <div class="row">
             <div class="col-sm-offset-2 col-sm-8 panel panel-default form-holder">

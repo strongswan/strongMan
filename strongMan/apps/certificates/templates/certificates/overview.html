@@ -24,20 +24,20 @@
         <div class="row" id="header">
             <div class="col-md-10 col-xs-9 btn-group" role="group">
                 <a href="{% url "certificates:overview" %}" {% if view == "all" %}disabled="True" {% endif %}
-                   class="btn btn-default">
-                        <span title="Show all certificates">All</span>
+                   class="btn btn-default" title="Show all certificates">
+                        All
                 </a>
                 <a href="{% url 'certificates:overview_ca' %}" {% if view == "root" %}disabled="True" {% endif %}
-                   class="btn btn-default">
-                        <span title="Show only root certificates">Root</span>
+                   class="btn btn-default" title="Show only root certificates">
+                        Root
                 </a>
                 <a href="{% url 'certificates:overview_certs' %}" {% if view == "entities" %}disabled="True" {% endif %}
-                   class="btn btn-default">
-                        <span title="Show only entity certificates">Entities</span>
+                   class="btn btn-default" title="Show only entity certificates">
+                        Entities
                 </a>
                 <a href="{% url 'certificates:overview_vici' %}" {% if view == "vici" %}disabled="True" {% endif %}
-                   class="btn btn-default">
-                        <span title="Shows the certificates provided by the vici interface">Vici</span>
+                   class="btn btn-default" title="Shows the certificates provided by the vici interface">
+                        Vici
                 </a>
             </div>
             <div class="pull-right" id="add-btn">
@@ -47,7 +47,6 @@
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
                     </a>
                 </span>
-
             </div>
         </div>
 
@@ -78,6 +77,7 @@
         </div>
     {% else %}
         <h3 id="no_certs_to_show">No certificates to show</h3>
+        <p>Feel free to add a key container with the blue Add button on the right side.</p>
     {% endif %}
     </div>
 {% endblock content %}
