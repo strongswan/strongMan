@@ -1,6 +1,8 @@
 <span title="Turn connection on / off" xmlns="http://www.w3.org/1999/html">
-    <div id="alert_{{ record.id }}" style='float: left;'></div>
-    <div class="btn-toolbar">
+    <div id="alert_style">
+        <div id="alert_{{ record.id }}" style='float: left; text-align: left;'></div>
+    </div>
+    <div class="btn-toolbar" style="white-space: nowrap;">
         <form id="toggle_connection{{ record.id }}" action="{% url 'connections:toggle' %}">
             {% csrf_token %}
             <input type="hidden" name="id" value="{{ record.id }}">
