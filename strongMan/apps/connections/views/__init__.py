@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-
 from .CreateHandler import AddHandler
 from .UpdateHandler import UpdateHandler
 from .OverviewHandler import OverviewHandler
@@ -12,6 +11,7 @@ from .LogHandler import LogHandler
 from .SaInfoHandler import SaInfoHandler
 from .CertificatePickerHandler import CertificatePickerHandler
 from .CaPickerHandler import CaPickerHandler
+
 
 @require_http_methods('GET')
 @login_required
@@ -59,11 +59,13 @@ def get_log(request):
     handler = LogHandler(request)
     return handler.handle()
 
+
 @login_required
 @require_http_methods('POST')
 def get_sa_info(request):
     handler = SaInfoHandler(request)
     return handler.handle()
+
 
 @login_required
 @require_http_methods(['POST'])
@@ -71,12 +73,12 @@ def get_certificatepicker(request):
     handler = CertificatePickerHandler(request)
     return handler.handle()
 
+
 @login_required
 @require_http_methods(['POST'])
 def get_capicker(request):
     handler = CaPickerHandler(request)
     return handler.handle()
-
 
 
 def _get_title(form):

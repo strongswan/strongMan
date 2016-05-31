@@ -1,12 +1,11 @@
-from django.conf.urls import url, include, handler400, handler403, handler404, handler500
+from django.conf import settings
+from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .apps import views
 from .apps.certificates import urls as certificates_url
 from .apps.connections import urls as connections_urls
 from .apps.views import index
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.conf import settings
-
 
 urlpatterns = [
     url(r'^$', index, name='index'),

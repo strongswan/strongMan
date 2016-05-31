@@ -7,7 +7,6 @@ from asn1crypto import keys
 from oscrypto import keys as k
 
 
-
 class ContainerTypes(Enum):
     PKCS1 = "PKCS1"
     PKCS8 = "PKCS8"
@@ -17,7 +16,6 @@ class ContainerTypes(Enum):
 
 
 class ContainerDetector:
-
     @classmethod
     def detect_type(cls, container_bytes, password=None):
         '''
@@ -41,7 +39,7 @@ class ContainerDetector:
 
     @classmethod
     def factory(cls, container_bytes, password=None):
-        type = cls.detect_type(container_bytes,password)
+        type = cls.detect_type(container_bytes, password)
         if type == ContainerTypes.PKCS1:
             return PKCS1Reader.by_bytes(container_bytes, password)
         if type == ContainerTypes.PKCS8:
@@ -360,6 +358,7 @@ class X509Reader(AbstractContainerReader):
 
     def cname(self):
         return self.asn1.subject.native["common_name"]
+
 
 class ContainerReaderException(Exception):
     pass

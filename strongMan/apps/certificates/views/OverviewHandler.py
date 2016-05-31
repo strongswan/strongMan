@@ -42,7 +42,7 @@ class AbstractOverviewHandler:
         :return: queryset of filtered certificates
         '''
         cert_ids = []
-        cert_ids  += self._search_for_indentities(search_text)
+        cert_ids += self._search_for_indentities(search_text)
         cert_ids += self._search_for_nicknames(all_certs, search_text)
         return all_certs.filter(pk__in=cert_ids)
 
@@ -79,7 +79,8 @@ class AbstractOverviewHandler:
         RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
         if len(queryset) == 0:
             table = None
-        return render(self.request, 'certificates/overview.html', {'table': table, "view": self.page_tag(), "search_pattern": search_pattern})
+        return render(self.request, 'certificates/overview.html',
+                      {'table': table, "view": self.page_tag(), "search_pattern": search_pattern})
 
     def handle(self):
         try:

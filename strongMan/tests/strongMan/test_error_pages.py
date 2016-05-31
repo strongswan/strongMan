@@ -1,11 +1,9 @@
-from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
-
+from django.test import TestCase, RequestFactory
 from strongMan.apps import views
 
 
 class ErrorPageViewsTests(TestCase):
-
     def setUp(self):
         self.factory = RequestFactory()
         self.request = self.factory.get('/')

@@ -14,6 +14,7 @@ def vici_reachable(context):
     except ViciSocketException as e:
         return {'reachable': False, 'message': str(e)}
 
+
 @register.assignment_tag(takes_context=True, name="vici_version_supported")
 def vici_version_supported(context):
     '''
@@ -36,7 +37,6 @@ def vici_version_supported(context):
         return True
 
     return False
-
 
 
 @register.simple_tag(name="vici_checker")

@@ -4,30 +4,32 @@
     <div class="container">
         <div class="row">
             <div class="page-header">
-                <h1>Vici interface <small>General informations</small></h1>
+                <h1>Vici interface
+                    <small>General informations</small>
+                </h1>
             </div>
         </div>
 
         <div>
             <p>
-                <ul class="nav nav-pills">
-                    {%  for key, value in vici_info.items %}
-                        <li role="presentation"><a href="#{{ key }}">{{ key }}</a></li>
-                    {%  endfor %}
-                </ul>
+            <ul class="nav nav-pills">
+                {% for key, value in vici_info.items %}
+                    <li role="presentation"><a href="#{{ key }}">{{ key }}</a></li>
+                {% endfor %}
+            </ul>
             </p>
         </div>
-        {%  for key, value in vici_info.items %}
+        {% for key, value in vici_info.items %}
             <div class="row">
                 <div class="panel panel-default" id="{{ key }}">
                     <div class="panel-heading">
                         <h3 class="panel-title">{{ key }}</h3>
                     </div>
                     <div class="panel-body">
-                        {{ value | linebreaksbr}}
+                        {{ value | linebreaksbr }}
                     </div>
                 </div>
             </div>
-        {%  endfor %}
+        {% endfor %}
     </div>
 {% endblock content %}

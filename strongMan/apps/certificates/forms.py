@@ -39,5 +39,6 @@ class AddForm(forms.Form):
         password_bytes = str.encode(password)
         return password_bytes
 
+
 class ChangeNicknameForm(forms.Form):
     nickname = forms.CharField(max_length=100, required=True)

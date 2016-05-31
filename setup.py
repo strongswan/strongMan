@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
-from argparse import RawTextHelpFormatter
-import os
 import subprocess
-import shutil
+from argparse import RawTextHelpFormatter
 from string import Template
+
+import os
+import shutil
 
 
 class InstallerException(Exception):
@@ -20,7 +21,7 @@ class BaseInstaller:
     def _tab(self, msg, times=2):
         ret = ""
         for line in msg.split('\n'):
-            ret += '\t'*times + line + '\n'
+            ret += '\t' * times + line + '\n'
         return ret[:-1]
 
     def _run_bash(self, cmd, force_mute=False):
@@ -81,7 +82,6 @@ class Migrator(BaseInstaller):
             self.env + "/bin/python " + self.django_dir + "/manage.py loaddata initial_data.json --settings=strongMan.settings.local")
 
 
-
 class Installer(BaseInstaller):
     def install_virtualenv(self, python_interpreter):
         self._run_bash("virtualenv -p " + python_interpreter + " --no-site-packages " + self.env)
@@ -122,10 +122,7 @@ class Installer(BaseInstaller):
             raise InstallerException("Virtualenv is required and not installed.")
 
 
-
-
 class Uninstaller(BaseInstaller):
-
     def remove_virtualenv(self):
         shutil.rmtree(self.env)
 
@@ -170,7 +167,6 @@ class GunicornService(BaseInstaller):
     def socket_exists(self):
         socket = self.django_dir + "/gunicorn.sock"
         return os.path.exists(socket)
-
 
 
 if __name__ == "__main__":
@@ -275,29 +271,3 @@ if __name__ == "__main__":
             g.remove()
         except Exception as e:
             print(e)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

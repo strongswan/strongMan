@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from django.test import Client, TestCase
+from django.test import TestCase
 
 
 class AuthenticationViewsTests(TestCase):

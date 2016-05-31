@@ -13,7 +13,6 @@ class Authentication(models.Model):
     auth = models.TextField()
     round = models.IntegerField(default=1)
 
-
     @property
     def connection(self):
         if self.local is not None:
@@ -61,7 +60,8 @@ class Authentication(models.Model):
 
 
 class CaCertificateAuthentication(Authentication):
-    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None, related_name='ca_cert_authentication')
+    ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None,
+                                related_name='ca_cert_authentication')
     ca_identity = models.TextField()
 
     def dict(self):

@@ -1,12 +1,11 @@
 import os
-from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
-from strongMan.apps.certificates.services import UserCertificateManager
-from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from strongMan.apps.connections.models import IKEv2Certificate
-from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate
-from strongMan.apps.certificates.models.certificates import Certificate
 from django.core.urlresolvers import reverse
+from django.test import TestCase, Client
+from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+from strongMan.apps.certificates.models.certificates import Certificate
+from strongMan.apps.certificates.services import UserCertificateManager
+from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate
 
 
 class ConnectionViewTest(TestCase):
@@ -27,14 +26,16 @@ class ConnectionViewTest(TestCase):
 
     def test_select_post(self):
         response = self.client.post('/connections/add/',
-                                    {'current_form': 'ChooseTypeForm', 'typ': 'Ike2EapForm', 'form_name': 'Ike2EapForm'})
+                                    {'current_form': 'ChooseTypeForm', 'typ': 'Ike2EapForm',
+                                     'form_name': 'Ike2EapForm'})
         self.assertEquals(response.status_code, 200)
 
     def test_Ike2CertificateCreate_post(self):
         url = '/connections/add/'
         res = self.client.post(url, {'current_form': 'Ike2CertificateForm', 'gateway': "gateway", 'profile': 'profile',
-                               'certificate': self.certificate.pk, 'identity': self.identity.pk,
-                               'certificate_ca': self.certificate.pk, 'identity_ca': "fsdasdfadfs", 'form_name': 'Ike2CertificateForm'})
+                                     'certificate': self.certificate.pk, 'identity': self.identity.pk,
+                                     'certificate_ca': self.certificate.pk, 'identity_ca': "fsdasdfadfs",
+                                     'form_name': 'Ike2CertificateForm'})
         self.assertEquals(1, Connection.objects.count())
 
     def test_Ike2CertificateCreate_update(self):
@@ -48,11 +49,10 @@ class ConnectionViewTest(TestCase):
         self.assertEquals(connection_created.profile, 'profile')
 
         url_update = '/connections/' + str(connection_created.id) + '/'
-        self.client.post(url_update, {'current_form': 'Ike2CertificateForm','gateway': "gateway", 'profile': 'hans',
+        self.client.post(url_update, {'current_form': 'Ike2CertificateForm', 'gateway': "gateway", 'profile': 'hans',
                                       'certificate': self.certificate.pk, 'identity': self.identity.pk,
                                       'certificate_ca': self.certificate.pk, 'identity_ca': "ffffff",
                                       'form_name': 'Ike2CertificateForm', 'wizard_step': 'configure'})
-
 
         connection = Connection.objects.first().subclass()
         self.assertEquals(connection.profile, 'hans')
@@ -66,10 +66,10 @@ class ConnectionViewTest(TestCase):
 
     def test_Ike2EapUpdate_post(self):
         url_create = '/connections/add/'
-        response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': "gateway", 'profile': 'profile',
-                                      'username': "username", 'password': "password",
-                                      'certificate_ca': self.certificate.pk, 'identity_ca': "asdfasdfasdfa"})
-
+        response = self.client.post(url_create,
+                                    {'current_form': 'Ike2EapForm', 'gateway': "gateway", 'profile': 'profile',
+                                     'username': "username", 'password': "password",
+                                     'certificate_ca': self.certificate.pk, 'identity_ca': "asdfasdfasdfa"})
 
         connection_created = Connection.objects.first().subclass()
         self.assertEquals(connection_created.profile, 'profile')
@@ -88,8 +88,8 @@ class ConnectionViewTest(TestCase):
         self.client.post(url, {'current_form': 'Ike2CertificateForm', 'gateway': "gateway", 'profile': 'profile',
                                'username': "username", 'password': "password",
                                'certificate': self.certificate.pk, 'identity': self.identity.pk,
-                               'certificate_ca': self.certificate.pk, 'identity_ca': "adsfasdf", 'form_name': 'Ike2EapCertificateForm'})
-
+                               'certificate_ca': self.certificate.pk, 'identity_ca': "adsfasdf",
+                               'form_name': 'Ike2EapCertificateForm'})
 
         self.assertEquals(1, Connection.objects.count())
 
@@ -134,6 +134,7 @@ class ConnectionViewTest(TestCase):
         url = reverse("connections:capicker")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
+
 
 class TestCert:
     def __init__(self, path):

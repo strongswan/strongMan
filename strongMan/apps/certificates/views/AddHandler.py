@@ -25,7 +25,7 @@ class AddHandler:
 
     def _render_added_page(self, result):
         context = {"private": result.privatekey, "public": result.certificate,
-                                                         "further_publics": result.further_certificates}
+                   "further_publics": result.further_certificates}
         if self.is_add_form:
             return self.request, 'certificates/added_form.html', context
         else:
@@ -42,7 +42,6 @@ class AddHandler:
                                  'No valid container detected. Maybe your container needs a password?')
             return self._render_upload_page(form=self.form)
 
-
         try:
             result = UserCertificateManager.add_keycontainer(self.form._cert_bytes(), self.form._read_password())
             for e in result.exceptions:
@@ -54,7 +53,6 @@ class AddHandler:
                 result.privatekey = result.certificate.private_key
             if result.certificate is None and result.privatekey is not None:
                 result.certificate = result.privatekey.certificates.all()[0]
-
 
             return self._render_added_page(result)
 

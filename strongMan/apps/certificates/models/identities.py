@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from .core import DjangoAbstractBase, CertificateModel
@@ -58,4 +57,3 @@ class DnIdentity(AbstractIdentity):
         ident.certificate = certificate
         ident.save()
         return ident
-

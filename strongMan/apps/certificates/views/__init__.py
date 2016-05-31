@@ -47,6 +47,7 @@ def add(request):
     elif request.method == 'GET':
         return render(request, 'certificates/add.html', {"form": AddForm()})
 
+
 @login_required
 @require_http_methods(["GET", "POST"])
 def add_form(request):

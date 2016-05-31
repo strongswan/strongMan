@@ -62,5 +62,3 @@ class IdentityChoice(forms.ChoiceField):
             choice = (subident.pk, IdentityChoiceValue(subident))
             choices.append(choice)
         return choices
-
-

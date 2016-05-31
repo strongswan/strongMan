@@ -1,12 +1,12 @@
 import os
 from django.test import TestCase
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
-from strongMan.apps.connections.forms.ConnectionForms import ChooseTypeForm, Ike2CertificateForm, Ike2EapForm, \
-    Ike2EapCertificateForm
-from strongMan.apps.connections.forms.SubForms import CaCertificateForm, ServerIdentityForm, HeaderForm, UserCertificateForm
 from strongMan.apps.certificates.models import Certificate
 from strongMan.apps.certificates.services import UserCertificateManager
-
+from strongMan.apps.connections.forms.ConnectionForms import ChooseTypeForm, Ike2CertificateForm, Ike2EapForm, \
+    Ike2EapCertificateForm
+from strongMan.apps.connections.forms.SubForms import CaCertificateForm, ServerIdentityForm, HeaderForm, \
+    UserCertificateForm
 from strongMan.apps.connections.models import IKEv2Certificate, Child, Proposal, Address, EapAuthentication, \
     CertificateAuthentication, Secret, CaCertificateAuthentication
 
@@ -47,7 +47,8 @@ class ConnectionFormsTest(TestCase):
         certificate = Certificate.objects.first().subclass()
         auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2)
         auth.save()
-        CaCertificateAuthentication(name='remote-1', auth='pubkey', ca_cert=certificate, ca_identity="asdfasdfff", remote=connection).save()
+        CaCertificateAuthentication(name='remote-1', auth='pubkey', ca_cert=certificate, ca_identity="asdfasdfff",
+                                    remote=connection).save()
         CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
                                   local=connection).save()
         Secret(type='EAP', data="password", authentication=auth).save()
@@ -55,40 +56,44 @@ class ConnectionFormsTest(TestCase):
         return connection
 
     def test_ChooseTypeForm(self):
-        form_data = {'current_form':"ChooseTypeForm", 'form_name':  "Ike2CertificateForm"}
+        form_data = {'current_form': "ChooseTypeForm", 'form_name': "Ike2CertificateForm"}
         form = ChooseTypeForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_ChooseTypeForm_invalid(self):
-        form_data = {'current_form':"ChooseTypeForm", 'form_name':  "sting"}
+        form_data = {'current_form': "ChooseTypeForm", 'form_name': "sting"}
         form = ChooseTypeForm(data=form_data)
         self.assertFalse(form.is_valid())
 
     def test_ConnectionForm_server_as_caidentity(self):
-        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile',
+                     'identity': self.usercert.identities.first().pk,
                      'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'is_server_identity': True}
         form = Ike2CertificateForm(data=form_data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
 
     def test_ConnectionForm_server_as_caidentity_unchecked(self):
-        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile',
+                     'identity': self.usercert.identities.first().pk,
                      'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'identity_ca': "gateway"}
         form = Ike2CertificateForm(data=form_data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
 
     def test_ConnectionForm_server_as_caidentity_empty_identity_ca(self):
-        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile', 'identity': self.usercert.identities.first().pk,
+        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile',
+                     'identity': self.usercert.identities.first().pk,
                      'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk}
         form = Ike2CertificateForm(data=form_data)
         form.update_certificates()
         self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm(self):
-        form_data = {'gateway': "gateway", 'profile': 'profile', 'identity': self.identity.pk, 'certificate': self.certificate.pk}
+        form_data = {'gateway': "gateway", 'profile': 'profile', 'identity': self.identity.pk,
+                     'certificate': self.certificate.pk}
         form = Ike2CertificateForm(data=form_data)
-        #TODO Update Choices Field
+        # TODO Update Choices Field
         self.assertFalse(form.is_valid())
 
     def test_Ike2CertificateForm_invalid(self):
@@ -97,19 +102,20 @@ class ConnectionFormsTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapCertificateForm(self):
-        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile', 'certificate': self.identity.id}
+        form_data = {'gateway': "gateway", 'username': "username", 'password': 'password', 'profile': 'profile',
+                     'certificate': self.identity.id}
         form = Ike2EapCertificateForm(data=form_data)
-        #TODO Update Choices Field
+        # TODO Update Choices Field
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapForm(self):
-        form_data = {'current_form':"Ike2EapForm", 'gateway': "gateway", 'username': "username", 'password': 'password',
+        form_data = {'current_form': "Ike2EapForm", 'gateway': "gateway", 'username': "username",
+                     'password': 'password',
                      'profile': 'profile', 'certificate_ca': self.certificate.pk, 'identity_ca': "yolo"}
         form = Ike2EapForm(data=form_data)
         form.update_certs()
         valid = form.is_valid()
         self.assertTrue(valid)
-
 
     def test_Ike2EapForm_invalid(self):
         form_data = {'gateway': "gateway", 'username': "username", 'password': 'password'}
@@ -163,15 +169,17 @@ class ConnectionFormsTest(TestCase):
         newform.fill(connection)
         self.assertEqual(newform.initial, data)
 
-
     def test_ServerIdentityForm_is_valid1(self):
         """
         Server identity checkbox is checked
         :return:
         """
+
         class ServerIdentForm(HeaderForm, ServerIdentityForm):
             pass
-        data = {"current_form":"ServerIdentForm", "profile": "myNewProfileName", "gateway": "LetsCallTheServerHansUeli", "is_server_identity": True}
+
+        data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
+                "gateway": "LetsCallTheServerHansUeli", "is_server_identity": True}
         form = ServerIdentForm(data=data)
         valid = form.is_valid()
         self.assertTrue(valid)
@@ -183,9 +191,12 @@ class ConnectionFormsTest(TestCase):
         Own identity is filled
         :return:
         """
+
         class ServerIdentForm(HeaderForm, ServerIdentityForm):
             pass
-        data = {"current_form":"ServerIdentForm", "profile": "myNewProfileName", "gateway": "LetsCallTheServerHansUeli", "identity_ca": "myidentity"}
+
+        data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
+                "gateway": "LetsCallTheServerHansUeli", "identity_ca": "myidentity"}
         form = ServerIdentForm(data=data)
         valid = form.is_valid()
         self.assertTrue(valid)
@@ -265,7 +276,6 @@ class ConnectionFormsTest(TestCase):
         self.assertIsNotNone(connection)
         self.assertEqual(connection.profile, "myNewProfileName")
         self.assertEqual(connection.remote_addresses.first().value, "LetsCallTheServerHansUeli")
-
 
 
 class TestCert:

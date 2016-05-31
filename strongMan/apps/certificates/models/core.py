@@ -1,4 +1,3 @@
-
 class DjangoAbstractBase:
     @classmethod
     def all_subclasses(cls):
@@ -54,8 +53,9 @@ class CertificateModel:
 class CertificateException(Exception):
     pass
 
+
 class CertificateDoNotDelete(CertificateException):
-    def     __init__(self, message_obj):
+    def __init__(self, message_obj):
         self.message_obj = message_obj
 
     def __str__(self):
@@ -82,4 +82,3 @@ class MessageObj:
 
     def __str__(self):
         return ""
-

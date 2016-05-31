@@ -10,4 +10,3 @@ class CaPickerHandler:
         form = Ike2CertificateForm()
         return render(self.request,
                       'connections/forms/CaPicker.html', {"form": form})
-

@@ -1,12 +1,11 @@
 from django.test import TestCase
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from strongMan.apps.vici.wrapper.exception import ViciPathNotASocketException
 from strongMan.apps.connections.models.authentication import Authentication
 from strongMan.apps.connections.models.connections import Connection
+from strongMan.apps.vici.wrapper.exception import ViciPathNotASocketException
+from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class ViciWrapperTest(TestCase):
-
     def setUp(self):
         self.vici_wrapper = ViciWrapper()
         self.vici_wrapper.session.clear_creds()
@@ -35,18 +34,18 @@ class ViciWrapperTest(TestCase):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
 
-        self.assertEquals(1,self.vici_wrapper.get_connections_names().__len__())
+        self.assertEquals(1, self.vici_wrapper.get_connections_names().__len__())
 
     def test_vici_is_active(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
-        self.assertEquals(1,self.vici_wrapper.get_connections_names().__len__())
+        self.assertEquals(1, self.vici_wrapper.get_connections_names().__len__())
         self.assertTrue(self.vici_wrapper.is_connection_loaded(self.connection.profile))
 
     def test_vici_unload_connection(self):
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.load_connection(self.connection.dict())
-        self.assertEquals(1,self.vici_wrapper.get_connections_names().__len__())
+        self.assertEquals(1, self.vici_wrapper.get_connections_names().__len__())
         self.vici_wrapper.unload_connection(self.connection.profile)
         self.assertEquals(0, self.vici_wrapper.get_connections_names().__len__())
 
@@ -62,4 +61,3 @@ class ViciWrapperTest(TestCase):
     def test_vici_get_connection_names(self):
         self.vici_wrapper.load_connection(self.connection.dict())
         self.assertEquals(self.vici_wrapper.get_connections_names()[0], 'rw')
-

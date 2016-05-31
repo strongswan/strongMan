@@ -51,7 +51,7 @@ class EncryptedField(models.Field):
 
     @cached_property
     def key(self):
-        if not hasattr(settings,"DB_SECRET_KEY"):
+        if not hasattr(settings, "DB_SECRET_KEY"):
             raise Exception("No DB_SECRET_KEY specified!")
         if len(settings.DB_SECRET_KEY) < 32:
             raise Exception("SECRET_KEY has to be equal bigger than 32 signs")

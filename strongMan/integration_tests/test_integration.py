@@ -33,7 +33,7 @@ class IntegrationTest(TestCase):
 
         for i in self.carol_cert.identities:
             if str(i.subclass()) == 'carol@strongswan.org':
-               self.carol_ident = i.subclass()
+                self.carol_ident = i.subclass()
         self.vici_wrapper = ViciWrapper()
         self.vici_wrapper.unload_all_connections()
 
@@ -44,8 +44,9 @@ class IntegrationTest(TestCase):
     def test_Ike2EapIntegration(self):
         url_create = '/connections/add/'
         response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': 'gateway', 'profile': 'EAP',
-                                      'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
-                                      'username': "eap-test", 'password': "test"})
+                                                 'certificate_ca': self.ca_cert.pk,
+                                                 'identity_ca': "moon.strongswan.org",
+                                                 'username': "eap-test", 'password': "test"})
 
         print(response.content.decode('utf-8'))
         self.assertEquals(1, Connection.objects.count())
@@ -63,8 +64,8 @@ class IntegrationTest(TestCase):
     def test_Ike2Eap_auto_ca(self):
         url_create = '/connections/add/'
         response = self.client.post(url_create, {'current_form': 'Ike2EapForm', 'gateway': 'gateway', 'profile': 'EAP',
-                                      'certificate_ca_auto': True, 'identity_ca': "moon.strongswan.org",
-                                      'username': "eap-test", 'password': "test"})
+                                                 'certificate_ca_auto': True, 'identity_ca': "moon.strongswan.org",
+                                                 'username': "eap-test", 'password': "test"})
 
         print(response.content.decode('utf-8'))
         self.assertEquals(1, Connection.objects.count())
@@ -99,19 +100,18 @@ class IntegrationTest(TestCase):
         self.client.post(toggle_url, {'id': connection.id})
         self.assertEqual(self.vici_wrapper.get_sas().__len__(), 0)
 
-
     def test_Ike2EapCertificateIntegration(self):
         url_create = '/connections/add/'
         self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Cert',
                                       'username': "eap-test", 'password': "test",
-                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate': self.carol_cert.pk,
+                                      'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapCertificateForm'})
         self.assertEquals(1, Connection.objects.count())
         self.assertEquals(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
-
 
         toggle_url = '/connections/toggle/'
         self.client.post(toggle_url, {'id': connection.id})
@@ -124,7 +124,8 @@ class IntegrationTest(TestCase):
     def test_Ike2EapTlsIntegration(self):
         url_create = '/connections/add/'
         self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Tls',
-                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate': self.carol_cert.pk,
+                                      'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapTlsForm'})
         self.assertEquals(1, Connection.objects.count())
@@ -176,7 +177,8 @@ class IntegrationTest(TestCase):
     def _start_connection(self):
         url_create = '/connections/add/'
         self.client.post(url_create, {'gateway': 'gateway', 'profile': 'Eap+Tls',
-                                      'certificate': self.carol_cert.pk, 'identity': self.carol_cert.identities.first().pk,
+                                      'certificate': self.carol_cert.pk,
+                                      'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapTlsForm'})
         self.assertEquals(1, Connection.objects.count())

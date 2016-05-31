@@ -17,9 +17,9 @@
                     <span class="glyphicon glyphicon-certificate" aria-hidden="false"></span>
                     {{ certificate.nickname }}
                     {% if not readonly %}
-                    <button type="button" class="btn btn-default btn-xs" id="cert-title-edit" onclick="editbtn()">
-                        <span>edit</span>
-                    </button>
+                        <button type="button" class="btn btn-default btn-xs" id="cert-title-edit" onclick="editbtn()">
+                            <span>edit</span>
+                        </button>
                     {% endif %}
                 </h2>
             </div>
@@ -29,7 +29,8 @@
                     <input type="hidden" name="update_nickname">
                     <p>Give this certificate a nickname</p>
                     <div class="input-group">
-                        <input type="text" class="form-control" name="nickname" placeholder="Give this certificate a nickname"
+                        <input type="text" class="form-control" name="nickname"
+                               placeholder="Give this certificate a nickname"
                                value="{{ certificate.nickname }}">
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit">Save</button>
@@ -176,7 +177,8 @@
                             <span title="Remove">
                                 <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
                                         id="remove_cert-btn">
-                                    <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove</span>
+                                    <span class="glyphicon glyphicon-remove"></span> <span
+                                        class="removebtn-text">Remove</span>
                                 </button>
                             </span>
                         </form>

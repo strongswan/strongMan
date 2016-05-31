@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 
 from .. import forms
 
+
 class AddHandler:
     def __init__(self, request):
         self.request = request
@@ -41,4 +42,3 @@ class AddHandler:
             if isinstance(form, HeaderForm):
                 form.create_connection()
                 return redirect(reverse("connections:index"))
-

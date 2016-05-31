@@ -58,7 +58,7 @@
             <div class="pull-right">
                 {% if connection %}
                     {% if connection.state == "DOWN" %}
-                    <span title="Remove connection">
+                        <span title="Remove connection">
                         <a href="{% url 'connections:delete' connection.id %}"
                            id="delete-{{ connection.id }}"
                            class="btn btn-default white-background black remove-btn">
@@ -66,7 +66,7 @@
                                 class="removebtn-text">Remove</span>
                         </a>
                     </span>
-                        {% endif %}
+                    {% endif %}
                 {% endif %}
                 <button type="submit" name="save" id="configuration"
                         class="btn btn-primary"><span
@@ -76,7 +76,7 @@
         </form>
         <script>
             $(".remove-btn").click(function () {
-                btn = $(this);  
+                btn = $(this);
                 if (btn.hasClass('btn-default')) {
                     btn.removeClass('btn-default').addClass('btn-danger');
                     btn.children('.removebtn-text').text('Remove connection');
@@ -88,7 +88,7 @@
 
             on_change_method_btn_click = function () {
                 bootbox.confirm("Are you sure you want to change the authentication method? All inputs will be lost.", function (result) {
-                    if(result){
+                    if (result) {
                         window.location.replace("");
                     }
                 });
