@@ -1,9 +1,8 @@
-from django.test import Client, TestCase
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
 
 
 class AboutViewsTests(TestCase):
-
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create(username='testuser')
@@ -15,5 +14,3 @@ class AboutViewsTests(TestCase):
         url = '/about/'
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-
-

@@ -5,7 +5,8 @@ from django.test import TestCase
 import strongMan.apps.certificates.models.certificates
 import strongMan.apps.certificates.models as models
 from strongMan.apps.certificates import container_reader
-from strongMan.apps.certificates.container_reader import ContainerTypes, ContainerDetector, AbstractContainerReader, X509Reader, \
+from strongMan.apps.certificates.container_reader import ContainerTypes, ContainerDetector, AbstractContainerReader, \
+    X509Reader, \
     PKCS12Reader, PKCS1Reader, PKCS8Reader
 
 
@@ -255,7 +256,8 @@ class PCKS12ContainerTest(TestCase):
         bytes = Paths.PKCS12_rsa.read()
         containe = PKCS12Reader.by_bytes(bytes)
         containe.parse()
-        cert = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(containe.public_key())
+        cert = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(
+            containe.public_key())
         self.assertIsInstance(cert, strongMan.apps.certificates.models.certificates.Certificate)
 
     def test_private_key(self):
@@ -278,7 +280,8 @@ class PCKS12ContainerTest(TestCase):
         container = PKCS12Reader.by_bytes(bytes)
         container.parse()
         private = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(container.private_key())
-        public = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(container.public_key())
+        public = strongMan.apps.certificates.models.certificates.CertificateFactory.user_certificate_by_x509reader(
+            container.public_key())
         self.assertEqual(private.public_key_hash, public.public_key_hash)
 
 

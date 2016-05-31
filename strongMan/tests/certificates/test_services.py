@@ -3,9 +3,11 @@ import pickle
 import os
 
 import strongMan.apps.certificates.models.certificates
-from strongMan.apps.certificates.services import UserCertificateManager, ViciCertificateManager, CertificateManagerException
+from strongMan.apps.certificates.services import UserCertificateManager, ViciCertificateManager, \
+    CertificateManagerException
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 from strongMan.apps.certificates import models
+
 
 def count(model):
     return model.objects.all().__len__()
@@ -50,6 +52,7 @@ class Paths:
     PKCS12_rsa = TestCert("warrior.pkcs12")
     PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
     X509_googlecom = TestCert("google.com_der.crt")
+
 
 class TestUserCertificateManager(TestCase):
     def setUp(self):
@@ -132,25 +135,3 @@ class TestViciCertificateManager(TestCase):
             self.manager._add_x509(ViciDict.cert.deserialize())
         self.assertEqual(count(strongMan.apps.certificates.models.certificates.ViciCertificate), 1)
         self.assertEqual(count(strongMan.apps.certificates.models.certificates.UserCertificate), 1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

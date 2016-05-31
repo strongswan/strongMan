@@ -1,12 +1,13 @@
 import os
 from collections import OrderedDict
 from django.test import TestCase
-from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
-from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, CertificateAuthentication, CaCertificateAuthentication
-from strongMan.apps.connections.models.connections import Connection, IKEv2EAP
-from strongMan.apps.certificates.models import Certificate, UserCertificate, CertificateDoNotDelete
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+from strongMan.apps.certificates.models import Certificate, UserCertificate, CertificateDoNotDelete
 from strongMan.apps.certificates.services import UserCertificateManager
+from strongMan.apps.connections.models.authentication import Authentication, EapAuthentication, \
+    CertificateAuthentication, CaCertificateAuthentication
+from strongMan.apps.connections.models.connections import Connection, IKEv2EAP
+from strongMan.apps.connections.models.specific import Child, Address, Proposal, Secret
 
 
 class ConnectionModelTest(TestCase):
@@ -31,7 +32,7 @@ class ConnectionModelTest(TestCase):
         auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id='hans', round=2)
         auth.save()
         CaCertificateAuthentication(name='remote-1', auth='pubkey',
-                                 ca_cert=certificate, ca_identity="adsfasdf", remote=connection).save()
+                                    ca_cert=certificate, ca_identity="adsfasdf", remote=connection).save()
         CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
                                   local=connection).save()
         Secret(type='EAP', data="password", authentication=auth).save()
@@ -106,7 +107,6 @@ class ConnectionModelTest(TestCase):
         UserCertificateManager.add_keycontainer(Paths.X509_rsa_ca_der.read())
         cert = UserCertificate.objects.get(pk=2)
         cert.delete()
-
 
 
 class TestCert:

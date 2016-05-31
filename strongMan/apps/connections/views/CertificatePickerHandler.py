@@ -10,7 +10,8 @@ class CertificatePickerHandler:
 
     def _render(self, form):
         return render(self.request,
-                      'connections/forms/CertificatePicker.html', {"certificate": form['certificate'], "identity": form['identity']})
+                      'connections/forms/CertificatePicker.html',
+                      {"certificate": form['certificate'], "identity": form['identity']})
 
     def handle(self):
         id = self._certificate_id()
@@ -33,4 +34,3 @@ class CertificatePickerHandler:
 
         get_object_or_404(UserCertificate, pk=id)
         return id
-

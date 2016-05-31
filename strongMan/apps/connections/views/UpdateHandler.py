@@ -49,7 +49,5 @@ class UpdateHandler:
                 return self._render(form)
 
             form.update_connection(self.id)
-            messages.success(self.request,"Connection has been updated.")
+            messages.success(self.request, "Connection has been updated.")
             return self._render(form)
-
-

@@ -1,11 +1,10 @@
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver, Signal
-
-from ..container_reader import X509Reader
-from .core import CertificateException, CertificateModel, DjangoAbstractBase, CertificateDoNotDelete
-from .identities import TextIdentity, DnIdentity
 from strongMan.apps.encryption import fields
+from .core import CertificateException, CertificateModel, DjangoAbstractBase
+from .identities import TextIdentity, DnIdentity
+from ..container_reader import X509Reader
 
 
 class KeyContainer(CertificateModel, models.Model):
@@ -13,9 +12,9 @@ class KeyContainer(CertificateModel, models.Model):
     type = models.CharField(max_length=10)
     algorithm = models.CharField(max_length=3)
     public_key_hash = models.TextField()
+
     class Meta:
         abstract = True
-
 
     @classmethod
     def by_bytes(cls, container_bytes, password=None):
@@ -28,7 +27,6 @@ class KeyContainer(CertificateModel, models.Model):
 
 class PrivateKey(KeyContainer):
     should_prevent_delete_signal = Signal(providing_args=["instance"])
-
 
     @classmethod
     def by_reader(cls, reader):
@@ -87,8 +85,10 @@ class Certificate(KeyContainer, DjangoAbstractBase):
     is_CA = models.BooleanField()
     valid_not_after = models.DateTimeField()
     valid_not_before = models.DateTimeField()
-    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_issuer", null=True)
-    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_subject", null=True)
+    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_issuer",
+                                  null=True)
+    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_subject",
+                                   null=True)
 
     @property
     def identities(self):
@@ -154,6 +154,7 @@ class UserCertificate(Certificate):
     @nickname.setter
     def nickname(self, value):
         self._nickname = value
+
 
 @receiver(pre_delete, sender=UserCertificate)
 def usercertificate_clean_submodels(sender, **kwargs):

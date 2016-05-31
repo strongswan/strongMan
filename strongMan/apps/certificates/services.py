@@ -25,7 +25,7 @@ class UserCertificateManager:
             if isinstance(reader, X509Reader):
                 return cls._add_x509(reader)
             if isinstance(reader, PKCS12Reader):
-                 return cls._add_pkcs12(reader)
+                return cls._add_pkcs12(reader)
         except Exception as e:
             return AddKeyContainerResult(False, exceptions=[e])
 
@@ -40,7 +40,7 @@ class UserCertificateManager:
         if not cert_exists:
             e = CertificateManagerException(
                 "It exists no certificate for this private key. Add a certificate first.")
-            return AddKeyContainerResult(False,exceptions=[e])
+            return AddKeyContainerResult(False, exceptions=[e])
         already_exists = not cls._privatekey_by_hash(reader.public_key_hash()) == None
         if already_exists:
             e = CertificateManagerException(
@@ -93,7 +93,8 @@ class UserCertificateManager:
 
     @classmethod
     def _certificate_by_hashserial(cls, publickey_hash, serial_number):
-        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(public_key_hash=publickey_hash, serial_number=serial_number)
+        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(
+            public_key_hash=publickey_hash, serial_number=serial_number)
         if len(certs) > 0:
             return certs[0]
         else:
@@ -101,7 +102,8 @@ class UserCertificateManager:
 
     @classmethod
     def _certificate_by_hash(cls, publickey_hash):
-        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(public_key_hash=publickey_hash)
+        certs = strongMan.apps.certificates.models.certificates.UserCertificate.objects.filter(
+            public_key_hash=publickey_hash)
         if len(certs) > 0:
             return certs[0]
         else:
@@ -132,7 +134,6 @@ class ViciCertificateManager:
             except CertificateManagerException as e:
                 pass
 
-
     @classmethod
     def _add_x509(cls, vici_dict):
         cert = strongMan.apps.certificates.models.certificates.CertificateFactory.vicicertificate_by_dict(vici_dict)
@@ -143,7 +144,8 @@ class ViciCertificateManager:
 
     @classmethod
     def _usercert_already_exists(cls, vicicert):
-        return  not UserCertificateManager._certificate_by_hashserial(vicicert.public_key_hash, vicicert.serial_number) == None
+        return not UserCertificateManager._certificate_by_hashserial(vicicert.public_key_hash,
+                                                                     vicicert.serial_number) == None
 
 
 class CertificateManagerException(Exception):
@@ -165,7 +167,7 @@ class AddKeyContainerResult:
             raise CertificateManagerException("Can't add two privatekeys")
 
         result = AddKeyContainerResult(True)
-        result.success = not(not self.success or not other.success)
+        result.success = not (not self.success or not other.success)
         if other.certificate is not None:
             result.certificate = other.certificate
         if self.certificate is not None:
@@ -195,10 +197,3 @@ class AddKeyContainerResult:
 
     def certificates_are_empty(self):
         return self.certificate is None and self.privatekey is None and len(self.further_certificates) == 0
-
-
-
-
-
-
-

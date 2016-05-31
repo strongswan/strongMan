@@ -1,10 +1,10 @@
 <div class="certificate-widget">
     <div class="thumbnail">
         <div class="caption">
-        <div class="title">
-            <h3 class="text-center"><span class="glyphicon glyphicon-certificate"
-                                          aria-hidden="false"></span> {{ x509.subject.cname }}</h3>
-        </div>
+            <div class="title">
+                <h3 class="text-center"><span class="glyphicon glyphicon-certificate"
+                                              aria-hidden="false"></span> {{ x509.subject.cname }}</h3>
+            </div>
             <div>
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
@@ -55,9 +55,11 @@
                             <table class="table">
                                 <tr>
                                     <td>Identities</td>
-                                    <td><ul>{% for identity in x509.identities.all %}
-                                        <li>{{ identity.subclass }}</li>
-                                    {% endfor %}</ul></td>
+                                    <td>
+                                        <ul>{% for identity in x509.identities.all %}
+                                            <li>{{ identity.subclass }}</li>
+                                        {% endfor %}</ul>
+                                    </td>
                                 </tr>
                             </table>
                         </div>

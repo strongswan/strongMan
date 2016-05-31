@@ -5,9 +5,10 @@
         <div class="alert alert-warning" role="alert"><strong>{{ result.message }}</strong></div>
     {% endif %}
     {% if  result.reachable %}
-     {% vici_version_supported as supported %}
+        {% vici_version_supported as supported %}
         {% if not supported %}
-            <div class="alert alert-warning" role="alert"><strong>StrongSwan version is not supported! StrongMan needs at least strongSwan version 5.4.0.</strong></div>
+            <div class="alert alert-warning" role="alert"><strong>StrongSwan version is not supported! StrongMan needs
+                at least strongSwan version 5.4.0.</strong></div>
         {% endif %}
     {% endif %}
 </div>

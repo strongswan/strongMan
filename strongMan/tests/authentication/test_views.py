@@ -32,7 +32,7 @@ class PwChangeTest(TestCase):
     def test_pw_change_successfully(self):
         url = '/change_pw'
         response = self.client.post(url, {"old_password": "1234", "password1": "Newpassword!2",
-                                                       "password2": "Newpassword!2"})
+                                          "password2": "Newpassword!2"})
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("Newpassword!2"))
 
@@ -44,19 +44,19 @@ class PwChangeTest(TestCase):
     def test_wrong_current_pw(self):
         url = '/change_pw'
         response = self.client.post(url, {"old_password": "asfasdfa", "password1": "newpassword!",
-                                                       "password2": "newpassword!"})
+                                          "password2": "newpassword!"})
         self.assert_pw_not_changed(response)
 
     def test_notequal_pw(self):
         url = '/change_pw'
         response = self.client.post(url, {"old_password": "1234", "password1": "newpassword!",
-                                                       "password2": "newpassword!2"})
+                                          "password2": "newpassword!2"})
         self.assert_pw_not_changed(response)
 
     def test_pw_rules(self):
         url = '/change_pw'
         response = self.client.post(url, {"old_password": "1234", "password1": "newpassword",
-                                                       "password2": "newpassword"})
+                                          "password2": "newpassword"})
         self.assert_pw_not_changed(response)
 
 

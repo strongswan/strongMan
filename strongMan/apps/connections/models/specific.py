@@ -12,7 +12,9 @@ from strongMan.apps.encryption import fields
 @receiver(UserCertificate.should_prevent_delete_signal, sender=UserCertificate)
 def prevent_cert_delete_if_cert_is_in_use(sender, **kwargs):
     cert = kwargs['instance']
-    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in cert.identities] + [cert.ca_cert_authentication]
+    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in
+                                                                           cert.identities] + [
+                          cert.ca_cert_authentication]
 
     for auth in authentications:
         if auth.count() > 0:
@@ -34,7 +36,8 @@ def prevent_key_delete_if_cert_is_in_use(sender, **kwargs):
 class Child(models.Model):
     name = models.TextField()
     mode = models.TextField()
-    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='children')
+    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                                   related_name='children')
 
     def dict(self):
         child = OrderedDict()
@@ -49,20 +52,23 @@ class Address(models.Model):
     remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts')
     remote_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
                                          related_name='remote_addresses')
-    local_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='local_addresses')
+    local_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                                        related_name='local_addresses')
     vips = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='vips')
 
 
 class Proposal(models.Model):
     type = models.TextField()
     child = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='esp_proposals')
-    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='proposals')
+    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                                   related_name='proposals')
 
 
 class Secret(models.Model):
     type = models.TextField()
     data = fields.EncryptedCharField(max_length=50)
-    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None, related_name='authentication')
+    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,
+                                       related_name='authentication')
 
     def dict(self):
         eap_id = self.authentication.subclass().eap_id

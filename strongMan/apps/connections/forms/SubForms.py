@@ -57,8 +57,6 @@ class HeaderForm(forms.Form):
         Address(value='0.0.0.0/0', remote_ts=child).save()
 
 
-
-
 class CaCertificateForm(forms.Form):
     """
     Manages the ca certificate field.
@@ -123,7 +121,7 @@ class CaCertificateForm(forms.Form):
             AutoCaAuthentication(name='remote-cert', auth='pubkey', remote=connection).save()
         else:
             CaCertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection,
-                       ca_cert=self.chosen_certificate).save()
+                                        ca_cert=self.chosen_certificate).save()
 
     def update_connection(self, connection):
         for remote in connection.remote.all():
@@ -133,7 +131,7 @@ class CaCertificateForm(forms.Form):
             if isinstance(sub, AutoCaAuthentication):
                 sub.delete()
         if self.is_auto_choose:
-            AutoCaAuthentication(name='remote-cert', auth='pubkey' ,remote=connection).save()
+            AutoCaAuthentication(name='remote-cert', auth='pubkey', remote=connection).save()
         else:
             CaCertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection,
                                         ca_cert=self.chosen_certificate).save()
@@ -154,7 +152,7 @@ class ServerIdentityForm(forms.Form):
             return ""
         if not "identity_ca" in self.data:
             raise forms.ValidationError("This field is required!", code='invalid')
-        ident =  self.data["identity_ca"]
+        ident = self.data["identity_ca"]
         if ident == "":
             raise forms.ValidationError("This field is required!", code='invalid')
         return ident
@@ -196,7 +194,8 @@ class ServerIdentityForm(forms.Form):
                 sub.ca_identity = self.ca_identity
                 sub.save()
                 return
-        raise Exception("No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
+        raise Exception(
+            "No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
 
     def update_connection(self, connection):
         for remote in connection.remote.all():

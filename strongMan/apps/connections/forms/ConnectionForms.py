@@ -31,7 +31,6 @@ class ChooseTypeForm(AbstractDynamicForm):
         super(ChooseTypeForm, self).__init__(*args, **kwargs)
         self.fields['form_name'].choices = ChooseTypeForm.get_choices()
 
-
     @property
     def selected_form_class(self):
         name = self.cleaned_data["form_name"]
@@ -44,7 +43,8 @@ class ChooseTypeForm(AbstractDynamicForm):
     @classmethod
     def get_choices(cls):
         return tuple(
-            tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in AbstractConnectionForm.__subclasses__())
+            tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
+            AbstractConnectionForm.__subclasses__())
 
 
 class AbstractConnectionForm(AbstractDynamicForm):
@@ -59,7 +59,6 @@ class AbstractConnectionForm(AbstractDynamicForm):
                 if not valid:
                     valid = False
         return valid
-
 
     def create_connection(self):
         connection = self.model(profile=self.cleaned_data['profile'], auth='pubkey', version=2)

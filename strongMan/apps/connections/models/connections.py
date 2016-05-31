@@ -73,7 +73,7 @@ class Connection(models.Model):
         vici_wrapper.unload_connection(self.profile)
         logs = vici_wrapper.terminate_connection(self.profile)
         for log in logs:
-                LogMessage(connection=self, message=log['message']).save()
+            LogMessage(connection=self, message=log['message']).save()
 
     @classmethod
     def get_types(cls):
@@ -127,6 +127,7 @@ class Connection(models.Model):
                     if 'cacerts' in connection[con_name][key]:
                         connection[con_name][key].pop('cacerts', [])
         return str(json.dumps(connection, indent=4))
+
 
 class IKEv2Certificate(Connection):
     @classmethod

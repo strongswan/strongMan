@@ -8,9 +8,9 @@ function handler(event) {
     var csrf = this.csrfmiddlewaretoken.value;
     $.ajax({
         data: $(this).serialize(),
-        type: 'POST', 
+        type: 'POST',
         url: '/connections/toggle/',
-                success: function (response) {
+        success: function (response) {
             if (!response.success) {
                 setAlert(response);
                 stateDown(response.id);

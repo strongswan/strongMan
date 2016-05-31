@@ -1,6 +1,5 @@
 from django import template
 
-
 register = template.Library()
 
 
@@ -13,10 +12,7 @@ def field_type(field):
 def get_choice(text):
     return text[-1:]
 
+
 @register.filter(name='classname')
 def classname(value):
     return value.__class__.__name__
-
-
-
-

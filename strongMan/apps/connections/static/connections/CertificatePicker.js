@@ -186,7 +186,6 @@ CaAuto = function (caPickerId) {
     var caAutoCheckbox = $_("#certificate_ca_auto", caPicker);
 
 
-
     var addEventHandler = function () {
         caAutoCheckbox.change(function () {
             refresh();
