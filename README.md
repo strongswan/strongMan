@@ -30,7 +30,7 @@ Now we can start the strongMan server.
 sudo ./run.py
 ```
 The server is now accessible on http://localhost:1515
-Username: John, Password: Lennon
+Username: John, Password: Lennon@1940
 
 
 ### Add a systemd service
