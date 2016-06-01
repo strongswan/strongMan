@@ -106,14 +106,6 @@ class Installer(BaseInstaller):
     def collect_staticfiles(self):
         self._run_bash("env/bin/python manage.py collectstatic --settings=" + self.PRODUCTION_SETTINGS + " --noinput")
 
-    def add_systemd_service(self):
-        print("\t- Add systemd service")
-        service = GunicornService()
-        service.create()
-        service.start()
-        if not service.socket_exists:
-            raise InstallerException("Error installing gunicon systemd service. Socket doesn't exist.")
-
     def check_preconditions(self):
         if self.is_installed:
             raise InstallerException("strongMan is already installed.")
@@ -130,8 +122,38 @@ class Uninstaller(BaseInstaller):
         shutil.rmtree(self.django_dir + "/strongMan/staticfiles")
 
 
+class Icon(BaseInstaller):
+    def __init__(self):
+        self.DESTINATION = "/usr/share/applications/strongMan.desktop"
+        self.ORIGIN = self.django_dir + "/setup/strongMan.desktop"
+
+    def exists(self):
+        return os.path.exists(self.DESTINATION)
+
+    @property
+    def content(self):
+        with open(self.ORIGIN, "r") as f:
+            content = f.read()
+
+        template = Template(content)
+        values = {"workingDir": self.django_dir}
+        return template.substitute(values)
+
+    def create(self):
+        content = self.content
+        with open(self.DESTINATION, 'w') as f:
+            f.write(content)
+        return True
+
+    def remove(self):
+        os.remove(self.DESTINATION)
+
+
+
+
 class GunicornService(BaseInstaller):
     SERVICE_PATH = "/etc/systemd/system/strongMan.service"
+
 
     @property
     def exists(self):
@@ -151,17 +173,25 @@ class GunicornService(BaseInstaller):
         with open(self.SERVICE_PATH, 'w') as f:
             f.write(content)
         self._run_bash("systemctl daemon-reload")
+        Icon().create()
         return True
 
     def enable(self):
         self._run_bash("systemctl enable strongMan")
 
+    def start(self):
+        self._run_bash("systemctl start strongMan")
+
     def disable(self):
         self._run_bash("systemctl disable strongMan")
+
+    def stop(self):
+        self._run_bash("systemctl stop strongMan")
 
     def remove(self):
         os.remove(self.SERVICE_PATH)
         self._run_bash("systemctl daemon-reload")
+        Icon().remove()
 
     @property
     def socket_exists(self):
@@ -261,6 +291,8 @@ if __name__ == "__main__":
         try:
             g = GunicornService()
             g.create()
+            g.enable()
+            g.start()
         except Exception as e:
             print(e)
         exit(0)
@@ -268,6 +300,8 @@ if __name__ == "__main__":
     if args.command == "remove-service":
         try:
             g = GunicornService()
+            g.stop()
+            g.disable()
             g.remove()
         except Exception as e:
             print(e)

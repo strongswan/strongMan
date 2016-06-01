@@ -1,9 +1,9 @@
 {% with certificate=form.certificate_ca identity=form.identity_ca is_server_identity=form.is_server_identity certificate_ca_auto=form.certificate_ca_auto ca_exists=form.ca_certificate_exists %}
     <div id="ca_picker_{{ certificate.name }}">
         <div class="row certificate_ca_auto">
-            <label class="control-label col-sm-3">{{ certificate.label }}</label>
+            <label class="control-label col-sm-3">CA/Server certificate</label>
             <div class="col-sm-8 col-xs-10">
-        <span {% if ca_exists == False %}title="Choose automatically has been disabled because strongMan doesn't contains any ca certificate." {% endif %}>
+        <span {% if ca_exists == False %}title="Choose automatically has been disabled because strongMan doesn't contains any certificate." {% endif %}>
         <input type="checkbox" class="certificate_ca_auto" name="{{ certificate_ca_auto.name }}"
                id="{{ certificate_ca_auto.name }}"
                {% if certificate_ca_auto.value and ca_exists %}checked{% endif %}
@@ -45,14 +45,14 @@
         <input type="checkbox" class="is_server_identity" name="{{ is_server_identity.name }}"
                id="{{ is_server_identity.name }}"
                placeholder="Hostname or IP" {% if is_server_identity.value %}checked{% endif %}>
-        Use server as identity</span>
+        Use server value</span>
             </div>
         </div>
         <div class="row identity_picker">
             <label class="control-label col-sm-3"></label>
             <div class="col-sm-8 col-xs-10">
                 <input type="text" class="form-control" name="{{ identity.name }}" id="{{ identity.name }}"
-                       placeholder="Hostname or IP" {% if identity.value %}value="{{ identity.value }}"
+                       placeholder="Custom server identity" {% if identity.value %}value="{{ identity.value }}"
                        {% else %}value=""{% endif %}/>
                 {% include "connections/forms/../widgets/errormsg.html" with field=identity %}
             </div>

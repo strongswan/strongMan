@@ -30,13 +30,17 @@ Now we can start the strongMan server.
 sudo ./run.py
 ```
 The server is now accessible on http://localhost:1515
-Username: John, Password: Lennon
+Username: John, Password: Lennon@1940
 
 
 ### Add a systemd service
-If you want to run strongMan permanently in the background you can start strongMan as a systemd service.
+If you want to run strongMan permanently in the background you can install strongMan as a systemd service.
 ```bash
-sudo ./setup.py add-service # Adds the service
-sudo systemctl enable strongMan.service # Let's start strongMan on every system startup (Optional)
-sudo systemctl start strongMan.service
+sudo ./setup.py add-service # Adds the service and additionally a launcher icon
+```
+
+### Remove service
+Removes the service and the launcher icon
+```bash
+sudo ./setup.py remove-service
 ```

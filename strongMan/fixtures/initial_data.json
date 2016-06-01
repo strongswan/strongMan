@@ -4,19 +4,9 @@
     "pk": 1,
     "fields": {
       "username": "John",
-      "password": "pbkdf2_sha256$24000$yAC7gEF9i2Si$7KTCgtLgys2dl9irbFXMlRQk8p5wB0wVGfNL4Ckby2g=",
+      "password": "pbkdf2_sha256$24000$k0JK2lfyW9Zz$Kz3KZeiJXgGY0IAexR1TZWqjx28ZJy6N+o/KSAQW2BM=",
       "first_name": "John",
       "last_name": "Lennon"
-    }
-  },
-  {
-    "model": "auth.user",
-    "pk": 2,
-    "fields": {
-      "username": "Paul",
-      "password": "pbkdf2_sha256$24000$yAC7gEF9i2Si$7KTCgtLgys2dl9irbFXMlRQk8p5wB0wVGfNL4Ckby2g=",
-      "first_name": "Paul",
-      "last_name": "McCartney"
     }
   }
 ]

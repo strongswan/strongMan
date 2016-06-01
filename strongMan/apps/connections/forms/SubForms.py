@@ -44,8 +44,10 @@ class HeaderForm(forms.Form):
 
     @staticmethod
     def _set_proposals(connection, child):
-        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        #Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="default", connection=connection).save()
         Proposal(type="aes128gcm128-modp2048", child=child).save()
+        #Proposal(type="default", child=child).save()
 
     @staticmethod
     def _set_addresses(connection, child, gateway):
@@ -315,7 +317,12 @@ class EapForm(forms.Form):
                 self.fields['password'].initial = Secret.objects.filter(authentication=subclass).first().data
 
     def create_connection(self, connection):
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round="2")
+        max_round = 0
+        for local in connection.local.all():
+            if local.round > max_round:
+                max_round = local.round
+
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round=max_round + 1)
         auth.save()
         Secret(type='EAP', data=self.my_password, authentication=auth).save()
 
