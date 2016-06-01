@@ -315,7 +315,12 @@ class EapForm(forms.Form):
                 self.fields['password'].initial = Secret.objects.filter(authentication=subclass).first().data
 
     def create_connection(self, connection):
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round="2")
+        max_round = 0
+        for local in connection.local.all():
+            if local.round > max_round:
+                max_round = local.round
+
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round=max_round + 1)
         auth.save()
         Secret(type='EAP', data=self.my_password, authentication=auth).save()
 
