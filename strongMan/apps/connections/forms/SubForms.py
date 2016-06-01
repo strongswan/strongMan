@@ -44,8 +44,10 @@ class HeaderForm(forms.Form):
 
     @staticmethod
     def _set_proposals(connection, child):
-        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        #Proposal(type="aes128-sha256-modp2048", connection=connection).save()
+        Proposal(type="default", connection=connection).save()
         Proposal(type="aes128gcm128-modp2048", child=child).save()
+        #Proposal(type="default", child=child).save()
 
     @staticmethod
     def _set_addresses(connection, child, gateway):
