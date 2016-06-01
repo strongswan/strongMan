@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=strongMan
+Comment=Management UI for strongSwan
+Exec=${workingDir}/setup/openWebBrowser.py
+Icon=${workingDir}/setup/strongswan.png
+Terminal=false
+Type=Application
+Categories=Utility;Application;
