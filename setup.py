@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import argparse
 import subprocess
 from argparse import RawTextHelpFormatter
@@ -7,6 +6,15 @@ from string import Template
 
 import os
 import shutil
+
+
+authors = '''
+Samuel Kurath <samuel.kurath@gmail.com>
+Severin Bühler <sevi_buehler@hotmail.com>
+'''
+
+
+
 
 
 class InstallerException(Exception):
