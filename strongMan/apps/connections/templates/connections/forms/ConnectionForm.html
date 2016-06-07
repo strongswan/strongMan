@@ -68,10 +68,14 @@
                     </span>
                     {% endif %}
                 {% endif %}
-                <button type="submit" name="save" id="configuration"
-                        class="btn btn-primary"><span
-                        class="glyphicon glyphicon-floppy-disk"></span> Save
-                </button>
+
+                {% if connection and connection.state == 'DOWN' or not connection %}
+                    <button type="submit" name="save" id="configuration"
+                            class="btn btn-primary"><span
+                            class="glyphicon glyphicon-floppy-disk"></span> Save
+                    </button>
+                {% endif %}
+
             </div>
         </form>
         <script>

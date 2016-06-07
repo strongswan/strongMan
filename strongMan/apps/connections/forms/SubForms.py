@@ -146,7 +146,7 @@ class ServerIdentityForm(forms.Form):
     Either the checkbox is checked or a own identity is field in the textbox.
 
     """
-    identity_ca = forms.CharField(max_length=200, label="Identity", required=False, initial="")
+    identity_ca = forms.CharField(max_length=200, label="Server identity", required=False, initial="")
     is_server_identity = forms.BooleanField(initial=True, required=False)
 
     def clean_identity_ca(self):
