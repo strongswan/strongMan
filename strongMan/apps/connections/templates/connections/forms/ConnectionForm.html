@@ -87,11 +87,9 @@
             });
 
             on_change_method_btn_click = function () {
-                bootbox.confirm("Are you sure you want to change the authentication method? All inputs will be lost.", function (result) {
-                    if (result) {
-                        window.location.replace("");
-                    }
-                });
+                if (confirm('Are you sure you want to change the authentication method? All inputs will be lost.')) {
+                    window.location.replace("");
+                }
             }
         </script>
 
