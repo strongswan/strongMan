@@ -1,12 +1,12 @@
 <div id="certificateident_picker_{{ certificate.name }}">
     <div class="row certificate_picker">
-        <label class="control-label col-sm-3 col-xs-2">{{ certificate.label }}</label>
-        <div class="col-sm-8 col-xs-8">
+        <label class="control-label col-sm-3 col-xs-12">{{ certificate.label }}</label>
+        <div class="col-sm-8 col-xs-10">
             <select class="selectpicker certificateselect" data-live-search="true"
                     name="{{ certificate.name }}"
                     id="id_{{ certificate.name }}" data-show-subtext="True">
                 {% if certificate.value == None or certificate.value == '-1' %}
-                    <option value="-1" selected>Nothing selected!</option>
+                    <option value="-1" selected>Nothing selected</option>
                 {% endif %}
                 {% for choise in certificate.field.queryset %}
                     <option value="{{ choise.id }}"
@@ -27,8 +27,8 @@
         </div>
     </div>
     <div class="row identity_picker">
-        <label class="control-label col-sm-3 col-xs-2">{{ identity.label }}</label>
-        <div class="col-sm-8 col-xs-8">
+        <label class="control-label col-sm-3 col-xs-12">{{ identity.label }}</label>
+        <div class="col-sm-8 col-xs-10">
             <select class="selectpicker identityselect" data-live-search="true" name="{{ identity.name }}"
                     id="id_{{ identity.name }}" data-show-subtext="True"
                     {% if identity.field.choices|length == 0 %}disabled="True"{% endif %}>

@@ -2,7 +2,7 @@
 <div id="ConnectionForm">
     <div class="row">
         <p class="col-xs-12">Your chosen authentication method.</p>
-        <label class="control-label col-sm-3 col-xs-2" for="label_form_name">Method</label>
+        <label class="control-label col-sm-3 col-xs-12" for="label_form_name">Method</label>
         {% if  connection %}
             <div class="controls col-sm-8 col-xs-9">
         {% else %}
@@ -31,8 +31,8 @@
             <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
             <div class="row">
                 <p class="col-xs-12">Name your connection so you can recognize it and set the server.</p>
-                <label class="control-label col-sm-3 col-xs-2">Name</label>
-                <div class="controls col-sm-8 col-xs-8">
+                <label class="control-label col-sm-3 col-xs-12">Name</label>
+                <div class="controls col-sm-8 col-xs-10">
                     <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
                            placeholder="Name your connection"/>
                     {% include "connections/forms/../widgets/errormsg.html" with field=form.profile %}
@@ -43,8 +43,8 @@
 
             </div>
             <div class="row">
-                <label class="control-label col-sm-3 col-xs-2">Server</label>
-                <div class="controls col-sm-8 col-xs-8">
+                <label class="control-label col-sm-3 col-xs-12">Server</label>
+                <div class="controls col-sm-8 col-xs-10">
                     <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
                            placeholder="Hostname or IP" id="gateway"/>
                     {% include "connections/forms/../widgets/errormsg.html" with field=form.gateway %}
