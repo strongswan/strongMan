@@ -21,7 +21,7 @@ before_install:
 script:
   - docker-compose up -d gateway
   - sleep 10
-  - docker-compose run roadwarrior /bin/sh -c "cd /strongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test strongMan.tests --settings=strongMan.settings.local; python manage.py test strongMan.integration_tests --settings=strongMan.settings.local;"
+  - docker-compose run roadwarrior /bin/sh -c "cd /strongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test strongMan.tests --settings=strongMan.settings.local;"
 
 notifications:
   email: false
