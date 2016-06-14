@@ -6,5 +6,5 @@ class AuthenticationViewsTests(TestCase):
     fixtures = ['initial_data.json']
 
     def test_fixtures(self):
-        user = authenticate(username='John', password='Lennon')
+        user = authenticate(username='John', password='Lennon@1940')
         self.assertIsNotNone(user)
