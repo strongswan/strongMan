@@ -26,7 +26,7 @@ RUN mkdir /opt/strongSwan \
 && make -j > /dev/null 2>&1 \
 && make install > /dev/null 2>&1 \
 && cd / \
-&& git clone https://github.com/Sebubu/strongMan.git \
+&& git clone https://github.com/strongswan/strongMan.git \
 && cd strongMan \
 && pip install --upgrade pip \
 && pip install -r requirements.txt \

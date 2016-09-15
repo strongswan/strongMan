@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Sebubu/strongMan.svg?branch=master)](https://travis-ci.org/Sebubu/strongMan)
+[![Build Status](https://travis-ci.org/strongswan/strongMan.svg?branch=master)](https://travis-ci.org/strongswan/strongMan)
 
 
 # strongMan 
@@ -19,7 +19,7 @@ Requirements:
 
 Run the following commands to install strongMan.
 ```bash
-git clone https://github.com/Sebubu/strongMan.git
+git clone https://github.com/strongswan/strongMan.git
 cd strongMan
 sudo ./setup.py install
 ```
