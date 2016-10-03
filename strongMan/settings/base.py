@@ -114,3 +114,10 @@ def create_read_key(file_path):
 
 SECRET_KEY = create_read_key('secret_key.txt')
 DB_SECRET_KEY = create_read_key('db_key.txt')
+
+# VICI socket URI
+# Use either tcp://<hostname>:<port? for TCP sockets,
+# or unix:///path/to/socket for UNIX sockets
+# Default is unix:///var/run/charon.vici
+
+VICI_SOCKET_URI = "unix:///var/run/charon.vici"
