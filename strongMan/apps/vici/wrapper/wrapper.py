@@ -11,7 +11,7 @@ from .exception import ViciSocketException, ViciTerminateException, ViciLoadExce
 class ViciWrapper:
     def __init__(self, socket_uri=None):
         socket_uri = socket_uri or settings.VICI_SOCKET_URI
-        self.socket_uri = parse(socket_uri)
+        self.socket_uri = urlparse(socket_uri)
 
         self._check_socket()
         self._connect_socket()
