@@ -2,21 +2,33 @@ import os, stat
 import socket
 import vici
 from collections import OrderedDict
+from urllib.parse import urlparse
+from django.conf import settings
 from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, \
     ViciPathNotASocketException
 
 
 class ViciWrapper:
-    def __init__(self, socket_path="/var/run/charon.vici"):
-        self.socket_path = socket_path
-        if not os.path.exists(self.socket_path):
-            raise ViciSocketException(self.socket_path + " doesn't exist!")
-        if not self._is_path_a_socket():
-            raise ViciPathNotASocketException("The path '" + self.socket_path + "' is not a Socket!")
+    def __init__(self, socket_uri=None):
+        socket_uri = socket_uri or settings.VICI_SOCKET_URI
+        self.socket_uri = urlparse(socket_uri)
+
+        self._check_socket()
         self._connect_socket()
 
     def __del__(self):
         self._close_socket()
+
+    def _check_socket(self):
+        if not self.socket_uri.scheme in ["unix", "tcp"]:
+            raise ViciPathNotASocketException(self.socket_uri + "is not a valid socket URI")
+
+        if self.socket_uri.scheme == "unix":
+            if not os.path.exists(self.socket_uri.netloc):
+                raise ViciSocketException(self.socket_uri.netloc + " doesn't exist!")
+
+            if not self._is_path_a_socket():
+                raise ViciPathNotASocketException("The path '" + self.socket_uri.netloc + "' is not a Socket!")
 
     def _close_socket(self):
         try:
@@ -27,14 +39,19 @@ class ViciWrapper:
 
     def _connect_socket(self):
         try:
-            self.socket = socket.socket(socket.AF_UNIX)
-            self.socket.connect(self.socket_path)
+            if self.socket_uri.scheme == "unix":
+                self.socket = socket.socket(socket.AF_UNIX)
+                self.socket.connect(self.socket_uri.netloc)
+            else:
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket.connect((self.socket_uri.hostname, self.socket_uri.port))
+
             self.session = vici.Session(self.socket)
         except Exception as e:
             raise ViciSocketException("Vici is not reachable! " + str(e))
 
     def _is_path_a_socket(self):
-        mode = os.stat(self.socket_path).st_mode
+        mode = os.stat(self.socket_uri.netloc).st_mode
         return stat.S_ISSOCK(mode)
 
     def load_connection(self, connection):
