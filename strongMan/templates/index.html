@@ -2,46 +2,34 @@
 {% load i18n %}
 {% block content %}
     <div id="main-page">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="jumbotron">
-                    <h2>Welcome to strongMan!</h2>
-                    <p>strongMan is a management interface for the strongSwan VPN solution.
-                        StrongMan provides a user friendly graphical interface to configure and establish IPsec
-                        connections.</p>
-                </div>
-            </div>
+        <div class="jumbotron">
+            <h2>Welcome to strongMan!</h2>
+            <p>strongMan is a management interface for the strongSwan VPN solution.
+                StrongMan provides a user friendly graphical interface to configure and establish IPsec
+                connections.</p>
         </div>
-        <div class="row">
-            <div class="col-md-6 col-sm-12">
-                <h3>Getting started</h3>
-                <ul>
-                    <li>
-                        Create a new connection with your credentials and establish a IPsec tunnel in the <a
-                            href="{% url "connections:index" %}"">connections section</a>.
-                    </li>
-                    <li>
-                        Upload certificates to establish an IPsec tunnel in the <a
-                            href="{% url "certificates:overview" %}"">certificates section</a>.
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-6 col-sm-12">
-                <h3>Links</h3>
-                <ul>
-                    <li>
-                        <a href="https://strongswan.org/">strongswan.org</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/strongswan/strongMan">Github sourcecode</a>
-                    </li>
-                    <li>
-                        How-to
-                    </li>
-                </ul>
-
-            </div>
-        </div>
+        <h3>Getting started</h3>
+        <ul>
+            <li>
+                Create a new connection with your credentials and establish a IPsec tunnel in the <a
+                    href="{% url "connections:index" %}">connections section</a>.
+            </li>
+            <li>
+                Upload certificates to establish an IPsec tunnel in the <a
+                    href="{% url "certificates:overview" %}">certificates section</a>.
+            </li>
+        </ul>
+        <h3>Links</h3>
+        <ul>
+            <li>
+                <a href="https://strongswan.org/">strongswan.org</a>
+            </li>
+            <li>
+                <a href="https://github.com/strongswan/strongMan">Github sourcecode</a>
+            </li>
+            <li>
+                How-to
+            </li>
+        </ul>
     </div>
-
 {% endblock %}

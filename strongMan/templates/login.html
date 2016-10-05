@@ -4,8 +4,9 @@
 {% block title %}Login{% endblock title %}
 {% block content %}
     <div id="login">
-        <div class="col-md-offset-1 col-md-3 hidden-sm hidden-xs" id="strongimg"><img
-                src="{% static 'img/strong.png' %}"></div>
+        <div class="col-md-offset-1 col-md-3 hidden-sm hidden-xs" id="strongimg">
+            <img src="{% static 'img/strong.png' %}">
+        </div>
         <div class="col-md-7">
             <div class="panel panel-default">
                 <form class="form-horizontal" action="{% url 'login' %}" method="post">
@@ -26,7 +27,6 @@
                         <button type="submit" id="loginbtn" class="btn btn-primary"><span
                                 class="glyphicon glyphicon-log-in"></span> Log in
                         </button>
-
                     </div>
                 </form>
             </div>

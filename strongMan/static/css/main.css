@@ -2,47 +2,94 @@
   font-family: 'strongUbuntu';
   src: url("../../static/fonts/Ubuntu-Regular.eot");
   /* IE9 Compat Modes */
+
   src: url("../../static/fonts/Ubuntu-Regular.eot?#iefix") format("embedded-opentype"), url("../../static/fonts/Ubuntu-Regular.woff") format("woff"), url("../../static/fonts/Ubuntu-Regular.ttf") format("truetype"), url("../../static/fonts/Ubuntu-Regular.svg#svgFontName") format("svg");
-  /* Legacy iOS */ }
+  /* Legacy iOS */
+}
 html {
-  height: 100%; }
-  html body {
-    padding-top: 20px;
-    height: 100%;
-    font-family: 'strongUbuntu', sans-serif; }
-    html body .container {
-      height: 100%; }
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 200px;
+  font-family: 'strongUbuntu', sans-serif;
+}
 
-#base .min-height {
-  min-height: 90%; }
-#base .title-area hr {
-  margin-top: 10px;
-  margin-bottom: 30px; }
+.navbar-brand > img {
+  display: inline-block;
+}
+.navbar {
+  margin-bottom: 0px;
+}
+.navbar-inverse {
+  background-color: #222529;
+}
+.navbar-inverse .navbar-brand {
+  color: #EDEDED;
+}
+.navbar-inverse .navbar-brand:hover {
+  color: #BABABA;
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #EDEDED;
+}
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: #BABABA;
+}
+.navbar-nav .navbar-right:last-child {
+  margin-right: 0;
+}
 
-#base-footer {
-  margin-top: 50px;
+.content {
+  padding-bottom: 60px;
+}
+.content h1 {
+  padding-top: 30px;
+  padding-bottom: 12px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
   width: 100%;
-  height: 200px;
-  background-color: #101010;
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px; }
-  #base-footer .footer-content {
-    height: 100%;
-    position: relative;
-    padding: 40px 20px 20px 40px; }
-    #base-footer .footer-content p, #base-footer .footer-content h1, #base-footer .footer-content h2, #base-footer .footer-content h3, #base-footer .footer-content h4, #base-footer .footer-content h5, #base-footer .footer-content span {
-      color: #EDEDED; }
-    #base-footer .footer-content .logo {
-      display: inline-block;
-      text-align: center; }
-      #base-footer .footer-content .logo .fa {
-        font-size: 3em;
-        color: #EDEDED;
-        margin-right: 25px; }
-      #base-footer .footer-content .logo .fa:hover {
-        color: #bababa; }
-    #base-footer .footer-content .copyright {
-      margin-top: 50px; }
+  padding-top: 40px;
+  padding-bottom: 20px;
+  min-height: 200px;
+  color: #9D9D9D;
+  background-color: #222529;
+  vertical-align: middle;
+  margin-top: 50px;
+}
+.footer a {
+  color: #9D9D9D;
+}
+.footer a:hover {
+  color: #FFF;
+}
+.footer .logo {
+    display: inline-block;
+}
+.footer .logo .fa {
+  font-size: 3em;
+  color: #EDEDED;
+  color: #9D9D9D;
+  margin-right: 12px;
+  margin-left: 12px;
+}
+.footer .logo .fa:hover {
+  color: #BABABA;
+  color: #FFF;
+}
+.footer .copyright {
+  margin-top: 50px;
+}
+
+/* site specific */
+
+.title-area hr {
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
 
 #login {
   margin-top: 50px; }
@@ -74,24 +121,6 @@ html {
     margin-bottom: 10px; }
   #pw_change #passwordrules {
     margin-top: 60px; }
-
-#main-page .jumbotron {
-  padding-top: 20px;
-  padding-bottom: 20px; }
-
-.navbar-inverse {
-  margin-bottom: 20px; }
-  .navbar-inverse .navbar-brand {
-    color: #EDEDED; }
-  .navbar-inverse .navbar-brand:hover {
-    color: #bababa; }
-  .navbar-inverse .navbar-nav > li > a {
-    color: #EDEDED; }
-  .navbar-inverse .navbar-nav > li > a:hover {
-    color: #bababa; }
-
-.navbar-nav.navbar-right:last-child {
-  margin-right: 0; }
 
 .black-background {
   background-color: #333; }

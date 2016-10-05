@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf8
 import argparse
 import subprocess
 from argparse import RawTextHelpFormatter
