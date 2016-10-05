@@ -23,7 +23,5 @@ script:
   - sleep 10
   - docker-compose run roadwarrior /bin/sh -c "cd /strongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test strongMan.tests.tests --settings=strongMan.settings.local; python manage.py test strongMan.tests.integration_tests --settings=strongMan.settings.local;"
 
-notifications:
-  email: false
 
 
