@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Pro mode{% endblock title %}
+{% block small-title %}Overview{% endblock small-title %}
+{% block content %}
+    Daemon: {{ daemon }} <br>
+    Version: {{ version }} <br>
+    System name: {{ sysname }} <br>
+    Release: {{ release }} <br>
+    Machine: {{ machine }} <br>
+{% endblock %}

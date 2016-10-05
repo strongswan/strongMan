@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 
 from strongMan.apps.vici.wrapper.exception import ViciException
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 from strongMan.apps.connections.models.connections import Connection
 from strongMan.apps.connections.models.common import State
