@@ -3,9 +3,53 @@
 {% block title %}Pro mode{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
 {% block content %}
-    Daemon: {{ daemon }} <br>
-    Version: {{ version }} <br>
-    System name: {{ sysname }} <br>
-    Release: {{ release }} <br>
-    Machine: {{ machine }} <br>
+    Daemon: {{ version.daemon }} <br>
+    Version: {{ version.version }} <br>
+    System name: {{ version.sysname }} <br>
+    Release: {{ version.release }} <br>
+    Machine: {{ version.machine }} <br>
+
+    <hr>
+    <p>{{ msg }}</p>
+    <hr>
+
+    <p><b>All data</b></p>
+    <table>
+        {% for key, value in pprint.items %}
+            <tr>
+                <td> {{ key }}: </td> <td> {{ value }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+
+    <p><b>Status</b></p>
+    <table>
+        {% for key, value in status.items %}
+            <tr>
+                <td> {{ key }}: </td> <td> {{ value }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+
+    <p><b>version</b></p>
+    <table>
+        {% for key, value in version.items %}
+            <tr>
+                <td> {{ key }}: </td> <td> {{ value }} </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+
+    <p><b>status, version, certificates</b></p>
+    <dl>
+        <dt>status</dt>
+        <dd>{{ status }}</dd>
+        <dt>version</dt>
+        <dd>{{ version }}</dd>
+        <dt>certificates</dt>
+        <dd>{{ certs }}</dd>
+    </dl>
 {% endblock %}
