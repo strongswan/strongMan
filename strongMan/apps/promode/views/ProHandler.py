@@ -19,14 +19,11 @@ class ProHandler:
                 vici_wrapper = ViciWrapper()
                 context['status'] = vici_wrapper.get_status()
                 context['version'] = vici_wrapper.get_version()
-                context['certs'] = vici_wrapper.get_certificates()
-
-                context['pprint'] = dict(context.items())
 
                 pro_vici_wrapper = ProViciWrapper()
-                msg = pro_vici_wrapper.get_version_pro()
-
-                context['msg'] = msg
+                context['list_conns'] = pro_vici_wrapper.list_conns()
+                context['get_conns'] = pro_vici_wrapper.get_conns()
+                context['list_certs'] = pro_vici_wrapper.list_certs()
 
             except ViciLoadException as e:
                 messages.warning(self.request, str(e))

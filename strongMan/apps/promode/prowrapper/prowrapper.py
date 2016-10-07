@@ -12,3 +12,18 @@ class ProViciWrapper(ViciWrapper):
             return self.session.version()
         except Exception as e:
             raise ViciLoadException("Version information cannot be loaded!")
+
+    def list_conns(self):
+        connections = []
+        for connection in self.session.list_conns():
+            connections.append(connection)
+        return connections
+
+    def get_conns(self):
+        return self.session.get_conns()
+
+    def list_certs(self):
+        certificates = []
+        for certificate in self.session.list_certs():
+            certificates.append(certificate)
+        return certificates

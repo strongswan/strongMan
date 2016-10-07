@@ -10,17 +10,14 @@
     Machine: {{ version.machine }} <br>
 
     <hr>
-    <p>{{ msg }}</p>
+    <p><b>list_conns</b></p>
+    <p>{{ list_conns }}</p>
     <hr>
-
-    <p><b>All data</b></p>
-    <table>
-        {% for key, value in pprint.items %}
-            <tr>
-                <td> {{ key }}: </td> <td> {{ value }} </td>
-            </tr>
-        {% endfor %}
-    </table>
+    <p><b>get_conns</b></p>
+    <p>{{ get_conns }}</p>
+    <hr>
+    <p><b>list_certs</b></p>
+    <p>{{ list_certs }}</p>
     <hr>
 
     <p><b>Status</b></p>
@@ -42,14 +39,4 @@
         {% endfor %}
     </table>
     <hr>
-
-    <p><b>status, version, certificates</b></p>
-    <dl>
-        <dt>status</dt>
-        <dd>{{ status }}</dd>
-        <dt>version</dt>
-        <dd>{{ version }}</dd>
-        <dt>certificates</dt>
-        <dd>{{ certs }}</dd>
-    </dl>
 {% endblock %}
