@@ -5,7 +5,7 @@ from django.contrib import messages
 from strongMan.apps.vici.wrapper.exception import ViciLoadException
 from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
-from strongMan.apps.promode.prowrapper.prowrapper import ProViciWrapper
+from strongMan.apps.advanced.advancedwrapper.advancedwrapper import ProViciWrapper
 
 
 class ProHandler:
@@ -31,4 +31,4 @@ class ProHandler:
             return self._render(context)
 
     def _render(self, context):
-        return render(self.request, 'promode/overview.html', context)
+        return render(self.request, 'advanced/overview.html', context)
