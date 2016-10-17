@@ -5,7 +5,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .apps import views
 from .apps.certificates import urls as certificates_url
 from .apps.connections import urls as connections_urls
-from .apps.advanced import urls as prold_urls
+from .apps.server_overview import urls as prold_urls
 from .apps.views import index
 
 urlpatterns = [
@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^logout/?$', views.logout, name='logout'),
     url(r'change_pw$', views.pw_change, name='pw_change'),
     url(r'^about/?$', views.about, name='about'),
-    url(r'^advanced/', include(prold_urls)),
+    url(r'^server_overview/', include(prold_urls)),
 ]
 
 handler400 = 'strongMan.apps.views.bad_request'

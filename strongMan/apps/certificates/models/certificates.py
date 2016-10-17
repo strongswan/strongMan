@@ -1,7 +1,8 @@
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver, Signal
-from strongMan.apps.encryption import fields
+
+from strongMan.helper_apps.encryption import fields
 from .core import CertificateException, CertificateModel, DjangoAbstractBase
 from .identities import TextIdentity, DnIdentity
 from ..container_reader import X509Reader

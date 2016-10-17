@@ -3,5 +3,5 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.promode, name='advanced'),
+    url(r'^$', views.promode, name='server_overview'),
 ]
