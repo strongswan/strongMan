@@ -1,0 +1,20 @@
+{% extends "server_connections/forms/ConnectionForm.html" %}
+{% load connections_extras %}
+{% block form_content %}
+    {% include "server_connections/forms/UserPassword.html" with username=form.username password=form.password %}
+    <hr>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Choose your certificate which authenticates you. Only certificates with private keys are shown.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
+    <hr>
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Choose the ca certificate which authenticates the server.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CaPicker.html" with form=form %}
+    <hr>
+{% endblock form_content %}

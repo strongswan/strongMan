@@ -2,7 +2,7 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciLoadException
 
 
-class ProViciWrapper(ViciWrapper):
+class ServerViciWrapper(ViciWrapper):
 
     def get_version_pro(self):
         '''
