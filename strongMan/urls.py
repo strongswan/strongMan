@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .apps import views
 from .apps.certificates import urls as certificates_url
+from .apps.eap_secrets import urls as eap_secrets_url
 from .apps.connections import urls as connections_urls
 from .apps.server_connections import urls as server_connections_urls
 from .apps.views import index
@@ -14,6 +15,7 @@ urlpatterns = [
     url(r'^connections/', include(connections_urls)),
     url(r'^server_connections/', include(server_connections_urls)),
     url(r'^certificates/', include(certificates_url)),
+    url(r'^eap_secrets/', include(eap_secrets_url)),
     url(r'^login/?$', views.login, name='login'),
     url(r'^logout/?$', views.logout, name='logout'),
     url(r'change_pw$', views.pw_change, name='pw_change'),

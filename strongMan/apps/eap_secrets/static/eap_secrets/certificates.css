@@ -1,0 +1,59 @@
+#certificate-overview #header {
+  margin-bottom: 20px; }
+#certificate-overview #search {
+  margin-bottom: 10px;
+  margin-top: 30px; }
+  #certificate-overview #search .input-group {
+    margin-left: 13px; }
+#certificate-overview #header #add-btn {
+  padding-right: 15px; }
+#certificate-overview .pagination-form {
+  display: inline-block; }
+#certificate-overview .pagination li {
+  display: inline-block; }
+#certificate-overview .editremove-cell {
+  width: 120px; }
+#certificate-overview td a {
+  display: block;
+  padding: 2px; }
+
+#certificate-detail .x509-edit {
+  bottom: auto;
+  top: 20px;
+  margin-bottom: 50px; }
+#certificate-detail .private-edit {
+  bottom: auto;
+  top: 20px;
+  margin-bottom: 50px; }
+#certificate-detail table tr td {
+  padding: 5px; }
+#certificate-detail table {
+  margin-bottom: 0px; }
+#certificate-detail #cert-header {
+  margin-bottom: 30px;
+  margin-top: 30px; }
+
+#certificate-add .form-row {
+  margin-bottom: 10px;
+  margin-top: 5px; }
+#certificate-add #upload-area {
+  padding-top: 25px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  padding-right: 10px; }
+#certificate-add #upload-panel {
+  margin-top: 20px; }
+
+#certificate-added #nav-btn {
+  margin-top: 20px;
+  margin-bottom: 30px; }
+
+.certificate-widget h3 {
+  margin-top: 10px;
+  margin-bottom: 20px; }
+
+.certificate-privatekey h3 {
+  margin-top: 10px;
+  margin-bottom: 30px; }
+
+/*# sourceMappingURL=eap_secrets.css.map*/

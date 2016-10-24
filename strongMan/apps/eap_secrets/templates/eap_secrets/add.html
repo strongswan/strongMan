@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block title %}EAP Secrets{% endblock title %}
+{% block small-title %}Create new Secret{% endblock small-title %}
+{% block html-head %}
+    <link href="{% static 'eap_secrets/eap_secrets.css' %}" rel="stylesheet">
+{% endblock html-head %}
+{% block content %}
+    <div class="container" id="eap_secrets-add">
+        <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
+            <div class="panel-body" id="upload-area">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="control-label col-sm-3 col-xs-12">Username</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="text" class="form-control" name="username" value="{{ username.value }}"
+                                   placeholder="Your username"/>
+                            {% include "connections/forms/../widgets/errormsg.html" with field=username %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "connections/widgets/QuestionPopover.html" with title="Username help" content="Enter the username that authenticates you." %}
+                        </div>
+                        <label class="control-label col-sm-3 col-xs-12">Password</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="password" class="form-control" name="password" value="{{ password.value }}"
+                                   placeholder="Your password"/>
+                            {% include "connections/forms/../widgets/errormsg.html" with field=password %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "connections/widgets/QuestionPopover.html" with title="Password help" content="Enter the corresponding password. Use a safe and strong password. The same secret has to be configured on the server side." %}
+                        </div>
+                    </div>
+                    <div class="row form-row">
+                        <div class="col-md-11 col-xs-12">
+                            <button type="submit" class="btn btn-default pull-right">
+                                <span class="glyphicon glyphicon-upload"></span> Create
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
+            $("#pwQuestion").focusout(function () {
+                $('[data-toggle="popover"]').popover('hide')
+            })
+        </script>
+    </div>
+{% endblock content %}
