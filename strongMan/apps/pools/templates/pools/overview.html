@@ -3,28 +3,37 @@
 {% load render_table from django_tables2 %}
 {% load staticfiles %}
 {% block html-head %}
-    <link href="{% static 'connections/bootstrap-toggle.min.css' %}" rel="stylesheet">
-    <script src="{% static 'connections/bootstrap-toggle.min.js' %}"></script>
-    <script src="{% static "connections/toggle_connection.js" %}"></script>
-    <script src="{% static "connections/logger.js" %}"></script>
+    <link href="{% static 'pools/bootstrap-toggle.min.css' %}" rel="stylesheet">
+    <script src="{% static 'pools/bootstrap-toggle.min.js' %}"></script>
+    <script src="{% static "pools/logger.js" %}"></script>
 {% endblock html-head %}
-{% block title %}Connection{% endblock title %}
-{% block small-title %}Pools{% endblock small-title %}
+{% block title %}Pools{% endblock title %}
+{% block small-title %}Manage your pools{% endblock small-title %}
 {% block content %}
     <div id="pools-overview" class="row col-xs-12 col-md-10 col-md-offset-1">
 
-        <div id="con-table" class="">
+        <div class="row" id="header">
+                <div class="pull-right" id="add-btn">
+                    <span title="Create a new pool">
+                        <a href="{% url "pools:add" %}" type="button" class="btn btn-primary btn-lg"
+                           aria-label="Left Align">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                        </a>
+                    </span>
+                </div>
+        </div>
+
+        <div id="pool-table" class="">
             {% if table %}
                 <div class="col-xs-12">
-                    {% render_table table 'connections/widgets/table.html' %}
+                    {% render_table table 'pools/widgets/table.html' %}
                 </div>
             {% else %}
                 <h3 id="no_certs_to_show">No pools to show</h3>
-                <p>Feel free to add a new pool with the blue Add button on the right side.</p>
             {% endif %}
         </div>
 
-        <div class="form-row">
+         <div class="form-row">
             <div class="col-xs-12">
                 <div class="panel-group" id="log_panel">
                     <div class="panel panel-default">

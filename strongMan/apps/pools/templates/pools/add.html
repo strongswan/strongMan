@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block title %}Pools{% endblock title %}
+{% block small-title %}Add new pool{% endblock small-title %}
+{% block html-head %}
+    <link href="{% static 'pools/pools.css' %}" rel="stylesheet">
+{% endblock html-head %}
+{% block content %}
+    <div class="container" id="pools-add">
+        <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
+            <div class="panel-body" id="upload-area">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <label class="control-label col-sm-3 col-xs-12">Pool name</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="text" class="form-control" name="poolname" value="{{ poolname.value }}"
+                                   placeholder="Pool name"/>
+                            {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. Take care, come names are reserved. Check out wiki.strongswan.org for more information." %}
+                        </div>
+                        <label class="control-label col-sm-3 col-xs-12">Addresses</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="text" class="form-control" name="addresses" value="{{ addresses.value }}"
+                                   placeholder="Address list"/>
+                            {% include "connections/forms/../widgets/errormsg.html" with field=addresses %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "connections/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the corresponding addresses comma separated." %}
+                        </div>
+                    </div>
+                    <div class="row form-row">
+                        <div class="col-md-11 col-xs-12">
+                            <button type="submit" class="btn btn-default pull-right">
+                                <span class="glyphicon glyphicon-upload"></span> Create
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
+            $("#pwQuestion").focusout(function () {
+                $('[data-toggle="popover"]').popover('hide')
+            })
+        </script>
+    </div>
+{% endblock content %}
