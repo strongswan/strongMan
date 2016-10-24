@@ -1,20 +1,85 @@
 {% extends "server_connections/forms/ConnectionForm.html" %}
 {% load connections_extras %}
 {% block form_content %}
-    {% include "server_connections/forms/UserPassword.html" with username=form.username password=form.password %}
-    <hr>
     <div class="row">
-        <div class="col-xs-12">
-            <p>Choose your certificate which authenticates you. Only certificates with private keys are shown.</p>
+        <p class="col-xs-12">Local settings</p>
+        <label class="control-label col-sm-3 col-xs-12">Local Round</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <input type="text" class="form-control" name="localround" value="2"
+                   placeholder="local round"/>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.localround %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
         </div>
     </div>
-    {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
-    <hr>
+
     <div class="row">
         <div class="col-xs-12">
-            <p>Choose the ca certificate which authenticates the server.</p>
+            <p>Choose the certification authority (CA) certificate which authenticates the server.</p>
         </div>
     </div>
     {% include "server_connections/forms/CaPicker.html" with form=form %}
+
+    <div class="row">
+        <label class="control-label col-sm-3 col-xs-12">Local Auth</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <input type="text" class="form-control" name="localauth" value="pubkey"
+                   placeholder="local auth"/>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.localauth %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <p class="col-xs-12">Remote settings</p>
+        <label class="control-label col-sm-3 col-xs-12">Remote Round</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <input type="text" class="form-control" name="remoteround" value="2"
+                   placeholder="remote round"/>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteround %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+        </div>
+    </div>
+
+    {% include "server_connections/forms/UserPassword.html" with username=form.username password=form.password %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Choose the certificate which authenticates the remote peer. Only certificates with private key's are shown.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
+
+    <div class="row">
+        <label class="control-label col-sm-3 col-xs-12">Remote Auth</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <input type="text" class="form-control" name="remoteauth" value="eap-md5|eap-mschapv2|eap-ttls|eap-peap"
+                   placeholder="remote auth"/>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteauth %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+        </div>
+    </div>
+
+    <div class="row">
+        <label class="control-label col-sm-3 col-xs-12">Remote CA Certs</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <input type="text" class="form-control" name="remotecacerts" value=""
+                   placeholder="remote cacerts"/>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remotecacerts %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+        </div>
+    </div>
+
     <hr>
 {% endblock form_content %}

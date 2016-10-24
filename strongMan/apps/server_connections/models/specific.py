@@ -49,7 +49,7 @@ class Child(models.Model):
 class Address(models.Model):
     value = models.TextField()
     local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='server_local_ts')
-    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts')
+    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='server_remote_ts')
     remote_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
                                          related_name='server_remote_addresses')
     local_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,

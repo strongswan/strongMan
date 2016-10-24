@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render
 from django_tables2 import RequestConfig
-from collections import OrderedDict
 
 from strongMan.apps.server_connections.models.connections import Connection
 

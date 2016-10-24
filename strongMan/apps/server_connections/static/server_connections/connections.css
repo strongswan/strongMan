@@ -6,8 +6,9 @@
   #connection-details .form-holder .popover {
     max-width: 300px; }
 
-#connection-overview #add {
-  margin-bottom: 10px; }
+#connection-overview .add_button {
+  margin-bottom: 10px;
+  margin-left: 10px; }
 #connection-overview #log_panel {
   margin-top: 100px; }
   #connection-overview #log_panel .panel-body {

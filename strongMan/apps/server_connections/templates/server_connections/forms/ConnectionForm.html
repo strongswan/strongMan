@@ -3,98 +3,165 @@
     <div class="row">
         <p class="col-xs-12">Your chosen authentication method.</p>
         <label class="control-label col-sm-3 col-xs-12" for="label_form_name">Method</label>
-        {% if  connection %}
+        {% if connection %}
             <div class="controls col-sm-8 col-xs-9">
         {% else %}
             <div class="controls col-sm-6 col-xs-8">
         {% endif %}
-
-        <select class="form-control" name="form_name" id="select_form_name" disabled="True">
-            <option>{{ form.model.choice_name }}</option>
-        </select>
+            <select class="form-control" name="form_name" id="select_form_name" disabled="True">
+                <option>{{ form.model.choice_name }}</option>
+            </select>
         </div>
         <div class="col-sm-2 col-xs-2">
             {% if not connection %}
                 <span title="Change authentication method">
-            <a class="btn btn-default" onclick="on_change_method_btn_click()" id="change_method_btn">
-                <i class="fa fa-pencil" aria-hidden="true"></i><span> Change</span>
-            </a>
-            </span>
+                    <a class="btn btn-default" onclick="on_change_method_btn_click()" id="change_method_btn">
+                        <i class="fa fa-pencil" aria-hidden="true"></i><span> Change</span>
+                    </a>
+                </span>
             {% endif %}
         </div>
+    </div>
+    <hr>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
+        <div class="row">
+            <p class="col-xs-12">Name your connection so you can recognize it.</p>
+            <label class="control-label col-sm-3 col-xs-12">Name</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
+                       placeholder="Name your connection"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.profile %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Name help" content="This is the name of the connection. The name appears as the main identifier in strongMan and also in strongSwan." %}
+            </div>
         </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">IKE Version</label>
+            <div class="controls col-sm-8 col-xs-10" name="ikeversion">
+                <label class="radio-inline"><input type="radio" name="ikeversion">IKEv1</label>
+                <label class="radio-inline"><input type="radio" name="ikeversion">IKEv2</label>
+                <label class="radio-inline"><input type="radio" name="ikeversion">Any IKE version</label>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.ikeversion %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="IKE Version." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Remote Address</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
+                       placeholder="Remote Hostname or IP" id="gateway"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.gateway %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote Address help" content="The opposite endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Pools</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <select class="form-control" name="pool">
+                    <option value="pool one">pool one</option>
+                    <option value="pool two">pool two</option>
+                    <option value="pool three">pool three</option>
+                    <option value="pool four">pool four</option>
+                    <option value="pool five">pool five</option>
+                </select>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.pool %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Pool help" content="Select pool." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Send Certificate Request</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <label class="checkbox-inline"><input type="checkbox" name="send_cert_req">Send certificate request</label>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_cert_req %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Certificate request help" content="Select if certificate request is enabled." %}
+            </div>
+        </div>
+
         <hr>
 
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="current_form" value="{{ form|classname }}"/>
-            <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
-            <div class="row">
-                <p class="col-xs-12">Name your connection so you can recognize it and set the server.</p>
-                <label class="control-label col-sm-3 col-xs-12">Name</label>
-                <div class="controls col-sm-8 col-xs-10">
-                    <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
-                           placeholder="Name your connection"/>
-                    {% include "server_connections/forms/../widgets/errormsg.html" with field=form.profile %}
-                </div>
-                <div class="col-sm-1 col-xs-2">
-                    {% include "server_connections/widgets/QuestionPopover.html" with title="Name help" content="This is the name of the connection. The name appears as the main identifier in strongMan and also in strongSwan." %}
-                </div>
+        {% block form_content %}{% endblock form_content %}
 
+        <div class="row">
+            <p class="col-xs-12">Child settings</p>
+            <label class="control-label col-sm-3 col-xs-12">local ts</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="local_ts" value=""
+                       placeholder="local_ts"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_ts %}
             </div>
-            <div class="row">
-                <label class="control-label col-sm-3 col-xs-12">Server</label>
-                <div class="controls col-sm-8 col-xs-10">
-                    <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
-                           placeholder="Hostname or IP" id="gateway"/>
-                    {% include "server_connections/forms/../widgets/errormsg.html" with field=form.gateway %}
-                </div>
-                <div class="col-sm-1 col-xs-2">
-                    {% include "server_connections/widgets/QuestionPopover.html" with title="Server help" content="The server is the opposite endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
-                </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
             </div>
-            <hr>
-            {% block form_content %}{% endblock form_content %}
-            <div class="pull-right">
-                {% if connection %}
-                    {% if connection.state == "DOWN" %}
-                        <span title="Remove connection">
-                        <a href="{% url 'server_connections:delete' connection.id %}"
-                           id="delete-{{ connection.id }}"
-                           class="btn btn-default white-background black remove-btn">
-                            <span class="glyphicon glyphicon-remove"></span> <span
-                                class="removebtn-text">Remove</span>
-                        </a>
-                    </span>
-                    {% endif %}
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">remote ts</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="remote_ts" value=""
+                       placeholder="remote_ts"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_ts %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+            </div>
+        </div>
+
+        <div class="pull-right">
+            {% if connection %}
+                {% if connection.state == "DOWN" %}
+                    <span title="Remove connection">
+                    <a href="{% url 'server_connections:delete' connection.id %}"
+                       id="delete-{{ connection.id }}"
+                       class="btn btn-default white-background black remove-btn">
+                        <span class="glyphicon glyphicon-remove"></span> <span
+                            class="removebtn-text">Remove</span>
+                    </a>
+                </span>
                 {% endif %}
+            {% endif %}
 
-                {% if connection and connection.state == 'DOWN' or not connection %}
-                    <button type="submit" name="save" id="configuration"
-                            class="btn btn-primary"><span
-                            class="glyphicon glyphicon-floppy-disk"></span> Save
-                    </button>
-                {% endif %}
+            {% if connection and connection.state == 'DOWN' or not connection %}
+                <button type="submit" name="save" id="configuration"
+                        class="btn btn-primary"><span
+                        class="glyphicon glyphicon-floppy-disk"></span> Save
+                </button>
+            {% endif %}
 
-            </div>
-        </form>
-        <script>
-            $(".remove-btn").click(function () {
-                btn = $(this);
-                if (btn.hasClass('btn-default')) {
-                    btn.removeClass('btn-default').addClass('btn-danger');
-                    btn.children('.removebtn-text').text('Remove connection');
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-
-            on_change_method_btn_click = function () {
-                if (confirm('Are you sure you want to change the authentication method? All inputs will be lost.')) {
-                    window.location.replace("");
-                }
+        </div>
+    </form>
+    <script>
+        $(".remove-btn").click(function () {
+            btn = $(this);
+            if (btn.hasClass('btn-default')) {
+                btn.removeClass('btn-default').addClass('btn-danger');
+                btn.children('.removebtn-text').text('Remove connection');
+                return false;
+            } else {
+                return true;
             }
-        </script>
+        });
 
-    </div>
+        on_change_method_btn_click = function () {
+            if (confirm('Are you sure you want to change the authentication method? All inputs will be lost.')) {
+                window.location.replace("");
+            }
+        }
+    </script>
+</div>
