@@ -1,7 +1,9 @@
 from django.contrib import messages
 
 from ..forms import AddForm
-from ..services import AddEapSecretResult
+# from ...server_connections import models
+from ...server_connections.models import Secret
+from ...server_connections.models import Authentication
 
 
 class AddHandler:
@@ -25,5 +27,7 @@ class AddHandler:
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')
 
+        secret = Secret(eap_username=self.form.my_username, type='EAP', data=self.form.my_password)
+        secret.save()
         return self._render(form=self.form)
 

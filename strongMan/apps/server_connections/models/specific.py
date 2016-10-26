@@ -65,14 +65,15 @@ class Proposal(models.Model):
 
 
 class Secret(models.Model):
+    eap_username = models.TextField()
     type = models.TextField()
     data = fields.EncryptedCharField(max_length=50)
     authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,
                                        related_name='server_authentication')
 
+
     def dict(self):
-        eap_id = self.authentication.subclass().eap_id
-        secrets = OrderedDict(type=self.type, data=self.data, id=eap_id)
+        secrets = OrderedDict(type=self.type, data=self.data, id=self.eap_username)
         return secrets
 
 

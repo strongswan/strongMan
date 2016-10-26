@@ -13,12 +13,6 @@ class AddForm(forms.Form):
         valid = super(AddForm, self).is_valid()
         return valid
 
-    def _read_password(self):
-        password = self.cleaned_data["password"]
-        if password == "": return None
-        password_bytes = str.encode(password)
-        return password_bytes
-
     @property
     def my_username(self):
         return self.cleaned_data["username"]
@@ -29,7 +23,10 @@ class AddForm(forms.Form):
 
     @property
     def my_password(self):
-        return self.cleaned_data["password"]
+        password = self.cleaned_data["password"]
+        if password == "": return None
+        password_bytes = str.encode(password)
+        return password_bytes
 
     @my_password.setter
     def my_password(self, value):

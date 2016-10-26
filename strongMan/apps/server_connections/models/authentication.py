@@ -84,12 +84,8 @@ class AutoCaAuthentication(Authentication):
 
 
 class EapAuthentication(Authentication):
-    eap_id = models.TextField()
-
     def dict(self):
         auth = super(EapAuthentication, self).dict()
-        values = auth[self.name]
-        values['eap_id'] = self.eap_id
         return auth
 
 
@@ -114,17 +110,12 @@ class CertificateAuthentication(Authentication):
 
 
 class EapTlsAuthentication(Authentication):
-    eap_id = models.TextField()
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_tls_identity')
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
         values = auth[self.name]
         values['certs'] = [self.identity.subclass().certificate.der_container]
-        ident = self.identity.subclass()
-        if not isinstance(ident, DnIdentity):
-            values['id'] = ident.value()
-        values['eap_id'] = self.eap_id
         return auth
 
     def has_private_key(self):

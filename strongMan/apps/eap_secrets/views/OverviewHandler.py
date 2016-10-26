@@ -8,9 +8,10 @@ from ..tables import EapSecretsTable
 from ...server_connections.models import Secret
 
 
-class AbstractOverviewHandler:
+class OverviewHandler:
     def __init__(self):
         self.request = None
+        self.delete_id = None
         self.ENTRIES_PER_PAGE = 10
 
     @classmethod
@@ -19,25 +20,25 @@ class AbstractOverviewHandler:
         handler.request = request
         return handler
 
+    @classmethod
+    def by_delete_request(cls, request, delete_id):
+        handler = cls()
+        handler.request = request
+        handler.delete_id = delete_id
+        return handler
+
     def page_tag(self):
-        '''
-        A string that identifies the view. This gets populated to the template.
-        :return:
-        '''
-        raise NotImplementedError()
+        return "all"
 
     def all_secrets(self):
-        '''
-        Returns all possible secrets. Can raise a OvervieHandlerException
-        '''
-        raise NotImplementedError()
+        return models.Secret.objects.all()
 
     def _search_for(self, all_secrets, search_text):
         '''
         Searches for keywords in Secrets
-        :param all_eapsecrets: prefiltered list of certificates
+        :param all_secrets: prefiltered list of eap secrets
         :param search_text: text to search for
-        :return: queryset of filtered certificates
+        :return: queryset of filtered secrets
         '''
         secret_ids = []
         secrets = models.secret.objects.all()
@@ -56,6 +57,8 @@ class AbstractOverviewHandler:
 
     def handle(self):
         try:
+            if self.delete_id is not None:
+                models.Secret.objects.get(pk__in=self.delete_id).delete()
             all_secrets = self.all_secrets()
         except OverviewHandlerException as e:
             messages.add_message(self.request, messages.WARNING, str(e))
@@ -74,14 +77,6 @@ class AbstractOverviewHandler:
         else:
             search_result = all_secrets
         return self._render(search_result, search_pattern)
-
-
-class MainOverviewHandler(AbstractOverviewHandler):
-    def page_tag(self):
-        return "all"
-
-    def all_secrets(self):
-        return models.Secret.objects.all()
 
 
 class OverviewHandlerException(Exception):

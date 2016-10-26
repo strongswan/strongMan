@@ -4,16 +4,35 @@ from django.views.decorators.http import require_http_methods
 
 from . import OverviewHandler
 # from .DetailsHandler import DetailsHandler
+from .AddHandler import AddHandler
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
+
+from . import OverviewHandler
 from ..forms import AddForm
 from .AddHandler import AddHandler
+
 
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def overview(request):
-    handler = OverviewHandler.MainOverviewHandler.by_request(request)
+    handler = OverviewHandler.OverviewHandler.by_request(request)
     return handler.handle()
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def delete_secret(request, secret_id):
+    handler = OverviewHandler.OverviewHandler.by_delete_request(request, secret_id)
+    return handler.handle()
+
+# @login_required
+# @require_http_methods(["GET", "POST"])
+# def details(request, eap_id):
+#     handler = DetailsHandler(request, eap_id)
+#     return handler.handle()
 
 # @login_required
 # @require_http_methods(["GET", "POST"])
