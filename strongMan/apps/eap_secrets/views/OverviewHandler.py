@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.shortcuts import render
 from django_tables2 import RequestConfig
 
-from ...server_connections import models
 from ..forms import EapSecretSearchForm
 from ..tables import EapSecretsTable
 from ...server_connections.models import Secret
@@ -11,7 +10,6 @@ from ...server_connections.models import Secret
 class OverviewHandler:
     def __init__(self):
         self.request = None
-        self.delete_id = None
         self.ENTRIES_PER_PAGE = 10
 
     @classmethod
@@ -20,18 +18,11 @@ class OverviewHandler:
         handler.request = request
         return handler
 
-    @classmethod
-    def by_delete_request(cls, request, delete_id):
-        handler = cls()
-        handler.request = request
-        handler.delete_id = delete_id
-        return handler
-
     def page_tag(self):
         return "all"
 
     def all_secrets(self):
-        return models.Secret.objects.all()
+        return Secret.objects.all()
 
     def _search_for(self, all_secrets, search_text):
         '''
@@ -41,9 +32,9 @@ class OverviewHandler:
         :return: queryset of filtered secrets
         '''
         secret_ids = []
-        secrets = models.secret.objects.all()
+        secrets = Secret.objects.all()
         for secret in secrets:
-            if search_text.lower() in str(secret.authentication.name).lower():
+            if search_text.lower() in str(secret.eap_username).lower():
                 secret_ids.append(secret.pk)
         return all_secrets.filter(pk__in=secret_ids)
 
@@ -57,8 +48,6 @@ class OverviewHandler:
 
     def handle(self):
         try:
-            if self.delete_id is not None:
-                models.Secret.objects.get(pk__in=self.delete_id).delete()
             all_secrets = self.all_secrets()
         except OverviewHandlerException as e:
             messages.add_message(self.request, messages.WARNING, str(e))

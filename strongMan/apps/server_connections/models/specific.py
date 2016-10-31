@@ -65,7 +65,7 @@ class Proposal(models.Model):
 
 
 class Secret(models.Model):
-    eap_username = models.TextField()
+    eap_username = models.TextField(unique=True)
     type = models.TextField()
     data = fields.EncryptedCharField(max_length=50)
     authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,

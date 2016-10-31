@@ -5,12 +5,12 @@ class EapSecretSearchForm(forms.Form):
     search_text = forms.CharField(max_length=200, required=False)
 
 
-class AddForm(forms.Form):
+class AddOrEditForm(forms.Form):
     username = forms.CharField(max_length=50, initial="")
     password = forms.CharField(max_length=50, widget=forms.PasswordInput, initial="")
 
     def is_valid(self):
-        valid = super(AddForm, self).is_valid()
+        valid = super(AddOrEditForm, self).is_valid()
         return valid
 
     @property
@@ -31,4 +31,3 @@ class AddForm(forms.Form):
     @my_password.setter
     def my_password(self, value):
         self.initial['password'] = value
-

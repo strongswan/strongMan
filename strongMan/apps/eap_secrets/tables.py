@@ -11,8 +11,11 @@ class EapSecretsTable(tables.Table):
         self.request = kwargs.pop("request")
         super(EapSecretsTable, self).__init__(*args, **kwargs)
 
+    def render_name(self, record):
+        return render_to_string('eap_secrets/widgets/name_column.html', {'name': record.eap_username}, request=self.request)
+
     def render_removebtn(self, record):
-        return render_to_string('eap_secrets/widgets/remove_column.html', {'id': record.id},
+        return render_to_string('eap_secrets/widgets/remove_column.html', {'name': record.eap_username},
                                 request=self.request)
 
     class Meta:

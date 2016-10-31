@@ -1,9 +1,9 @@
-<form action="{% url "eap_secrets:delete_secret" id %}" method="POST" class="inline-form"
-      onsubmit="return removeBtnClicked(this)" id="{{ id }}">
+<form action="{% url "eap_secrets:edit" name %}" method="POST" class="inline-form"
+      onsubmit="return removeBtnClicked(this)" id="{{ name }}">
     {% csrf_token %}
                     <span title="Remove">
                         <button type="submit" class="btn btn-default remove-btn"
-                                id="removebtn-{{ id }}" name="remove_secret">
+                                id="removebtn-{{ name }}" name="remove_secret">
                             <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text"></span>
                         </button>
                     </span>
