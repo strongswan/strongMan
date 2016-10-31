@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from ..models.pools import Pool
-from ..forms import AddForm
+from ..forms import AddOrEditForm
 
 
 class AddHandler:
@@ -17,11 +17,11 @@ class AddHandler:
         handler.request = request
         return handler
 
-    def _render(self, form=AddForm()):
+    def _render(self, form=AddOrEditForm()):
             return self.request, 'pools/overview.html', {"form": form}
 
     def handle(self):
-        self.form = AddForm(self.request.POST)
+        self.form = AddOrEditForm(self.request.POST)
         if not self.form.is_valid():
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')

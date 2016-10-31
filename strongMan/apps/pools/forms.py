@@ -1,12 +1,12 @@
 from django import forms
 
 
-class AddForm(forms.Form):
+class AddOrEditForm(forms.Form):
     poolname = forms.CharField(max_length=50, initial="")
     addresses = forms.CharField(max_length=150, initial="")
 
     def is_valid(self):
-        valid = super(AddForm, self).is_valid()
+        valid = super(AddOrEditForm, self).is_valid()
         return valid
 
     @property
