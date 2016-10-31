@@ -1,20 +1,20 @@
 {% extends "server_connections/forms/ConnectionForm.html" %}
 {% load connections_extras %}
 {% block form_content %}
-    <div class="row">
-        <p class="col-xs-12">Local settings</p>
+    <!--<div class="row">
         <label class="control-label col-sm-3 col-xs-12">Local Round</label>
         <div class="controls col-sm-8 col-xs-10">
             <input type="text" class="form-control" name="localround" value="2"
                    placeholder="local round"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.localround %}
+            {#% include "server_connections/forms/../widgets/errormsg.html" with field=form.localround %#}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+            {#% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %#}
         </div>
-    </div>
+    </div>-->
 
     <div class="row">
+        <p class="col-xs-12">Local settings</p>
         <div class="col-xs-12">
             <p>Choose the certification authority (CA) certificate which authenticates the server.</p>
         </div>
@@ -35,17 +35,19 @@
 
     <hr>
 
-    <div class="row">
-        <p class="col-xs-12">Remote settings</p>
+    <!--<div class="row">
         <label class="control-label col-sm-3 col-xs-12">Remote Round</label>
         <div class="controls col-sm-8 col-xs-10">
             <input type="text" class="form-control" name="remoteround" value="2"
                    placeholder="remote round"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteround %}
+            {#% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteround %#}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+            {#% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %#}
         </div>
+    </div>-->
+    <div class="row">
+        <p class="col-xs-12">Remote settings</p>
     </div>
 
     {% include "server_connections/forms/UserPassword.html" with username=form.username password=form.password %}

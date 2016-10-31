@@ -4,11 +4,28 @@ from strongMan.apps.server_connections.models import Connection, Child, Address,
     CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, Secret, EapTlsAuthentication
 from .FormFields import CertificateChoice, IdentityChoice
 
+POOL_CHOICES = (
+    ('0', "pool1"),
+    ('1', "pool2"),
+    ('2', "pool3"),
+    ('3', "pool4"),
+    ('4', "pool5"),
+)
+
+VERSION_CHOICES = (
+    ('0', "IKEv1"),
+    ('1', "IKEv2"),
+    ('2', "Any IKE version"),
+)
+
 
 class HeaderForm(forms.Form):
     connection_id = forms.IntegerField(required=False)
     profile = forms.CharField(max_length=50, initial="")
     gateway = forms.CharField(max_length=50, initial="")
+    version = forms.ChoiceField(widget=forms.RadioSelect(), choices=VERSION_CHOICES, initial='2', required=True)
+    pool = forms.ChoiceField(widget=forms.Select(), choices=POOL_CHOICES, label="", required=False)
+    send_cert_req = forms.BooleanField(required=False)
 
     def clean_profile(self):
         profile = self.cleaned_data['profile']
@@ -23,6 +40,9 @@ class HeaderForm(forms.Form):
     def fill(self, connection):
         self.initial['profile'] = connection.profile
         self.initial['gateway'] = connection.server_remote_addresses.first().value
+        self.initial['version'] = connection.version
+        self.initial['pool'] = connection.pool
+        self.initial['send_cert_req'] = connection.send_cert_req
 
     def create_connection(self, connection):
         child = Child(name=self.cleaned_data['profile'], connection=connection)
@@ -34,6 +54,9 @@ class HeaderForm(forms.Form):
         Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
         connection.profile = self.cleaned_data['profile']
+        connection.version = self.cleaned_data['version']
+        connection.pool = self.cleaned_data['pool']
+        connection.send_cert_req = self.cleaned_data['send_cert_req']
         connection.save()
 
     def model(self):

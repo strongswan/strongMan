@@ -43,11 +43,16 @@
 
         <div class="row">
             <label class="control-label col-sm-3 col-xs-12">IKE Version</label>
-            <div class="controls col-sm-8 col-xs-10" name="ikeversion">
-                <label class="radio-inline"><input type="radio" name="ikeversion">IKEv1</label>
-                <label class="radio-inline"><input type="radio" name="ikeversion">IKEv2</label>
-                <label class="radio-inline"><input type="radio" name="ikeversion">Any IKE version</label>
-                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.ikeversion %}
+            <div class="controls col-sm-8 col-xs-10" name="version">
+                {% for choice in form.version.field.choices %}
+                  <label class="radio-inline">
+                    <input type="radio" name="version" value="{{choice.0}}"
+                      {% ifequal form.version.value choice.0 %}
+                         checked="checked"
+                      {% endifequal %}/>
+                    {{choice.1}}
+                  </label>
+                {% endfor %}
             </div>
             <div class="col-sm-1 col-xs-2">
                 {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="IKE Version." %}
@@ -70,11 +75,14 @@
             <label class="control-label col-sm-3 col-xs-12">Pools</label>
             <div class="controls col-sm-8 col-xs-10">
                 <select class="form-control" name="pool">
-                    <option value="pool one">pool one</option>
-                    <option value="pool two">pool two</option>
-                    <option value="pool three">pool three</option>
-                    <option value="pool four">pool four</option>
-                    <option value="pool five">pool five</option>
+                    {% for choice in form.pool.field.choices %}
+                        <option value="{{choice.0}}"
+                        {% ifequal form.pool.value choice.0 %}
+                             selected="selected"
+                        {% endifequal %}>
+                            {{choice.1}}
+                        </option>
+                    {% endfor %}
                 </select>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.pool %}
             </div>
@@ -86,7 +94,11 @@
         <div class="row">
             <label class="control-label col-sm-3 col-xs-12">Send Certificate Request</label>
             <div class="controls col-sm-8 col-xs-10">
-                <label class="checkbox-inline"><input type="checkbox" name="send_cert_req">Send certificate request</label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="send_cert_req" {% if form.send_cert_req.value == True %}
+                             checked="checked"
+                        {% endif %}>Send certificate request
+                </label>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_cert_req %}
             </div>
             <div class="col-sm-1 col-xs-2">

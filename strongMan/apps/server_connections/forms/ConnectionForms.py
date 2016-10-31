@@ -61,7 +61,8 @@ class AbstractConnectionForm(AbstractDynamicForm):
         return valid
 
     def create_connection(self):
-        connection = self.model(profile=self.cleaned_data['profile'], auth='pubkey', version=2)
+        connection = self.model(profile=self.cleaned_data['profile'], version=self.cleaned_data['version'],
+                                pool=self.cleaned_data['pool'], send_cert_req=self.cleaned_data['send_cert_req'])
         connection.save()
         # Call create_connection method for every base class
         for base in self.__class__.__bases__:

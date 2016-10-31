@@ -14,10 +14,26 @@ from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from collections import Iterable
 
 
+POOL_CHOICES = (
+    ('0', "pool1"),
+    ('1', "pool2"),
+    ('2', "pool3"),
+    ('3', "pool4"),
+    ('4', "pool5"),
+)
+
+VERSION_CHOICES = (
+    ('0', "IKEv1"),
+    ('1', "IKEv2"),
+    ('2', "Any IKE version"),
+)
+
+
 class Connection(models.Model):
     profile = models.TextField(unique=True)
-    auth = models.TextField()
-    version = models.IntegerField()
+    version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='1')
+    pool = models.CharField(max_length=56, choices=POOL_CHOICES, default='0')
+    send_cert_req = models.BooleanField(default=False)
 
     def dict(self):
         children = OrderedDict()
@@ -127,6 +143,9 @@ class Connection(models.Model):
                     if 'cacerts' in connection[con_name][key]:
                         connection[con_name][key].pop('cacerts', [])
         return str(json.dumps(connection, indent=4))
+
+    def __repr__(self):
+        return str(self.version)
 
 
 class IKEv2Certificate(Connection):
