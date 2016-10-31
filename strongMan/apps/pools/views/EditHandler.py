@@ -14,7 +14,7 @@ class EditHandler:
         self.pool = pool
 
     def _render(self, form=AddOrEditForm()):
-        return render(self.request, 'pools/edit.html', {"form": form, "poolname": self.pool.poolname})
+        return render(self.request, 'pools/edit.html', {"form": form, "poolname": self.pool.poolname, "addresses": self.pool.addresses})
 
     def handle(self):
         if self.request.method == "GET":  # Edit
@@ -29,7 +29,11 @@ class EditHandler:
             if not self.form.is_valid():
                 messages.add_message(self.request, messages.ERROR,
                                      'Form was not valid')
-
-            return redirect(reverse("pools:index"))
+                return self._render(self.request)
+            else:
+                self.pool.poolname = self.form.my_poolname
+                self.pool.addresses = self.form.my_addresses
+                self.pool.save()
+                return redirect(reverse("pools:index"))
 
 

@@ -15,5 +15,10 @@ class PoolsTable(tables.Table):
         return render_to_string('pools/widgets/remove_column.html', {'poolname': record.poolname},
                                 request=self.request)
 
+    def render_poolname(self, record):
+        return render_to_string('pools/widgets/name_column.html', {'record': record},
+                                request=self.request)
+
+
     class Meta:
         attrs = {"class": "table"}
