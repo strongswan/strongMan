@@ -1,6 +1,6 @@
 from django.contrib import messages
-
-from strongMan.apps import pools
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from ..models.pools import Pool
 from ..forms import AddForm
 
@@ -26,15 +26,7 @@ class AddHandler:
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')
 #
-#       if form_class == forms.ChooseTypeForm:
-#           return self._render(form=form.selected_form_class())
-#
-#       if isinstance(form, HeaderForm):
-#           form.create_connection()
-#           return redirect(reverse("connections:index"))
-
         pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
-        # pool.create(self.form.my_poolname, self.form.my_addresses)
         pool.save()
-        return self._render(form=self.form)
+        return redirect(reverse("pools:index"))
 

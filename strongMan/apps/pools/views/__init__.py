@@ -11,8 +11,7 @@ from .AddHandler import AddHandler
 def add(request):
     if request.method == 'POST':
         handler = AddHandler.by_request(request)
-        (request, html, context) = handler.handle()
-        return render(request, html, context)
+        return handler.handle()
     elif request.method == 'GET':
         return render(request, 'pools/add.html', {"form": AddForm()})
 
