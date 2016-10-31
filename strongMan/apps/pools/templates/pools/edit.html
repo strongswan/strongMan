@@ -20,7 +20,7 @@
                             {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
-                            {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. Take care, come names are reserved. Check out wiki.strongswan.org for more information." %}
+                            {% include "pools/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. Take care, come names are reserved. Check out wiki.strongswan.org for more information." %}
                         </div>
                         <label class="control-label col-sm-3 col-xs-12">Addresses</label>
                         <div class="controls col-sm-8 col-xs-10">
@@ -29,7 +29,7 @@
                             {% include "connections/forms/../widgets/errormsg.html" with field=addresses %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
-                            {% include "connections/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the corresponding addresses comma separated." %}
+                            {% include "pools/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the address or range for this pool." %}
                         </div>
                     </div>
                     <div class="row form-row">
@@ -44,11 +44,12 @@
         </div>
         <script>
             $(function () {
-                $('[data-toggle="popover"]').popover()
-            })
-            $("#pwQuestion").focusout(function () {
-                $('[data-toggle="popover"]').popover('hide')
-            })
+                $(document).popover({
+                    selector: '[data-toggle=popover]',
+                    trigger: 'focus',
+                    container: 'body'
+                });
+              });
         </script>
     </div>
 {% endblock content %}
