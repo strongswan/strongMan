@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 
 
 from .OverviewHandler import OverviewHandler
@@ -20,11 +20,8 @@ def overview(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def add(request):
-    if request.method == 'POST':
-        handler = AddHandler.by_request(request)
-        return handler.handle()
-    elif request.method == 'GET':
-        return render(request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
+    handler = AddHandler.by_request(request)
+    return handler.handle()
 
 
 @login_required
