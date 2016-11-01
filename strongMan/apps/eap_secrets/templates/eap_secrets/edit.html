@@ -16,7 +16,7 @@
                         <label class="control-label col-sm-3 col-xs-12">Username</label>
                         <div class="controls col-sm-8 col-xs-10">
                             <input type="text" class="form-control" name="username" value="{{ username }}"{{ username }}
-                                   placeholder="Your username"/>
+                                   placeholder="Your username" readonly/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=username %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
@@ -34,9 +34,12 @@
                     </div>
                     <div class="row form-row">
                         <div class="col-md-11 col-xs-12">
-                            <button type="submit" class="btn btn-default pull-right">
-                                <span class="glyphicon glyphicon-upload"></span> Change
+                            <button type="submit" class="btn btn-default pull-right add_button">
+                                <span class="glyphicon glyphicon-floppy-disk"></span> Change
                             </button>
+                            <a href="{% url "eap_secrets:edit" username %}">
+                                <button type="button" class="btn btn-default pull-right">Show password</button>
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -44,11 +47,12 @@
         </div>
         <script>
             $(function () {
-                $('[data-toggle="popover"]').popover()
-            })
-            $("#pwQuestion").focusout(function () {
-                $('[data-toggle="popover"]').popover('hide')
-            })
+                $(document).popover({
+                    selector: '[data-toggle=popover]',
+                    trigger: 'focus',
+                    container: 'body'
+                });
+            });
         </script>
     </div>
 {% endblock content %}

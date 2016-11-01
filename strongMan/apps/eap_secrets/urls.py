@@ -5,6 +5,6 @@ from . import views
 app_name = 'eap_secrets'
 urlpatterns = [
     url(r'add$', views.add, name='add'),
-    url(r'^(?P<secret_name>[0-9a-zA-Zäüö ]+)$', views.edit, name='edit'),
+    url(r'^(?P<secret_name>[0-9a-zA-Z]+)$', views.edit, name='edit'),
     url(r'$', views.overview, name='overview'),
 ]

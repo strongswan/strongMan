@@ -29,8 +29,8 @@ class EditHandler:
             if not self.form.is_valid():
                 messages.add_message(self.request, messages.ERROR,
                                      'Form was not valid')
-
-            self.update_secret()
+            else:
+                self.update_secret()
             return redirect(reverse("eap_secrets:overview"))
 
     def update_secret(self):
