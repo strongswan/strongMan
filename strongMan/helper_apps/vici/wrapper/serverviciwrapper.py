@@ -1,5 +1,6 @@
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.vici.wrapper.exception import ViciLoadException
+
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class ServerViciWrapper(ViciWrapper):

@@ -13,7 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'strongMan.apps.vici',
+    'strongMan.helper_apps.vici',
     'strongMan.apps.connections',
     'strongMan.apps.certificates',
     'strongMan.apps.eap_secrets',

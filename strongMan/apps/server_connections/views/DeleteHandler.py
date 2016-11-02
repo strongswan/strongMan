@@ -1,11 +1,10 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-
-from strongMan.apps.vici.wrapper.exception import ViciException
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from django.http import HttpResponseRedirect
+from strongMan.helper_apps.vici.wrapper.exception import ViciException
 
 from strongMan.apps.server_connections.models.connections import Connection
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class DeleteHandler:

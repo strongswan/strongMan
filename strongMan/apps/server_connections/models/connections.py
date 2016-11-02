@@ -1,5 +1,6 @@
-import sys
 import json
+import sys
+from collections import Iterable
 from collections import OrderedDict
 
 from django.db import models
@@ -7,12 +8,9 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from strongMan.apps.server_connections.models.common import State
-
-from .specific import Child, Address, Proposal, Secret, LogMessage
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from .authentication import Authentication, AutoCaAuthentication
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
-from collections import Iterable
-
+from .specific import Child, Address, Proposal, Secret, LogMessage
 
 POOL_CHOICES = (
     ('0', "pool1"),

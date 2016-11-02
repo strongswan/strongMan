@@ -1,8 +1,6 @@
 import strongMan.apps.certificates.models.certificates
-from strongMan.apps.certificates import models
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader, ContainerDetector
-
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class UserCertificateManager:

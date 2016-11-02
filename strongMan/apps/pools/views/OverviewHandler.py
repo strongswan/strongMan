@@ -3,8 +3,7 @@ from django.shortcuts import render
 from django_tables2 import RequestConfig
 
 from strongMan.apps.pools.models import Pool
-from strongMan.apps.vici.wrapper.exception import ViciException
-from strongMan.apps.vici.wrapper import Vici
+from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from .. import tables
 
 

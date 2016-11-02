@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
 from django.contrib import messages
-from django.shortcuts import render
 from django.contrib.auth import login as auth_login, authenticate
+from django.shortcuts import render
+from strongMan.helper_apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
 
-from strongMan.apps.vici.wrapper.exception import ViciSocketException, ViciLoadException
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.forms import PasswordChangeForm
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class AboutHandler:

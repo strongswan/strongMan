@@ -2,12 +2,12 @@ from django.contrib import messages
 from django.shortcuts import render
 from django_tables2 import RequestConfig
 
+from strongMan.helper_apps.vici.wrapper.exception import ViciSocketException
 from .. import models
 from ..forms import CertificateSearchForm
-from ..services import ViciCertificateManager
-from ...vici.wrapper.exception import ViciSocketException
-from ..tables import UserCertificateTable
 from ..models import UserCertificate
+from ..services import ViciCertificateManager
+from ..tables import UserCertificateTable
 
 
 class AbstractOverviewHandler:

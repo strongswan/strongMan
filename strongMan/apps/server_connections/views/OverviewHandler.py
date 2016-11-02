@@ -3,9 +3,7 @@ from django.shortcuts import render
 from django_tables2 import RequestConfig
 
 from strongMan.apps.server_connections.models.connections import Connection
-
-from strongMan.apps.vici.wrapper.exception import ViciException
-
+from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from ..tables import ConnectionTable
 
 
