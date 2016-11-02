@@ -6,7 +6,7 @@ from ..forms import AddOrEditForm
 from .AddHandler import AddHandler
 from django.shortcuts import render, get_object_or_404
 from .EditHandler import EditHandler
-from ..models.pools import Pool
+from ..models import Pool
 
 @login_required
 @require_http_methods(["GET", "POST"])

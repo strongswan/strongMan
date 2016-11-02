@@ -23,6 +23,7 @@ class EditHandler:
         elif self.request.method == "POST":
             if "remove_pool" in self.request.POST:
                 self.pool.delete()
+                # evtl remove/load_pool -> daemon
                 return redirect(reverse("pools:index"))
 
             self.form = AddOrEditForm(self.request.POST)
@@ -34,6 +35,7 @@ class EditHandler:
                 self.pool.poolname = self.form.my_poolname
                 self.pool.addresses = self.form.my_addresses
                 self.pool.save()
+                # load_pool -> daemon
                 return redirect(reverse("pools:index"))
 
 

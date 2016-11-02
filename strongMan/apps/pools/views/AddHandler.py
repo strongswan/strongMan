@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
-from ..models.pools import Pool
+from ..models import Pool
 from ..forms import AddOrEditForm
 
 
@@ -28,5 +28,6 @@ class AddHandler:
 #
         pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
         pool.save()
+        # load_pool -> daemon
         return redirect(reverse("pools:index"))
 
