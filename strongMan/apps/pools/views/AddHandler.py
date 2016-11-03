@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from ..models import Pool
 from ..forms import AddOrEditForm
+from django.db import IntegrityError
 
 
 class AddHandler:
@@ -25,9 +26,22 @@ class AddHandler:
         if not self.form.is_valid():
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')
-#
+
+        if not self.form.my_addresses:
+            messages.add_message(self.request, messages.ERROR,
+                                 'Addresses must not be empty.')
+            return self._render(self.request)
+
         pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
-        pool.save()
+        try:
+            pool.clean()
+            pool.save()
+        except IntegrityError:
+            messages.add_message(self.request, messages.ERROR,
+                                 'Poolname already in use.')
+            return redirect(reverse("pools:add"))
+
         # load_pool -> daemon
+        messages.add_message(self.request, messages.SUCCESS, 'Successfully added pool')
         return redirect(reverse("pools:index"))
 

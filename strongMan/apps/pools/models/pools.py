@@ -1,6 +1,4 @@
 
-from collections import OrderedDict
-
 from django.db import models
 
 
@@ -14,11 +12,9 @@ class Pool(models.Model):
         # do something with the pool
         return pool
 
-    # def dict(self):
-    #     children = OrderedDict()
-    #     for child in self.children.all():
-    #         children[child.name] = child
-    #     return children
+    def clean(self):
+        if self.poolname:
+            self.poolname = self.poolname.strip()
 
     def __str__(self):
         return self

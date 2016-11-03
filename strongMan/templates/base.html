@@ -47,17 +47,19 @@
                 </a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{% url "connections:index" %}">Connections</a></li>
-                    <li><a href="{% url "certificates:overview" %}">Certificates</a></li>
-                    <li><a href="{% url "eap_secrets:overview" %}">EAP Secrets</a></li>
-                    <li><a href="{% url "server_connections:index" %}">Server Connections</a></li>
-                    <li><a href="{% url "pools:index" %}">Pools</a></li>
-                    <li><a href="{% url "about" %}">About</a></li>
-                </ul>
+                    <ul class="nav navbar-nav">
+                        <li><a href="{% url "connections:index" %}">Connections</a></li>
+                        <li><a href="{% url "certificates:overview" %}">Certificates</a></li>
+                        <li><a href="{% url "server_connections:index" %}">Server Connections</a></li>
+                        <li><a href="{% url "eap_secrets:overview" %}">EAP Secrets</a></li>
+                        <li><a href="{% url "pools:index" %}">Pools</a></li>
+                        <li><a href="{% url "about" %}">About</a></li>
+                    </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
+
                         <li><a href="{% url "index" %}">Switch to Server mode</a></li>
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                 <span class="glyphicon glyphicon-user"></span> {{ user.username }}
