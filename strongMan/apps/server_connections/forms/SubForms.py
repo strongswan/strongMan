@@ -336,8 +336,8 @@ class EapForm(forms.Form):
         for local in connection.server_local.all():
             subclass = local.subclass()
             if isinstance(subclass, EapAuthentication):
-                self.fields['username'].initial = subclass.eap_id
-                self.fields['password'].initial = Secret.objects.filter(authentication=subclass).first().data
+                self.fields['username'].initial = subclass.secret.username
+                self.fields['password'].initial = subclass.secret.password
 
     def create_connection(self, connection):
         max_round = 0
@@ -345,14 +345,14 @@ class EapForm(forms.Form):
             if local.round > max_round:
                 max_round = local.round
 
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round=max_round + 1)
+        secret = Secret(username=self.my_username, type='EAP', password=self.my_password)
+        secret.save()
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, secret=secret, round=max_round + 1)
         auth.save()
-        Secret(type='EAP', data=self.my_password, authentication=auth).save()
 
     def update_connection(self, connection):
         for local in connection.server_local.all():
             sub = local.subclass()
             if isinstance(sub, EapAuthentication):
-                sub.eap_id = self.my_username
+                sub.secret.update(username=self.my_username, password=self.my_password)
                 sub.save()
-                Secret.objects.filter(authentication=sub).update(data=self.my_password)

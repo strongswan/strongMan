@@ -34,7 +34,7 @@ class OverviewHandler:
         secret_ids = []
         secrets = Secret.objects.all()
         for secret in secrets:
-            if search_text.lower() in str(secret.eap_username).lower():
+            if search_text.lower() in str(secret.username).lower():
                 secret_ids.append(secret.pk)
         return all_secrets.filter(pk__in=secret_ids)
 
