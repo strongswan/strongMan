@@ -4,7 +4,7 @@ from django_tables2 import RequestConfig
 
 from ..forms import EapSecretSearchForm
 from ..tables import EapSecretsTable
-from ...server_connections.models import Secret
+from ..models import Secret
 
 
 class OverviewHandler:

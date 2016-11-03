@@ -64,19 +64,6 @@ class Proposal(models.Model):
                                    related_name='server_proposals')
 
 
-class Secret(models.Model):
-    eap_username = models.TextField(unique=True)
-    type = models.TextField()
-    data = fields.EncryptedCharField(max_length=50)
-    authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,
-                                       related_name='server_authentication')
-
-
-    def dict(self):
-        secrets = OrderedDict(type=self.type, data=self.data, id=self.eap_username)
-        return secrets
-
-
 class LogMessage(models.Model):
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)

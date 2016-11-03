@@ -4,6 +4,7 @@ from collections import OrderedDict
 from django.db import models
 
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity, DnIdentity
+from strongMan.apps.eap_secrets.models import Secret
 
 
 class Authentication(models.Model):
@@ -47,7 +48,13 @@ class Authentication(models.Model):
     def has_private_key(self):
         return False
 
+    def has_eap_secret(self):
+        return False
+
     def get_key_dict(self):
+        pass
+
+    def get_secret(self):
         pass
 
     def _get_algorithm_type(self, algorithm):
@@ -84,9 +91,17 @@ class AutoCaAuthentication(Authentication):
 
 
 class EapAuthentication(Authentication):
+    secret = models.ForeignKey(Secret, null=False, blank=False, related_name='eap_secret', on_delete=models.PROTECT)
+
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         return auth
+
+    def has_eap_secret(self):
+        return True
+
+    def get_secret(self):
+        return self.secret
 
 
 class CertificateAuthentication(Authentication):
@@ -111,6 +126,7 @@ class CertificateAuthentication(Authentication):
 
 class EapTlsAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_tls_identity')
+    secret = models.ForeignKey(Secret, null=False, blank=False, related_name='eap_tls_secret', on_delete=models.PROTECT)
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
@@ -124,3 +140,9 @@ class EapTlsAuthentication(Authentication):
     def get_key_dict(self):
         key = self.identity.subclass().certificate.subclass().private_key
         return OrderedDict(type=self._get_algorithm_type(key.algorithm), data=key.der_container)
+
+    def has_eap_secret(self):
+        return True
+
+    def get_secret(self):
+        return self.secret

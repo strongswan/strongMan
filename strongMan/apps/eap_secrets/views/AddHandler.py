@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.db import IntegrityError
 
 from ..forms import AddOrEditForm
-from ...server_connections.models import Secret
+from ..models import Secret
 
 
 class AddHandler:
@@ -29,8 +30,13 @@ class AddHandler:
                                  'Form was not valid')
                 return render(self.request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
             else:
-                secret = Secret(eap_username=self.form.my_username, type='EAP', data=self.form.my_password)
-                secret.save()
-                messages.add_message(self.request, messages.SUCCESS, 'Successfully created EAP Secret')
-            return redirect(reverse("eap_secrets:overview"))
+                try:
+                    secret = Secret(username=self.form.my_username, type='EAP', password=self.form.my_password)
+                    secret.save()
+                except IntegrityError:
+                    messages.add_message(self.request, messages.ERROR,
+                                    'An EAP Secret with this Username does already exist')
+                    return render(self.request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
 
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully created EAP Secret')
+                return redirect(reverse("eap_secrets:overview"))

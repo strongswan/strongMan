@@ -6,8 +6,7 @@ from django.shortcuts import get_object_or_404
 from .OverviewHandler import OverviewHandler
 from .AddHandler import AddHandler
 from .EditHandler import EditHandler
-from ..forms import AddOrEditForm
-from ...server_connections.models import Secret
+from ..models import Secret
 
 
 @login_required
@@ -27,6 +26,6 @@ def add(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def edit(request, secret_name):
-    secret = get_object_or_404(Secret, eap_username=secret_name)
+    secret = get_object_or_404(Secret, username=secret_name)
     handler = EditHandler(request, secret)
     return handler.handle()

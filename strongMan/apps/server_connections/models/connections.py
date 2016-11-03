@@ -9,8 +9,9 @@ from django.dispatch import receiver
 
 from strongMan.apps.server_connections.models.common import State
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
+
+from .specific import Child, Address, Proposal, LogMessage
 from .authentication import Authentication, AutoCaAuthentication
-from .specific import Child, Address, Proposal, Secret, LogMessage
 
 POOL_CHOICES = (
     ('0', "pool1"),
@@ -67,15 +68,15 @@ class Connection(models.Model):
             local = local.subclass()
             if local.has_private_key():
                 vici_wrapper.load_key(local.get_key_dict())
-            for secret in Secret.objects.filter(authentication=local):
-                vici_wrapper.load_secret(secret.dict())
+            if local.has_eap_secret():
+                    vici_wrapper.load_secret(local.get_secret().dict())
 
         for remote in self.server_remote.all():
             remote = remote.subclass()
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
-            for secret in Secret.objects.filter(authentication=remote):
-                vici_wrapper.load_secret(secret.dict())
+            if local.has_eap_secret():
+                    vici_wrapper.load_secret(local.get_secret().dict())
 
         for child in self.children.all():
             logs = vici_wrapper.initiate(child.name, self.profile)
@@ -183,11 +184,11 @@ def delete_all_connected_models(sender, instance, **kwargs):
     Address.objects.filter(vips=instance).delete()
 
     for local in Authentication.objects.filter(local=instance):
-        for secret in Secret.objects.filter(authentication=local):
-            secret.delete()
+        if local.has_eap_secret():
+            local.get_secret().delete()
         local.delete()
 
     for remote in Authentication.objects.filter(remote=instance):
-        for secret in Secret.objects.filter(authentication=remote):
-            secret.delete()
+        if local.has_eap_secret():
+            local.get_secret().delete()
         remote.delete()
