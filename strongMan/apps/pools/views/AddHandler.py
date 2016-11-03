@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from ..models import Pool
 from ..forms import AddOrEditForm
 from django.db import IntegrityError
+from strongMan.helper_apps.vici.wrapper.exception import ViciException
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class AddHandler:
@@ -32,16 +34,25 @@ class AddHandler:
                                  'Addresses must not be empty.')
             return self._render(self.request)
 
-        pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
+        pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses, attribute=self.form.my_attribute,
+                    attributevalues=self.form.my_attributevalues)
         try:
             pool.clean()
             pool.save()
+            vici = ViciWrapper()
+            vici_pool = {'name': self.form.my_poolname,  'items':
+                {'addrs': self.form.my_addresses, self.form.my_attribute: [self.form.my_attributevalues]}}
+            vici.session.load_pool(vici_pool)
         except IntegrityError:
             messages.add_message(self.request, messages.ERROR,
                                  'Poolname already in use.')
-            return redirect(reverse("pools:add"))
+            return self._render(self.request)
+        except ViciException as e:
+            messages.add_message(self.request, messages.ERROR,
+                                 'Could not save pool. Reason:\n'+e)
+            return self._render(self.request)
 
-        # load_pool -> daemon
         messages.add_message(self.request, messages.SUCCESS, 'Successfully added pool')
+
         return redirect(reverse("pools:index"))
 

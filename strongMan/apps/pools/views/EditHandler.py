@@ -33,6 +33,8 @@ class EditHandler:
             else:
                 self.pool.poolname = self.form.my_poolname
                 self.pool.addresses = self.form.my_addresses
+                self.pool.attribute = self.form.my_attribute
+                self.pool.attributevalues = self.form.attributevalues
                 try:
                     self.pool.save()
                 except IntegrityError:

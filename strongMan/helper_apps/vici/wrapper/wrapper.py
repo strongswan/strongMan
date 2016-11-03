@@ -194,3 +194,7 @@ class ViciWrapper:
                 return default_state
         except Exception as e:
             return default_state
+
+    def get_pools(self):
+        pools = self.session.get_pools()
+        return pools

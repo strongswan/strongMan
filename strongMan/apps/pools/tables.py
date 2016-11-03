@@ -26,3 +26,4 @@ class PoolsTable(tables.Table):
 
     class Meta:
         attrs = {"class": "table"}
+
