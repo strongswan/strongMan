@@ -34,9 +34,10 @@
                     </div>
                     <div class="row form-row">
                         <div class="col-md-11 col-xs-12">
-                            <button type="submit" class="btn btn-default pull-right">
+                            <button type="submit" class="btn btn-default pull-right add_button">
                                 <span class="glyphicon glyphicon-floppy-disk"></span> Create
                             </button>
+                            <button type="button" name="password-visibility" class="btn btn-default pull-right">Show password</button>
                         </div>
                     </div>
                 </form>
@@ -48,6 +49,16 @@
                     selector: '[data-toggle=popover]',
                     trigger: 'focus',
                     container: 'body'
+                });
+                $("button[name='password-visibility']").click(function() {
+                    if ($( "input[name='password']" ).attr('type') == 'password'){
+                        $( "input[name='password']" ).attr('type', 'text');
+                        $(this).html('Hide password');
+                    }
+                    else {
+                        $( "input[name='password']" ).attr('type', 'password');
+                        $(this).html('Show password');
+                    }
                 });
             });
         </script>

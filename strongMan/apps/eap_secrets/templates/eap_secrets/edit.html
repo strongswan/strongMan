@@ -15,7 +15,7 @@
                     <div class="row">
                         <label class="control-label col-sm-3 col-xs-12">Username</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="username" value="{{ username }}"{{ username }}
+                            <input type="text" class="form-control" name="username" value="{{ username }}"
                                    placeholder="Your username" readonly/>
                             {% include "eap_secrets/widgets/errormsg.html" with field=username %}
                         </div>
@@ -25,7 +25,7 @@
                         <label class="control-label col-sm-3 col-xs-12">Password</label>
                         <div class="controls col-sm-8 col-xs-10">
                             <input type="password" class="form-control" name="password" value="{{ password }}"
-                                   placeholder="Your password"/>
+                                   placeholder="Your password" />
                             {% include "eap_secrets/widgets/errormsg.html" with field=password %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
@@ -37,9 +37,7 @@
                             <button type="submit" class="btn btn-default pull-right add_button">
                                 <span class="glyphicon glyphicon-floppy-disk"></span> Change
                             </button>
-                            <a href="{% url "eap_secrets:edit" username %}">
-                                <button type="button" class="btn btn-default pull-right">Show password</button>
-                            </a>
+                            <button type="button" name="password-visibility" class="btn btn-default pull-right">Show password</button>
                         </div>
                     </div>
                 </form>
@@ -51,6 +49,16 @@
                     selector: '[data-toggle=popover]',
                     trigger: 'focus',
                     container: 'body'
+                });
+                $("button[name='password-visibility']").click(function() {
+                    if ($( "input[name='password']" ).attr('type') == 'password'){
+                        $( "input[name='password']" ).attr('type', 'text');
+                        $(this).html('Hide password');
+                    }
+                    else {
+                        $( "input[name='password']" ).attr('type', 'password');
+                        $(this).html('Show password');
+                    }
                 });
             });
         </script>
