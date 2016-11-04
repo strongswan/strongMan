@@ -6,6 +6,7 @@ from django.db import IntegrityError
 
 from ..forms import AddOrEditForm
 from ..models import Secret
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class AddHandler:
@@ -37,6 +38,6 @@ class AddHandler:
                     messages.add_message(self.request, messages.ERROR,
                                     'An EAP Secret with this Username does already exist')
                     return render(self.request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
-
+                ViciWrapper().load_secret(self.secret.dict())
                 messages.add_message(self.request, messages.SUCCESS, 'Successfully created EAP Secret')
                 return redirect(reverse("eap_secrets:overview"))
