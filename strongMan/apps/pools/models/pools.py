@@ -1,8 +1,7 @@
-from collections import OrderedDict
 from django.db import models
 
-
 ATTRIBUTE_CHOICES = (
+    ('None', 'None'),
     ('dns', 'dns'),
     ('nbns', 'nbns'),
     ('dhcp', 'dhcp'),
@@ -30,3 +29,13 @@ class Pool(models.Model):
 
     def __repr__(self):
         return str(self.poolname)
+
+    # def dict(self):
+    #     attributevalues_list = OrderedDict()
+    #     attributevalues_list = 'd'
+    #     pools = OrderedDict(poolname=self.poolname,
+        # addresses=self.addresses, attribute=self.attribute, self.attributevalues)
+    #     return pools
+
+    # on delete: pool.related_name.all...
+

@@ -34,7 +34,8 @@ class AddHandler:
                                  'Addresses must not be empty.')
             return self._render(self.request)
 
-        pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses, attribute=self.form.my_attribute,
+        pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
+                    attribute=self.form.my_attribute,
                     attributevalues=self.form.my_attributevalues)
         try:
             pool.clean()

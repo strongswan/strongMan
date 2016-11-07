@@ -10,12 +10,12 @@
     <div class="container" id="pools-add">
         <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
             <div class="panel-body" id="upload-area">
-                <form method="post" action="{% url "pools:edit" poolname %}">
+                <form method="post" action="{% url "pools:edit" pool.poolname %}">
                     {% csrf_token %}
                     <div class="row">
                         <label class="control-label col-sm-3 col-xs-12">Pool name</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input readonly type="text" class="form-control" name="poolname" value="{{ poolname }}"
+                            <input readonly type="text" class="form-control" name="poolname" value="{{ pool.poolname }}"
                                    placeholder="Pool name"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
                         </div>
@@ -24,7 +24,7 @@
                         </div>
                         <label class="control-label col-sm-3 col-xs-12">Addresses</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="addresses" value="{{ addresses }}"
+                            <input type="text" class="form-control" name="addresses" value="{{ pool.addresses }}"
                                    placeholder="Address list"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=addresses %}
                         </div>
@@ -45,7 +45,7 @@
                                     </option>
                                 {% endfor %}
                             </select>
-                            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.attribute %}
+                            {% include "server_connections/forms/../widgets/errormsg.html" with field=pool.attribute %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
                             {% include "server_connections/widgets/QuestionPopover.html" with title="Attributes" content="Select attribute type." %}
@@ -53,7 +53,7 @@
 
                         <label class="control-label col-sm-3 col-xs-12">Attribute values</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="attributevalues" value="{{ attributevalues.value }}"
+                            <input type="text" class="form-control" name="attributevalues" value="{{ pool.attributevalues }}"
                                    placeholder="Attribute values"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=attributevalues %}
                         </div>

@@ -1,7 +1,7 @@
 from django import forms
 
-
 ATTRIBUTE_CHOICES = (
+    ('None', 'None'),
     ('dns', 'dns'),
     ('nbns', 'nbns'),
     ('dhcp', 'dhcp'),
@@ -16,8 +16,21 @@ ATTRIBUTE_CHOICES = (
 class AddOrEditForm(forms.Form):
     poolname = forms.CharField(max_length=50, initial="")
     addresses = forms.CharField(max_length=50, initial="")
-    attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES, label="")
+    attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES, initial="0")
     attributevalues = forms.CharField(max_length=50, initial="")
+
+    def fill(self, pool):
+        self.initial['poolname'] = pool.poolname
+        self.initial['addresses'] = pool.addresses
+        self.initial['attribute'] = pool.attribute
+        self.initial['attributevalues'] = pool.attributevalues
+
+    def update_pool(self, pool):
+        pool.poolname = self.cleaned_data['poolname']
+        pool.addresses = self.cleaned_data['addresses']
+        pool.attribute = self.cleaned_data['attribute']
+        pool.attributevalues = self.cleaned_data['attributevalues']
+        pool.save()
 
     def is_valid(self):
         valid = super(AddOrEditForm, self).is_valid()
