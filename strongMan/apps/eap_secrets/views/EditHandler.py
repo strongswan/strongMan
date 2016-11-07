@@ -22,7 +22,8 @@ class EditHandler:
             self.secret.delete()
         except ProtectedError as e:
             messages.add_message(self.request, messages.ERROR,
-                                 'Secret not deleted! Secret is referenced by an Connection')
+                                 'Secret not deleted! Secret is referenced by a Connection')
+            return redirect(reverse("eap_secrets:overview"))
         messages.add_message(self.request, messages.SUCCESS, 'Successfully deleted EAP Secret')
         return redirect(reverse("eap_secrets:overview"))
 

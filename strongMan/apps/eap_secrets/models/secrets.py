@@ -11,10 +11,7 @@ class Secret(models.Model):
     password = fields.EncryptedCharField(max_length=50)
 
     def dict(self):
-        owners = []
-        for owner in self.eap_tls_secret.all():
-            owners.append(owner.identity.subclass().value())
-        secrets = OrderedDict(type=self.type, data=self.password, id=self.username, owners=owners)
+        secrets = OrderedDict(type=self.type, data=self.password, owners=[self.username])
         return secrets
 
     def __str__(self):

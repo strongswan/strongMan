@@ -91,8 +91,6 @@ class AutoCaAuthentication(Authentication):
 
 
 class EapAuthentication(Authentication):
-    secret = models.ForeignKey(Secret, null=False, blank=False, related_name='eap_secret', on_delete=models.PROTECT)
-
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         return auth
@@ -126,7 +124,6 @@ class CertificateAuthentication(Authentication):
 
 class EapTlsAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_tls_identity')
-    secret = models.ForeignKey(Secret, null=False, blank=False, related_name='eap_tls_secret', on_delete=models.PROTECT)
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()
