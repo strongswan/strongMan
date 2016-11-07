@@ -8,6 +8,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from strongMan.apps.server_connections.models.common import State
+from strongMan.apps.pools.models import Pool
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 from .specific import Child, Address, Proposal, LogMessage
@@ -32,6 +33,7 @@ class Connection(models.Model):
     profile = models.TextField(unique=True)
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='1')
     pool = models.CharField(max_length=56, choices=POOL_CHOICES, default='0')
+    pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
     send_cert_req = models.BooleanField(default=False)
 
     def dict(self):

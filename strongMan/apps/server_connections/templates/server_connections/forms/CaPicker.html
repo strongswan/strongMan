@@ -18,7 +18,7 @@
                         name="{{ certificate.name }}"
                         id="id_{{ certificate.name }}" data-show-subtext="True">
                     {% if certificate.value == None or certificate.value == '-1' %}
-                        <option value="-1" selected>Nothing selected</option>
+                        <option value="-1" selected="selected">Nothing selected</option>
                     {% endif %}
                     {% for choise in certificate.field.queryset %}
                         <option value="{{ choise.id }}"
@@ -30,7 +30,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=certificate %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the opposite server. Choose either the server certificate directly or the CA certificate. If no ca certificate is available 'Choose automatically' will be disabled." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a certificate that authenticates the server. Choose either the server certificate directly or the CA certificate. If no ca certificate is available 'Choose automatically' will be disabled." %}
             </div>
             <div class="col-sm-11 col-xs-10">
                 <div class="pull-right cert_upload">
@@ -61,7 +61,6 @@
                 {% include "server_connections/widgets/QuestionPopover.html" with title="CA identity help" content="Enter the server identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. The CA identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
             </div>
         </div>
-
 
         <!-- Modal -->
         <div class="modal fade" id="AddCaCertificateModal" tabindex="-1" role="dialog">

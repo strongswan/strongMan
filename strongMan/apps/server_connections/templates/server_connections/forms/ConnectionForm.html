@@ -22,6 +22,7 @@
             {% endif %}
         </div>
     </div>
+
     <hr>
 
     <form action="" method="post">
@@ -71,23 +72,25 @@
             </div>
         </div>
 
-        <div class="row">
-            <label class="control-label col-sm-3 col-xs-12">Pools</label>
+        <div class="row pool_picker">
+            <label class="control-label col-sm-3 col-xs-12">{{ form.pool.label }}</label>
             <div class="controls col-sm-8 col-xs-10">
-                <select class="form-control" name="pool">
-                    {% for choice in form.pool.field.choices %}
-                        <option value="{{choice.0}}"
-                        {% ifequal form.pool.value choice.0 %}
-                             selected="selected"
-                        {% endifequal %}>
-                            {{choice.1}}
-                        </option>
+                <select class="selectpicker" data-live-search="true"
+                        name="{{ form.pool.name }}"
+                        id="id_{{ form.pool.name }}" data-show-subtext="True">
+                    {% if form.pool.value == None or form.pool.value == '-1' %}
+                        <option value="-1" selected="selected">Nothing selected</option>
+                    {% endif %}
+                    {% for choise in form.pool.field.queryset %}
+                        <option value="{{ choise.id }}"
+                                {% if form.pool.value|slugify == choise.id|slugify %}
+                                selected="selected"{% endif %}>{{ choise }}</option>
                     {% endfor %}
                 </select>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.pool %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Pool help" content="Select pool." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Pools help" content="Select a pool." %}
             </div>
         </div>
 

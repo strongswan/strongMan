@@ -1,6 +1,4 @@
-
 from collections import OrderedDict
-
 from django.db import models
 
 
@@ -28,7 +26,7 @@ class Pool(models.Model):
         return pool
 
     def __str__(self):
-        return self
+        return str(self.poolname)
 
     def __repr__(self):
-        return self
+        return str(self.poolname)
