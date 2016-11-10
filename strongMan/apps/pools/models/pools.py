@@ -16,7 +16,7 @@ ATTRIBUTE_CHOICES = (
 class Pool(models.Model):
     poolname = models.TextField(unique=True)
     addresses = models.TextField()
-    attribute = models.CharField(max_length=56, choices=ATTRIBUTE_CHOICES, default='0')
+    attribute = models.CharField(max_length=56, choices=ATTRIBUTE_CHOICES)
     attributevalues = models.TextField()
 
     @classmethod

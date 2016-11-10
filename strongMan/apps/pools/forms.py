@@ -1,22 +1,11 @@
 from django import forms
-
-ATTRIBUTE_CHOICES = (
-    ('None', 'None'),
-    ('dns', 'dns'),
-    ('nbns', 'nbns'),
-    ('dhcp', 'dhcp'),
-    ('netmask', 'netmask'),
-    ('server', 'server'),
-    ('subnet', 'subnet'),
-    ('split_include', 'split_include'),
-    ('split_exclude', 'split_exclude'),
-)
+from strongMan.apps.pools.models.pools import ATTRIBUTE_CHOICES
 
 
 class AddOrEditForm(forms.Form):
     poolname = forms.CharField(max_length=50, initial="")
     addresses = forms.CharField(max_length=50, initial="")
-    attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES, initial="0")
+    attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES)
     attributevalues = forms.CharField(max_length=50, initial="")
 
     def fill(self, pool):

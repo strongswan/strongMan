@@ -38,7 +38,7 @@
                             <select class="form-control" name="attribute">
                                 {% for choice in form.attribute.field.choices %}
                                     <option value="{{choice.0}}"
-                                    {% ifequal form.attribute.value choice.0 %}
+                                    {% ifequal pool.attribute choice.0 %}
                                          selected="selected"
                                     {% endifequal %}>
                                         {{choice.1}}
