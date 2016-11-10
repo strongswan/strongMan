@@ -29,7 +29,6 @@ def overview(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def edit(request, poolname):
-    # pool = get_object_or_404(Pool, poolname=poolname)
     handler = EditHandler(request, poolname)
     return handler.handle()
 

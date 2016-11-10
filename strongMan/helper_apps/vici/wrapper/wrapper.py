@@ -196,5 +196,7 @@ class ViciWrapper:
             return default_state
 
     def get_pools(self):
-        pools = self.session.get_pools()
-        return pools
+        return self.session.get_pools()
+
+    def unload_pool(self, pool_name):
+        return self.session.unload_pool(pool_name)
