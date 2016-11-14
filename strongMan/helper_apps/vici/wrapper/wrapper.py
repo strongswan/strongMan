@@ -200,3 +200,9 @@ class ViciWrapper:
 
     def unload_pool(self, pool_name):
         return self.session.unload_pool(pool_name)
+
+    def clear_creds(self):
+        try:
+            self.session.clear_creds()
+        except Exception as e:
+            raise ViciLoadException("Credentials cannot be cleared!")

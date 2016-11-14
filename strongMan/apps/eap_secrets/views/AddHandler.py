@@ -27,9 +27,7 @@ class AddHandler:
         elif self.request.method == 'POST':
             self.form = AddOrEditForm(self.request.POST)
             if not self.form.is_valid():
-                messages.add_message(self.request, messages.ERROR,
-                                 'Form was not valid')
-                return render(self.request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
+                return render(self.request, 'eap_secrets/add.html', {"form": self.form})
             else:
                 try:
                     secret = Secret(username=self.form.my_username, type='EAP', password=self.form.my_password)
@@ -37,7 +35,7 @@ class AddHandler:
                 except IntegrityError:
                     messages.add_message(self.request, messages.ERROR,
                                     'An EAP Secret with this Username does already exist')
-                    return render(self.request, 'eap_secrets/add.html', {"form": AddOrEditForm()})
+                    return render(self.request, 'eap_secrets/add.html', {"form": self.form})
                 ViciWrapper().load_secret(secret.dict())
                 messages.add_message(self.request, messages.SUCCESS, 'Successfully created EAP Secret')
                 return redirect(reverse("eap_secrets:overview"))

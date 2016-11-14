@@ -15,18 +15,18 @@
                     <div class="row">
                         <label class="control-label col-sm-3 col-xs-12">Username</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="username" value="{{ username.value }}"
+                            <input type="text" class="form-control" name="username" value="{{ form.username.value }}"
                                    placeholder="Your username"/>
-                            {% include "eap_secrets/widgets/errormsg.html" with field=username %}
+                            {% include "eap_secrets/widgets/errormsg.html" with field=form.username %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
-                            {% include "eap_secrets/widgets/QuestionPopover.html" with title="Username help" content="Enter the username that authenticates the user." %}
+                            {% include "eap_secrets/widgets/QuestionPopover.html" with title="Username help" content="Enter the username that authenticates the user. Only numbers and letters are allowed." %}
                         </div>
                         <label class="control-label col-sm-3 col-xs-12">Password</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="password" class="form-control" name="password" value="{{ password.value }}"
+                            <input type="password" class="form-control" name="password" value="{{ form.password.value }}"
                                    placeholder="Your password"/>
-                            {% include "eap_secrets/widgets/errormsg.html" with field=password %}
+                            {% include "eap_secrets/widgets/errormsg.html" with field=form.password %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
                             {% include "eap_secrets/widgets/QuestionPopover.html" with title="Password help" content="Enter the corresponding password. Use a safe and strong password." %}
