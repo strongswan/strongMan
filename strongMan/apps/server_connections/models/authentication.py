@@ -48,14 +48,14 @@ class Authentication(models.Model):
     def has_private_key(self):
         return False
 
-    def has_eap_secret(self):
-        return False
+    # def has_eap_secret(self):
+    #     return False
 
     def get_key_dict(self):
         pass
 
-    def get_secret(self):
-        pass
+    # def get_secret(self):
+    #     pass
 
     def _get_algorithm_type(self, algorithm):
         if algorithm == 'ec':
@@ -95,11 +95,11 @@ class EapAuthentication(Authentication):
         auth = super(EapAuthentication, self).dict()
         return auth
 
-    def has_eap_secret(self):
-        return True
-
-    def get_secret(self):
-        return self.secret
+    # def has_eap_secret(self):
+    #     return True
+    #
+    # def get_secret(self):
+    #     return self.secret
 
 
 class CertificateAuthentication(Authentication):

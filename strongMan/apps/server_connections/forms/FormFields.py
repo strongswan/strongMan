@@ -14,12 +14,6 @@ class PoolChoice(forms.ModelChoiceField):
         return True
 
 
-class SecretChoice(forms.ModelChoiceField):
-    @property
-    def is_secret_choice(self):
-        return True
-
-
 class IdentityChoiceValue:
     def __init__(self, identity):
         self.identity = identity

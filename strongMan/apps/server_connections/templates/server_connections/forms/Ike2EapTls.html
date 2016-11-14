@@ -31,15 +31,25 @@
     </div>
     {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
 
-    <div class="row">
+    <div class="row picker">
         <label class="control-label col-sm-3 col-xs-12">Remote Auth</label>
         <div class="controls col-sm-8 col-xs-10">
-            <input type="text" class="form-control" name="remoteauth" value="eap-tls|eap-ttls"
-                   placeholder="remote auth"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteauth %}
+            <select class="selectpicker" name="remote_auth">
+                {% if form.remote_auth.value == None or form.remote_auth.value == '-1' %}
+                    <option value="-1" selected="selected">Nothing selected</option>
+                {% endif %}
+                {% for key, value in form.remote_auth.field.choices %}
+                    <option value="{{ key }}"
+                        {% if form.remote_auth.value|slugify == key|slugify %}
+                            selected="selected"
+                        {% endif %}>
+                    {{ value }}</option>
+                {% endfor %}
+            </select>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_auth %}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Remote Authentication help" content="Select a remote authentication." %}
         </div>
     </div>
 

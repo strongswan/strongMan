@@ -15,10 +15,10 @@
     <div id="connection-overview" class="row col-xs-12 col-md-10 col-md-offset-1">
         <div id="add-btn" class="col-xs-12">
             <span title="Add a new connection">
-                <a href="{% url "server_connections:choose" %}" class="btn btn-primary btn-xs pull-right add_button">
+                <a href="{% url "server_connections:choose" 'remote_access' %}" class="btn btn-primary btn-xs pull-right add_button">
                     <span class="glyphicon glyphicon-plus"></span> Add Remote Access connection
                 </a>
-                <a href="{% url "server_connections:choose" %}" class="btn btn-primary btn-xs pull-right add_button">
+                <a href="{% url "server_connections:choose" 'site_to_site' %}" class="btn btn-primary btn-xs pull-right add_button">
                     <span class="glyphicon glyphicon-plus"></span> Add Site-to-Site connection
                 </a>
             </span>

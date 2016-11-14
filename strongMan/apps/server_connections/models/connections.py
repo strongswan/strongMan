@@ -14,25 +14,16 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from .specific import Child, Address, Proposal, LogMessage
 from .authentication import Authentication, AutoCaAuthentication
 
-POOL_CHOICES = (
-    ('0', "pool1"),
-    ('1', "pool2"),
-    ('2', "pool3"),
-    ('3', "pool4"),
-    ('4', "pool5"),
-)
-
-VERSION_CHOICES = (
-    ('0', "IKEv1"),
-    ('1', "IKEv2"),
-    ('2', "Any IKE version"),
-)
-
 
 class Connection(models.Model):
+    VERSION_CHOICES = (
+        ('0', "IKEv1"),
+        ('1', "IKEv2"),
+        ('2', "Any IKE version"),
+    )
+
     profile = models.TextField(unique=True)
-    version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='1')
-    pool = models.CharField(max_length=56, choices=POOL_CHOICES, default='0')
+    version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='2')
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
     send_cert_req = models.BooleanField(default=False)
 
@@ -150,47 +141,86 @@ class Connection(models.Model):
 
 
 class IKEv2Certificate(Connection):
+    LOCAL_AUTH = (
+        ('0', "pubkey"),
+    )
+    REMOTE_AUTH = (
+        ('0', "pubkey"),
+    )
+
     @classmethod
     def choice_name(cls):
         return "IKEv2 Certificate"
 
 
 class IKEv2EAP(Connection):
+    LOCAL_AUTH = (
+        ('0', "pubkey"),
+    )
+    REMOTE_AUTH = (
+        ('0', "eap-radius"),
+        ('1', "eap-ttls"),
+    )
+
     @classmethod
     def choice_name(cls):
         return "IKEv2 EAP (Username/Password)"
 
 
 class IKEv2CertificateEAP(Connection):
+    LOCAL_AUTH = (
+        ('0', "pubkey"),
+    )
+    REMOTE_AUTH = (
+        ('0', "eap-md5"),
+        ('1', "eap-mschapv2"),
+        ('2', "eap-ttls"),
+        ('3', "eap-peap"),
+    )
+
     @classmethod
     def choice_name(cls):
         return "IKEv2 Certificate + EAP (Username/Password)"
 
 
 class IKEv2EapTls(Connection):
+    LOCAL_AUTH = (
+        ('eap-tls', "eap-tls"),
+        ('eap-ttls', "eap-ttls"),
+    )
+    REMOTE_AUTH = (
+        ('eap-tls', "eap-tls"),
+        ('eap-ttls', "eap-ttls"),
+    )
+
+    remote_auth = models.CharField(max_length=56, choices=REMOTE_AUTH, default='0')
+
+    @classmethod
+    def remote_auth(self):
+        return str(self.remote_auth)
+
     @classmethod
     def choice_name(cls):
         return "IKEv2 EAP-TLS (Certificate)"
 
+    @receiver(pre_delete, sender=Connection)
+    def delete_all_connected_models(sender, instance, **kwargs):
+        for child in Child.objects.filter(connection=instance):
+            Proposal.objects.filter(child=child).delete()
+            Address.objects.filter(local_ts=child).delete()
+            Address.objects.filter(remote_ts=child).delete()
+            child.delete()
+        Proposal.objects.filter(connection=instance).delete()
+        Address.objects.filter(local_addresses=instance).delete()
+        Address.objects.filter(remote_addresses=instance).delete()
+        Address.objects.filter(vips=instance).delete()
 
-@receiver(pre_delete, sender=Connection)
-def delete_all_connected_models(sender, instance, **kwargs):
-    for child in Child.objects.filter(connection=instance):
-        Proposal.objects.filter(child=child).delete()
-        Address.objects.filter(local_ts=child).delete()
-        Address.objects.filter(remote_ts=child).delete()
-        child.delete()
-    Proposal.objects.filter(connection=instance).delete()
-    Address.objects.filter(local_addresses=instance).delete()
-    Address.objects.filter(remote_addresses=instance).delete()
-    Address.objects.filter(vips=instance).delete()
+        for local in Authentication.objects.filter(local=instance):
+            if local.has_eap_secret():
+                local.get_secret().delete()
+            local.delete()
 
-    for local in Authentication.objects.filter(local=instance):
-        if local.has_eap_secret():
-            local.get_secret().delete()
-        local.delete()
-
-    for remote in Authentication.objects.filter(remote=instance):
-        if local.has_eap_secret():
-            local.get_secret().delete()
-        remote.delete()
+        for remote in Authentication.objects.filter(remote=instance):
+            if local.has_eap_secret():
+                local.get_secret().delete()
+            remote.delete()

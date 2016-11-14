@@ -13,8 +13,8 @@ from .common import CertConDoNotDeleteMessage, KeyConDoNotDeleteMessage
 def prevent_cert_delete_if_cert_is_in_use(sender, **kwargs):
     cert = kwargs['instance']
     authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in
-                                                                           cert.identities] + [
-                          cert.server_ca_cert_authentication]
+                                                                           cert.identities] + \
+                      [cert.server_ca_cert_authentication]
 
     for auth in authentications:
         if auth.count() > 0:

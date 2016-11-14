@@ -22,8 +22,8 @@ def overview(request):
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-def create(request):
-    handler = AddHandler(request)
+def create(request, connection_type):
+    handler = AddHandler(request, connection_type)
     return handler.handle()
 
 

@@ -8,10 +8,13 @@ from .. import forms
 
 
 class AddHandler:
-    def __init__(self, request):
+    def __init__(self, request, connection_type):
         self.request = request
+        self.connection_type = connection_type
 
     def _render(self, form=ChooseTypeForm()):
+        if isinstance(form, ChooseTypeForm):
+            form = ChooseTypeForm(None, self.connection_type)
         return render(self.request, 'server_connections/Detail.html', {"form": form})
 
     def _abstract_form(self):
@@ -31,7 +34,7 @@ class AddHandler:
             abstract_form = self._abstract_form()
             form_class = abstract_form.current_form_class
 
-            form = form_class(self.request.POST)
+            form = form_class(self.request.POST, self.connection_type)
             form.update_certs()
             if not form.is_valid():
                 return self._render(form)

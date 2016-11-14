@@ -29,7 +29,10 @@ class ChooseTypeForm(AbstractDynamicForm):
 
     def __init__(self, *args, **kwargs):
         super(ChooseTypeForm, self).__init__(*args, **kwargs)
-        self.fields['form_name'].choices = ChooseTypeForm.get_choices()
+        if 'remote_access' in args:
+            self.fields['form_name'].choices = ChooseTypeForm.get_choices_remote_access()
+        if 'site_to_site' in args:
+            self.fields['form_name'].choices = ChooseTypeForm.get_choices_site_to_site()
 
     @property
     def selected_form_class(self):
@@ -41,10 +44,17 @@ class ChooseTypeForm(AbstractDynamicForm):
         return "server_connections/forms/ChooseType.html"
 
     @classmethod
-    def get_choices(cls):
+    def get_choices_remote_access(cls):
         return tuple(
             tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
             AbstractConnectionForm.__subclasses__())
+
+    @classmethod
+    def get_choices_site_to_site(cls):
+        return tuple((
+            tuple((type(Ike2CertificateForm()).__name__, Ike2CertificateForm().model.choice_name)),
+            tuple((type(Ike2EapTlsForm()).__name__, Ike2EapTlsForm().model.choice_name))
+        ))
 
 
 class AbstractConnectionForm(AbstractDynamicForm):
