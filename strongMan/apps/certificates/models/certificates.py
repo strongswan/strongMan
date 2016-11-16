@@ -25,6 +25,14 @@ class KeyContainer(CertificateModel, models.Model):
     def by_reader(cls, reader):
         raise NotImplementedError()
 
+    def get_algorithm_type(self):
+        if self.algorithm == 'ec':
+            return 'ECDSA'
+        elif self.algorithm == 'rsa':
+            return 'RSA'
+        else:
+            raise Exception('Algorithm of key is not supported!')
+
 
 class PrivateKey(KeyContainer):
     should_prevent_delete_signal = Signal(providing_args=["instance"])

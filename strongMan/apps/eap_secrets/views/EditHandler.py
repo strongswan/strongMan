@@ -6,6 +6,7 @@ from django.db.models import ProtectedError
 
 from ..forms import AddOrEditForm
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
+from configloader import load_credentials
 
 
 class EditHandler:
@@ -34,8 +35,8 @@ class EditHandler:
             self.secret.password = form.my_password
             self.secret.save()
             vici = ViciWrapper()
-            # vici.clear_creds()
-            vici.load_secret(self.secret.dict())
+            vici.clear_creds()
+            load_credentials(vici)
             messages.add_message(self.request, messages.SUCCESS, 'Successfully updated EAP Secret')
             return redirect(reverse("eap_secrets:overview"))
 

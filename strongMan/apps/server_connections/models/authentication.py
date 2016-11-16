@@ -50,14 +50,6 @@ class Authentication(models.Model):
     def get_key_dict(self):
         pass
 
-    def _get_algorithm_type(self, algorithm):
-        if algorithm == 'ec':
-            return 'ECDSA'
-        elif algorithm == 'rsa':
-            return 'RSA'
-        else:
-            raise Exception('Algorithm of key is not supported!')
-
 
 class CaCertificateAuthentication(Authentication):
     ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None,
@@ -115,7 +107,7 @@ class CertificateAuthentication(Authentication):
 
     def get_key_dict(self):
         key = self.identity.subclass().certificate.subclass().private_key
-        return OrderedDict(type=self._get_algorithm_type(key.algorithm), data=key.der_container)
+        return OrderedDict(type=key.get_algorithm_type(), data=key.der_container)
 
 
 class EapTlsAuthentication(Authentication):
@@ -137,4 +129,4 @@ class EapTlsAuthentication(Authentication):
 
     def get_key_dict(self):
         key = self.identity.subclass().certificate.subclass().private_key
-        return OrderedDict(type=self._get_algorithm_type(key.algorithm), data=key.der_container)
+        return OrderedDict(type=key.get_algorithm_type(), data=key.der_container)
