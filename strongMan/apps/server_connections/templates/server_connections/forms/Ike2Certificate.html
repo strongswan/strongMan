@@ -9,18 +9,6 @@
     </div>
     {% include "server_connections/forms/CaPicker.html" with form=form %}
 
-    <div class="row">
-        <label class="control-label col-sm-3 col-xs-12">Local Auth</label>
-        <div class="controls col-sm-8 col-xs-10">
-            <input type="text" class="form-control" name="localauth" value="pubkey"
-                   placeholder="local auth"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.localauth %}
-        </div>
-        <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
-        </div>
-    </div>
-
     <hr>
 
     <div class="row">
@@ -30,18 +18,6 @@
         </div>
     </div>
     {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
-
-    <div class="row">
-        <label class="control-label col-sm-3 col-xs-12">Remote Auth</label>
-        <div class="controls col-sm-8 col-xs-10">
-            <input type="text" class="form-control" name="remoteauth" value="pubkey"
-                   placeholder="remote auth"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remoteauth %}
-        </div>
-        <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
-        </div>
-    </div>
 
     <div class="row">
         <label class="control-label col-sm-3 col-xs-12">Remote CA Certs</label>

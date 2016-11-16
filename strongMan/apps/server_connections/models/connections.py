@@ -30,14 +30,14 @@ class Connection(models.Model):
 
     def dict(self):
         children = OrderedDict()
-        for child in self.children.all():
+        for child in self.server_children.all():
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
         ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.server_remote_addresses.all()]
         ike_sa['vips'] = [vip.value for vip in self.server_vips.all()]
         ike_sa['version'] = self.version
-        ike_sa['proposals'] = [proposal.type for proposal in self.proposals.all()]
+        ike_sa['proposals'] = [proposal.type for proposal in self.server_proposals.all()]
         ike_sa['children'] = children
 
         for local in self.server_local.all():
@@ -70,7 +70,7 @@ class Connection(models.Model):
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
 
-        for child in self.children.all():
+        for child in self.server_children.all():
             logs = vici_wrapper.initiate(child.name, self.profile)
             for log in logs:
                 LogMessage(connection=self, message=log['message']).save()
@@ -142,12 +142,6 @@ class Connection(models.Model):
 
 
 class IKEv2Certificate(Connection):
-    LOCAL_AUTH = (
-        ('0', "pubkey"),
-    )
-    REMOTE_AUTH = (
-        ('0', "pubkey"),
-    )
 
     @classmethod
     def choice_name(cls):
@@ -155,13 +149,6 @@ class IKEv2Certificate(Connection):
 
 
 class IKEv2EAP(Connection):
-    LOCAL_AUTH = (
-        ('0', "pubkey"),
-    )
-    REMOTE_AUTH = (
-        ('0', "eap-radius"),
-        ('1', "eap-ttls"),
-    )
 
     @classmethod
     def choice_name(cls):
@@ -169,15 +156,6 @@ class IKEv2EAP(Connection):
 
 
 class IKEv2CertificateEAP(Connection):
-    LOCAL_AUTH = (
-        ('0', "pubkey"),
-    )
-    REMOTE_AUTH = (
-        ('0', "eap-md5"),
-        ('1', "eap-mschapv2"),
-        ('2', "eap-ttls"),
-        ('3', "eap-peap"),
-    )
 
     @classmethod
     def choice_name(cls):
@@ -185,20 +163,6 @@ class IKEv2CertificateEAP(Connection):
 
 
 class IKEv2EapTls(Connection):
-    LOCAL_AUTH = (
-        ('eap-tls', "eap-tls"),
-        ('eap-ttls', "eap-ttls"),
-    )
-    REMOTE_AUTH = (
-        ('eap-tls', "eap-tls"),
-        ('eap-ttls', "eap-ttls"),
-    )
-
-    remote_auth = models.CharField(max_length=56, choices=REMOTE_AUTH, default='0')
-
-    @classmethod
-    def remote_auth(self):
-        return str(self.remote_auth)
 
     @classmethod
     def choice_name(cls):

@@ -4,14 +4,13 @@ from collections import OrderedDict
 from django.db import models
 
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity, DnIdentity
-from strongMan.apps.eap_secrets.models import Secret
 
 
 class Authentication(models.Model):
     local = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None, related_name='server_local')
     remote = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None, related_name='server_remote')
     name = models.TextField()  # starts with remote-* or local-*
-    auth = models.TextField()
+    auth = models.CharField(max_length=56)
     round = models.IntegerField(default=1)
 
     @property
@@ -48,14 +47,8 @@ class Authentication(models.Model):
     def has_private_key(self):
         return False
 
-    # def has_eap_secret(self):
-    #     return False
-
     def get_key_dict(self):
         pass
-
-    # def get_secret(self):
-    #     pass
 
     def _get_algorithm_type(self, algorithm):
         if algorithm == 'ec':
@@ -91,15 +84,18 @@ class AutoCaAuthentication(Authentication):
 
 
 class EapAuthentication(Authentication):
+    AUTH_CHOICES = (
+        ('eap-radius', "eap-radius"),
+        ('eap-md5', "eap-md5"),
+        ('eap-mschapv2', "eap-mschapv2"),
+        ('eap-ttls', "eap-ttls"),
+        ('eap-peap', "eap-peap"),
+    )
+    Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
+
     def dict(self):
         auth = super(EapAuthentication, self).dict()
         return auth
-
-    # def has_eap_secret(self):
-    #     return True
-    #
-    # def get_secret(self):
-    #     return self.secret
 
 
 class CertificateAuthentication(Authentication):
@@ -123,6 +119,11 @@ class CertificateAuthentication(Authentication):
 
 
 class EapTlsAuthentication(Authentication):
+    AUTH_CHOICES = (
+        ('eap-tls', "eap-tls"),
+        ('eap-ttls', "eap-ttls"),
+    )
+    Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_tls_identity')
 
     def dict(self):
@@ -137,9 +138,3 @@ class EapTlsAuthentication(Authentication):
     def get_key_dict(self):
         key = self.identity.subclass().certificate.subclass().private_key
         return OrderedDict(type=self._get_algorithm_type(key.algorithm), data=key.der_container)
-
-    def has_eap_secret(self):
-        return True
-
-    def get_secret(self):
-        return self.secret
