@@ -26,6 +26,7 @@ class Connection(models.Model):
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='2')
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
     send_cert_req = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=False)
 
     def dict(self):
         children = OrderedDict()
@@ -52,6 +53,8 @@ class Connection(models.Model):
         return connection
 
     def start(self):
+        self.enabled = True
+        self.save()
         vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
         connection_dict = self.subclass().dict()
@@ -61,15 +64,11 @@ class Connection(models.Model):
             local = local.subclass()
             if local.has_private_key():
                 vici_wrapper.load_key(local.get_key_dict())
-            if local.has_eap_secret():
-                    vici_wrapper.load_secret(local.get_secret().dict())
 
         for remote in self.server_remote.all():
             remote = remote.subclass()
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
-            if local.has_eap_secret():
-                    vici_wrapper.load_secret(local.get_secret().dict())
 
         for child in self.children.all():
             logs = vici_wrapper.initiate(child.name, self.profile)
@@ -77,6 +76,8 @@ class Connection(models.Model):
                 LogMessage(connection=self, message=log['message']).save()
 
     def stop(self):
+        self.enabled = False
+        self.save()
         vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
         logs = vici_wrapper.terminate_connection(self.profile)
@@ -216,11 +217,7 @@ class IKEv2EapTls(Connection):
         Address.objects.filter(vips=instance).delete()
 
         for local in Authentication.objects.filter(local=instance):
-            if local.has_eap_secret():
-                local.get_secret().delete()
             local.delete()
 
         for remote in Authentication.objects.filter(remote=instance):
-            if local.has_eap_secret():
-                local.get_secret().delete()
             remote.delete()
