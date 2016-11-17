@@ -201,13 +201,13 @@ class ViciWrapper:
     def unload_pool(self, pool_name):
         try:
             self.session.unload_pool(pool_name)
-        except Exception:
-            raise ViciLoadException("Unload pool failed!")
+        except Exception as e:
+            raise ViciLoadException(str(e))
 
     def clear_creds(self):
         try:
             self.session.clear_creds()
-        except Exception as e:
+        except Exception:
             raise ViciLoadException("Credentials cannot be cleared!")
 
     def load_pool(self, pool):

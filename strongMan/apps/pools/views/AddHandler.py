@@ -21,9 +21,6 @@ class AddHandler:
         handler.request = request
         return handler
 
-    def _render(self, form=AddOrEditForm()):
-            return self.request, 'pools/overview.html', {"form": form}
-
     def handle(self):
         self.form = AddOrEditForm(self.request.POST)
         if not self.form.is_valid():
@@ -31,42 +28,38 @@ class AddHandler:
                                  'Form was not valid')
             return render(self.request, 'pools/add.html', {"form": self.form})
 
-        if not self.form.my_addresses:
-            messages.add_message(self.request, messages.ERROR,
-                                 'Addresses must not be empty.')
-            return render(self.request, 'pools/add.html', {"form": self.form})
-
+        if self.form.my_attribute == 'None':
+            if self.form.my_attributevalues != "":
+                messages.add_message(self.request, messages.ERROR,
+                                     'Can\'t add pool: Attribute values unclear for Attribute "None"')
+                return render(self.request, 'pools/add.html', {"form": self.form})
+            pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
+            vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
+        else:
+            if self.form.my_attributevalues == "":
+                messages.add_message(self.request, messages.ERROR,
+                                     'Can\'t add pool: Attribute values mandatory if attribute is set.')
+                return render(self.request, 'pools/add.html', {"form": self.form})
+            attr = self.form.my_attribute
+            pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
+                        attribute=attr,
+                        attributevalues=self.form.my_attributevalues)
+            vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses, attr: [self.form.my_attributevalues]}}
         try:
-            if self.form.my_attribute == 'None':
-                pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
-                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
-            else:
-                attr = self.form.my_attribute
-                pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
-                            attribute=attr,
-                            attributevalues=self.form.my_attributevalues)
-                vici_pool = {self.form.my_poolname:
-                                 {'addrs': self.form.my_addresses, attr: [self.form.my_attributevalues]}}
-
             pool.clean()
             pool.save()
             vici = ViciWrapper()
+            vici.load_pool(vici_pool)
 
-            try:
-                vici.load_pool(vici_pool)
-            except ViciException as e:
-                messages.add_message(self.request, messages.ERROR,
-                                     str(e))
+        except ViciException as e:
+            messages.add_message(self.request, messages.ERROR, str(e))
+            pool.delete()
+            return render(self.request, 'pools/add.html', {"form": self.form})
         except IntegrityError:
             messages.add_message(self.request, messages.ERROR,
                                  'Poolname already in use.')
-            return self._render(self.request)
-        except ViciException as e:
-            messages.add_message(self.request, messages.ERROR,
-                                 'Could not save pool. Reason:\n'+e)
             return render(self.request, 'pools/add.html', {"form": self.form})
 
         messages.add_message(self.request, messages.SUCCESS, 'Successfully added pool')
-
         return redirect(reverse("pools:index"))
 

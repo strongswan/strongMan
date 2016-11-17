@@ -18,56 +18,73 @@ class EditHandler:
         self.pool = Pool.objects.get(poolname=self.poolname)
 
     def handle(self):
-        if self.request.method == "GET":  # Edit
-            form = AddOrEditForm()
-            form.fill(self.pool)
-            return render(self.request, 'pools/edit.html', {"form": form})
+        if self.request.method == "GET":
+            return self.load_edit_form()
 
         elif self.request.method == "POST":
             self.form = AddOrEditForm(self.parameter_dict)
             vici = ViciWrapper()
             if "remove_pool" in self.request.POST:
-                vici_poolname = {'name': self.poolname}
-                try:
-                    vici.unload_pool(vici_poolname)
-                    self.pool.delete()
-                    messages.add_message(self.request, messages.SUCCESS, "Pool deletion successful.")
+                return self.delete_pool(vici)
 
-                except ViciException:
-                    messages.add_message(self.request, messages.ERROR,
-                                         'Unload pool failed. (ViciException). There could be online leases.')
-                except ProtectedError:
-                    messages.add_message(self.request, messages.ERROR,
-                                         'Pool not deleted. Pool is in use by a connection.')
-                except Exception as e:
-                    messages.add_message(self.request, messages.ERROR, str(e))
-                return redirect(reverse("pools:index"))
+            return self.update_pool(vici)
 
-            if not self.form.is_valid():
-                messages.add_message(self.request, messages.ERROR,
-                                     'Form was not valid')
-                return render(self.request, 'pools/edit.html', {"form": self.form})
-            else:
-                self.form.update_pool(self.pool)
-                try:
-                    self.pool.save()
-                    if self.form.my_attribute == 'None':
-                        vici_pool = { self.form.my_poolname: {'addrs': self.form.my_addresses}}
-                        messages.add_message(self.request, messages.SUCCESS, 'Successfully updated pool, '
-                                                                             'but Attributevalue(s) not set. '
-                                                                             '(Attribute was "None")')
-                        vici.load_pool(vici_pool)
-                        return redirect(reverse("pools:index"))
-                    else:
-                        vici_pool = {'name': self.form.my_poolname, 'items':
-                            {'addrs': self.form.my_addresses, self.form.my_attribute: [self.form.my_attributevalues]}}
-                        vici.load_pool(vici_pool)
-                except IntegrityError:
+    def load_edit_form(self):
+        form = AddOrEditForm()
+        form.fill(self.pool)
+        return render(self.request, 'pools/edit.html', {"form": form})
+
+    def update_pool(self, vici):
+        if not self.form.is_valid():
+            messages.add_message(self.request, messages.ERROR,
+                                 'Form was not valid')
+            return render(self.request, 'pools/edit.html', {"form": self.form})
+        else:
+            if self.form.my_attribute == 'None':
+                if self.form.my_attributevalues != "":
                     messages.add_message(self.request, messages.ERROR,
-                                         'Poolname already in use.')
+                                         'Won\'t update: Attribute values unclear for Attribute "None"')
                     return render(self.request, 'pools/edit.html', {"form": self.form})
-                messages.add_message(self.request, messages.SUCCESS, 'Successfully updated pool')
-                return redirect(reverse("pools:index"))
+                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
+                msg = 'Successfully updated pool'
+
+            else:
+                if self.form.my_attributevalues == "":
+                    messages.add_message(self.request, messages.ERROR,
+                                         'Won\'t update: Attribute values mandatory if attribute is set.')
+                    return render(self.request, 'pools/edit.html', {"form": self.form})
+                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses,
+                                                     self.form.my_attribute: [self.form.my_attributevalues]}}
+                msg = 'Successfully updated pool'
+
+            try:
+                vici.load_pool(vici_pool)
+                self.form.update_pool(self.pool)
+                self.pool.save()
+                messages.add_message(self.request, messages.SUCCESS, msg)
+            except ViciException as e:
+                messages.add_message(self.request, messages.ERROR, str(e))
+                return render(self.request, 'pools/edit.html', {"form": self.form})
+
+            return redirect(reverse("pools:index"))
+
+    def delete_pool(self, vici):
+        vici_poolname = {'name': self.poolname}
+        # check if online leases!!!
+        try:
+            vici.unload_pool(vici_poolname)
+            self.pool.delete()
+            messages.add_message(self.request, messages.SUCCESS, "Pool deletion successful.")
+
+        except ViciException as e:
+            messages.add_message(self.request, messages.ERROR,
+                                 'Unload pool failed: ' + e)
+        except ProtectedError:
+            messages.add_message(self.request, messages.ERROR,
+                                 'Pool not deleted. Pool is in use by a connection.')
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, str(e))
+        return redirect(reverse("pools:index"))
 
     @property
     def parameter_dict(self):
