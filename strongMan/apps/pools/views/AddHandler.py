@@ -6,6 +6,7 @@ from ..forms import AddOrEditForm
 from django.db import IntegrityError
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
+from django.shortcuts import render
 
 
 class AddHandler:
@@ -28,22 +29,34 @@ class AddHandler:
         if not self.form.is_valid():
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')
+            return render(self.request, 'pools/add.html', {"form": self.form})
 
         if not self.form.my_addresses:
             messages.add_message(self.request, messages.ERROR,
                                  'Addresses must not be empty.')
-            return self._render(self.request)
+            return render(self.request, 'pools/add.html', {"form": self.form})
 
-        pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
-                    attribute=self.form.my_attribute,
-                    attributevalues=self.form.my_attributevalues)
         try:
+            if self.form.my_attribute == 'None':
+                pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
+                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
+            else:
+                attr = self.form.my_attribute
+                pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
+                            attribute=attr,
+                            attributevalues=self.form.my_attributevalues)
+                vici_pool = {self.form.my_poolname:
+                                 {'addrs': self.form.my_addresses, attr: [self.form.my_attributevalues]}}
+
             pool.clean()
             pool.save()
             vici = ViciWrapper()
-            vici_pool = {self.form.my_poolname:
-                            {'addrs': self.form.my_addresses, self.form.my_attribute: [self.form.my_attributevalues]}}
-            vici.session.load_pool(vici_pool)
+
+            try:
+                vici.load_pool(vici_pool)
+            except ViciException as e:
+                messages.add_message(self.request, messages.ERROR,
+                                     str(e))
         except IntegrityError:
             messages.add_message(self.request, messages.ERROR,
                                  'Poolname already in use.')
@@ -51,7 +64,7 @@ class AddHandler:
         except ViciException as e:
             messages.add_message(self.request, messages.ERROR,
                                  'Could not save pool. Reason:\n'+e)
-            return self._render(self.request)
+            return render(self.request, 'pools/add.html', {"form": self.form})
 
         messages.add_message(self.request, messages.SUCCESS, 'Successfully added pool')
 

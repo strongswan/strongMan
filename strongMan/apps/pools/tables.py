@@ -5,13 +5,15 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class PoolsTable(tables.Table):
-    detail_collapse_column = tables.Column(accessor="id", verbose_name="", orderable=False)
+
     poolname = tables.Column(accessor="poolname", verbose_name="Name")
     addresses = tables.Column(accessor="addresses", verbose_name="Addresses")
     removebtn = tables.Column(accessor="id", verbose_name='Remove Pool', orderable=False)
+    detail_collapse_column = tables.Column(accessor="id", verbose_name="", orderable=False)
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
+        # self.pooldetail =  kwargs.pop("pooldetail")
         super(PoolsTable, self).__init__(*args, **kwargs)
 
     def render_removebtn(self, record):

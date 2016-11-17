@@ -1,7 +1,7 @@
 from django.db import models
 
 ATTRIBUTE_CHOICES = (
-    ('None', 'None'),
+    (None, 'None'),
     ('dns', 'dns'),
     ('nbns', 'nbns'),
     ('dhcp', 'dhcp'),
@@ -16,8 +16,8 @@ ATTRIBUTE_CHOICES = (
 class Pool(models.Model):
     poolname = models.TextField(unique=True)
     addresses = models.TextField()
-    attribute = models.CharField(max_length=56, choices=ATTRIBUTE_CHOICES)
-    attributevalues = models.TextField()
+    attribute = models.CharField(max_length=56, choices=ATTRIBUTE_CHOICES, null=True)
+    attributevalues = models.TextField(null=True)
 
     @classmethod
     def create(cls, poolname, addresses, attribute, attributevalues):

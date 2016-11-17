@@ -3,22 +3,29 @@ from strongMan.apps.pools.models.pools import ATTRIBUTE_CHOICES
 
 
 class AddOrEditForm(forms.Form):
-    poolname = forms.CharField(max_length=50, initial="")
-    addresses = forms.CharField(max_length=50, initial="")
+    poolname = forms.RegexField(max_length=50, initial="", regex=r'^[0-9a-zA-Z]+$')
+    addresses = forms.CharField(initial="")
     attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES)
-    attributevalues = forms.CharField(max_length=50, initial="")
+    attributevalues = forms.CharField(initial="", required=None)
 
     def fill(self, pool):
         self.initial['poolname'] = pool.poolname
         self.initial['addresses'] = pool.addresses
         self.initial['attribute'] = pool.attribute
-        self.initial['attributevalues'] = pool.attributevalues
+        if pool.attribute is None:
+            self.initial['attributevalues'] = ""
+        else:
+            self.initial['attributevalues'] = pool.attributevalues
 
     def update_pool(self, pool):
         pool.poolname = self.cleaned_data['poolname']
         pool.addresses = self.cleaned_data['addresses']
-        pool.attribute = self.cleaned_data['attribute']
-        pool.attributevalues = self.cleaned_data['attributevalues']
+        if self.cleaned_data['attribute'] == 'None':
+            pool.attribute = None
+            pool.attributevalues = None
+        else:
+            pool.attribute = self.cleaned_data['attribute']
+            pool.attributevalues = self.cleaned_data['attributevalues']
         pool.save()
 
     def is_valid(self):
@@ -51,7 +58,7 @@ class AddOrEditForm(forms.Form):
 
     @property
     def my_attributevalues(self):
-        return self.cleaned_data["attributevalues"]
+        return self.data["attributevalues"]
 
     @my_attributevalues.setter
     def my_attributevalues(self, value):

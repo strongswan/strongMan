@@ -29,6 +29,11 @@
                 <div class="col-xs-12">
                     {% render_table table 'pools/widgets/table.html' %}
                 </div>
+{#                {% if record %}#}
+{#                    <div>#}
+{#                        {% render_table pools 'pools/widgets/table.html' %}#}
+{#                    </div>#}
+{#                {% endif %}#}
             {% else %}
                 <h3 id="no_pools_to_show">No pools to show</h3>
             {% endif %}

@@ -2,7 +2,7 @@
 {% load i18n %}
 <div class="old table-container">
     {% block table %}
-        <table{% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+        <table{% if table.attrs %} {{ table.attrs.as_html }}{% endif %} id="poolTable">
 
 
 
@@ -27,14 +27,31 @@
                 <tbody>
                 {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
                     {% block table.tbody.row %}
-                        <tr class="{% cycle 'even' 'odd' %}">
+                        <tr class="{% cycle 'even' 'odd' %} accordion-toggle" data-toggle="collapse" data-target="#collapse">
                             {% for column, cell in row.items %}
                                 <td {{ column.attrs.td.as_html }}>
                                     {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}
                                         {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
                             {% endfor %}
                         </tr>
+
+{#                         <tr >#}
+{#                            <td colspan="4" class="hiddenRow">#}
+{#                                <div class="accordian-body collapse" id="collapse{{ pools.poolname }}">#}
+{#                                        <h4>Poolname: {{ pools.poolname }}</h4>#}
+{#                                        <b>Attribute:</b> {{ pools.attribute }}<br />#}
+{#                                        <b>Attributevalue(s):</b> {{ pools.attributevalues }}<br />#}
+{#                                        <b>Nof addresses in pool:</b> {{ pools.size }}<br />#}
+{#                                        <b>Virtual IP pool base addr:</b> {{ pools.base }}<br />#}
+{#                                        <b># of online:</b> {{ pools.online }}<br />#}
+{#                                        <b># of offline:</b> {{ pools.offline }}<br />#}
+{#                                        <b>Leases in pool:</b> {{ pools.leases }}<br />#}
+{#                                </div>#}
+{#                            </td>#}
+{#                        </tr>#}
                     {% endblock table.tbody.row %}
+
+
                     {% empty %}
                     {% if table.empty_text %}
                         {% block table.tbody.empty_text %}

@@ -13,18 +13,18 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="row">
-                        <label class="control-label col-sm-3 col-xs-12">Pool name</label>
+                        <label class="control-label col-sm-3 col-xs-12">Pool name*</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="poolname" value="{{ poolname.value }}"
+                            <input required type="text" class="form-control" name="poolname" value="{{ form.poolname.value }}"
                                    placeholder="Pool name"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
                             {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. Take care, some names are reserved. Check out wiki.strongswan.org for more information." %}
                         </div>
-                        <label class="control-label col-sm-3 col-xs-12">Addresses</label>
+                        <label class="control-label col-sm-3 col-xs-12">Addresses*</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="addresses" value="{{ addresses.value }}"
+                            <input required type="text" class="form-control" name="addresses" value="{{ form.addresses.value }}"
                                    placeholder="Address list"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=addresses %}
                         </div>
@@ -52,7 +52,7 @@
                         </div>
                         <label class="control-label col-sm-3 col-xs-12">Attribute values</label>
                         <div class="controls col-sm-8 col-xs-10">
-                            <input type="text" class="form-control" name="attributevalues" value="{{ attributevalues.value }}"
+                            <input type="text" class="form-control" name="attributevalues" value="{{ form.attributevalues.value }}"
                                    placeholder="Attribute values"/>
                             {% include "connections/forms/../widgets/errormsg.html" with field=attributevalues %}
                         </div>
