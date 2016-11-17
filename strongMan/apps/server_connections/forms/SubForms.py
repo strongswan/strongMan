@@ -1,8 +1,8 @@
 from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.server_connections.models import Connection, Child, Address, Proposal, AutoCaAuthentication, \
-    CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, EapTlsAuthentication, \
-    IKEv2Certificate, IKEv2CertificateEAP, IKEv2EAP, IKEv2EapTls
+    CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, EapCertificateAuthentication, \
+    EapTlsAuthentication, IKEv2CertificateEAP, IKEv2EAP, IKEv2EapTls
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
 
@@ -348,5 +348,42 @@ class EapForm(forms.Form):
         for remote in connection.server_remote.all():
             sub = remote.subclass()
             if isinstance(sub, EapAuthentication):
+                sub.auth = self.cleaned_data['remote_auth']
+                sub.save()
+
+
+class EapCertificateForm(forms.Form):
+    """
+    Form to choose the eap secret for 2 round authentication.
+    """
+    remote_auth = forms.ChoiceField(widget=forms.Select(), choices=EapCertificateAuthentication.AUTH_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super(EapCertificateForm, self).__init__(*args, **kwargs)
+
+    def fill(self, connection):
+        remote_auth = None
+        for remote in connection.server_remote.all():
+            subclass = remote.subclass()
+            if isinstance(subclass, EapCertificateAuthentication):
+                remote_auth = subclass
+                break
+        if remote_auth is None:
+            assert False
+        self.initial['remote_auth'] = remote_auth.auth
+
+    def create_connection(self, connection):
+        max_round = 0
+        for remote in connection.server_remote.all():
+            if remote.round > max_round:
+                max_round = remote.round
+
+        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection, round=max_round + 1)
+        auth.save()
+
+    def update_connection(self, connection):
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
+            if isinstance(sub, EapCertificateAuthentication):
                 sub.auth = self.cleaned_data['remote_auth']
                 sub.save()

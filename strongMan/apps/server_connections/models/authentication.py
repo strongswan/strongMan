@@ -90,6 +90,20 @@ class EapAuthentication(Authentication):
         return auth
 
 
+class EapCertificateAuthentication(Authentication):
+    AUTH_CHOICES = (
+        ('eap-md5', "eap-md5"),
+        ('eap-mschapv2', "eap-mschapv2"),
+        ('eap-ttls', "eap-ttls"),
+        ('eap-peap', "eap-peap"),
+    )
+    Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
+
+    def dict(self):
+        auth = super(EapCertificateAuthentication, self).dict()
+        return auth
+
+
 class CertificateAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_cert_identity')
 

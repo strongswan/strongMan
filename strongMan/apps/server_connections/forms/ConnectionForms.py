@@ -2,7 +2,7 @@ import sys
 
 from django import forms
 from strongMan.apps.server_connections.forms.SubForms import HeaderForm, CaCertificateForm, \
-    ServerIdentityForm, UserCertificateForm, EapForm, EapTlsForm
+    ServerIdentityForm, UserCertificateForm, EapForm, EapCertificateForm, EapTlsForm
 from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
     IKEv2EapTls
 
@@ -138,7 +138,7 @@ class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerI
 
 
 class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
-                             ServerIdentityForm, EapForm):
+                             ServerIdentityForm, EapCertificateForm):
     @property
     def model(self):
         return IKEv2CertificateEAP
