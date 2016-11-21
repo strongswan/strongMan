@@ -76,7 +76,7 @@ class EditHandler:
 
         except ViciException as e:
             messages.add_message(self.request, messages.ERROR,
-                                 'Unload pool failed: ' + e)
+                                 'Unload pool failed: ' + str(e))
         except ProtectedError:
             messages.add_message(self.request, messages.ERROR,
                                  'Pool not deleted. Pool is in use by a connection.')

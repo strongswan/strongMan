@@ -29,8 +29,10 @@ class AddHandler:
             return render(self.request, 'pools/add.html', {"form": self.form})
 
         if self.form.my_poolname.lower() == 'dhcp' or self.form.my_poolname.lower() == 'radius':
-            vici_pool = {self.form.my_poolname: {'addrs': ''}}
-            pool = Pool(poolname=self.form.my_poolname)
+            messages.add_message(self.request, messages.ERROR,
+                                 'Poolname "' + self.form.my_poolname + '" not allowed in pool creation. '
+                                 'To use this name, please reference it directly from the connection wizard.')
+            return render(self.request, 'pools/add.html', {"form": self.form})
 
         else:
             if self.form.my_attribute == 'None':

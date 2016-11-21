@@ -20,8 +20,21 @@ class OverviewHandler:
             messages.warning(self.request, str(e))
 
     def _render(self):
-        queryset = Pool.objects.all()
-        table = tables.PoolsTable(queryset, request=self.request)
+        dhcpdbvalue = Pool.objects.all().filter(poolname__contains='dhcp')
+        if not dhcpdbvalue:
+            dhcppool = Pool(poolname='dhcp')
+            dhcppool.clean()
+            dhcppool.save()
+
+        radiusdbvalue = Pool.objects.all().filter(poolname__contains='radius')
+        if not radiusdbvalue:
+            radiuspool = Pool(poolname='radius')
+            radiuspool.clean()
+            radiuspool.save()
+
+        queryset = Pool.objects.exclude(poolname__contains='dhcp')
+        q2 = queryset.exclude(poolname__contains='radius')
+        table = tables.PoolsTable(q2, request=self.request)
 
         # pools = ViciWrapper().get_pools()
 

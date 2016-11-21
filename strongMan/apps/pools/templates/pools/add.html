@@ -20,9 +20,9 @@
                             {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
                         </div>
                         <div class="col-sm-1 col-xs-2">
-                            {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. 'dhcp' and 'radius' are reserved keywords." %}
+                            {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. 'dhcp' and 'radius' are reserved keywords. These can be used from the server connections wizard directly. There's no need to create such a pool." %}
                         </div>
-                        <label class="control-label col-sm-3 col-xs-12">Addresses</label>
+                        <label class="control-label col-sm-3 col-xs-12">Addresses*</label>
                         <div class="controls col-sm-8 col-xs-10">
                             <input type="text" class="form-control" name="addresses" value="{{ form.addresses.value }}"
                                    placeholder="Address list"/>
