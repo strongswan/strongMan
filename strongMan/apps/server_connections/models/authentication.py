@@ -105,7 +105,8 @@ class EapCertificateAuthentication(Authentication):
 
 
 class CertificateAuthentication(Authentication):
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_cert_identity')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
+                                 related_name='server_cert_identity')
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
@@ -130,7 +131,8 @@ class EapTlsAuthentication(Authentication):
         ('eap-ttls', "eap-ttls"),
     )
     Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='server_tls_identity')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
+                                 related_name='server_tls_identity')
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()

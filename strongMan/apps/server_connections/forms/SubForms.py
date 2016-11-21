@@ -14,6 +14,8 @@ class HeaderForm(forms.Form):
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
     pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", required=False)
     send_cert_req = forms.BooleanField(required=False)
+    local_ts = forms.CharField(max_length=50, required=False)
+    remote_ts = forms.CharField(max_length=50, required=False)
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
@@ -35,16 +37,20 @@ class HeaderForm(forms.Form):
         self.initial['version'] = connection.version
         self.initial['pool'] = connection.pool
         self.initial['send_cert_req'] = connection.send_cert_req
+        self.initial['local_ts'] = connection.server_children.first().server_local_ts.first().value
+        self.initial['remote_ts'] = connection.server_children.first().server_remote_ts.first().value
 
     def create_connection(self, connection):
         child = Child(name=self.cleaned_data['profile'], connection=connection)
         child.save()
         self._set_proposals(connection, child)
-        self._set_addresses(connection, child, self.cleaned_data['gateway'])
+        self._set_addresses(connection, child, self.cleaned_data['gateway'], self.cleaned_data['local_ts'],
+                            self.cleaned_data['remote_ts'])
 
     def update_connection(self, connection):
         Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
-        Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['gateway'])
+        Address.objects.filter(local_ts=connection.server_children.first()).update(value=self.cleaned_data['local_ts'])
+        Address.objects.filter(remote_ts=connection.server_children.first()).update(value=self.cleaned_data['remote_ts'])
         connection.profile = self.cleaned_data['profile']
         connection.version = self.cleaned_data['version']
         connection.pool = self.cleaned_data['pool']
@@ -65,13 +71,13 @@ class HeaderForm(forms.Form):
         #Proposal(type="default", child=child).save()
 
     @staticmethod
-    def _set_addresses(connection, child, gateway):
+    def _set_addresses(connection, child, gateway, local_ts, remote_ts):
         Address(value=gateway, remote_addresses=connection).save()
         Address(value='localhost', local_addresses=connection).save()
         Address(value='0.0.0.0', vips=connection).save()
         Address(value='::', vips=connection).save()
-        Address(value='::/0', remote_ts=child).save()
-        Address(value='0.0.0.0/0', remote_ts=child).save()
+        Address(value=local_ts, local_ts=child).save()
+        Address(value=remote_ts, remote_ts=child).save()
 
 
 class CaCertificateForm(forms.Form):
@@ -123,8 +129,8 @@ class CaCertificateForm(forms.Form):
         return exists
 
     def fill(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
             if isinstance(sub, AutoCaAuthentication):
                 self.is_auto_choose = True
                 break
@@ -139,14 +145,14 @@ class CaCertificateForm(forms.Form):
         else:
             auth = 'pubkey'
         if self.is_auto_choose:
-            AutoCaAuthentication(name='local', auth=auth, local=connection).save()
+            AutoCaAuthentication(name='remote-cert', auth=auth, remote=connection).save()
         else:
-            CaCertificateAuthentication(name='local', auth=auth, local=connection,
+            CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
                                         ca_cert=self.chosen_certificate).save()
 
     def update_connection(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
             if isinstance(sub, CaCertificateAuthentication):
                 sub.delete()
             if isinstance(sub, AutoCaAuthentication):
@@ -156,9 +162,9 @@ class CaCertificateForm(forms.Form):
         else:
             auth = 'pubkey'
         if self.is_auto_choose:
-            AutoCaAuthentication(name='local', auth=auth, local=connection).save()
+            AutoCaAuthentication(name='remote-cert', auth=auth, remote=connection).save()
         else:
-            CaCertificateAuthentication(name='local', auth=auth, local=connection,
+            CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
                                         ca_cert=self.chosen_certificate).save()
 
 
@@ -203,8 +209,8 @@ class ServerIdentityForm(forms.Form):
         self.initial["identity_ca"] = value
 
     def fill(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
             if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
                 is_server_identity_checked = sub.ca_identity == connection.server_remote_addresses.first().value
                 self.is_server_identity_checked = is_server_identity_checked
@@ -212,8 +218,8 @@ class ServerIdentityForm(forms.Form):
                     self.ca_identity = sub.ca_identity
 
     def create_connection(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
             if isinstance(sub, AutoCaAuthentication) or isinstance(sub, CaCertificateAuthentication):
                 sub.ca_identity = self.ca_identity
                 sub.save()
@@ -222,8 +228,8 @@ class ServerIdentityForm(forms.Form):
             "No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
 
     def update_connection(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
             if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
                 sub.ca_identity = self.ca_identity
                 sub.save()
@@ -262,26 +268,82 @@ class UserCertificateForm(forms.Form):
         self.initial['identity'] = value
 
     def fill(self, connection):
-        remote_auth = None
-        for remote in connection.server_remote.all():
-            subclass = remote.subclass()
+        local_auth = None
+        for local in connection.server_local.all():
+            subclass = local.subclass()
             if isinstance(subclass, CertificateAuthentication):
-                remote_auth = subclass
+                local_auth = subclass
                 break
-        if remote_auth is None:
+        if local_auth is None:
             assert False
-        self.my_certificate = remote_auth.identity.certificate.pk
-        self.my_identity = remote_auth.identity.pk
+        self.my_certificate = local_auth.identity.certificate.pk
+        self.my_identity = local_auth.identity.pk
 
     def create_connection(self, connection):
-        CertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection, identity=self.my_identity).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection,
+                                  identity=self.my_identity).save()
 
     def update_connection(self, connection):
-        for remote in connection.server_remote.all():
-            sub = remote.subclass()
+        for local in connection.server_local.all():
+            sub = local.subclass()
             if isinstance(sub, CertificateAuthentication):
                 sub.identity = self.my_identity
                 sub.save()
+
+# class UserCertificateForm(forms.Form):
+#     """
+#     Form to choose the Usercertifite. Only shows the certs which contains a private key
+#     """
+#     certificate = CertificateChoice(queryset=UserCertificate.objects.none(), label="User certificate",
+#                                     required=True)
+#     identity = IdentityChoice(choices=(), required=True)
+#
+#     def __init__(self, *args, **kwargs):
+#         super(UserCertificateForm, self).__init__(*args, **kwargs)
+#         self.fields['certificate'].queryset = UserCertificate.objects.filter(private_key__isnull=False)
+#
+#     def update_certificates(self):
+#         IdentityChoice.load_identities(self, "certificate", "identity")
+#
+#     @property
+#     def my_certificate(self):
+#         return UserCertificate.objects.get(pk=self.cleaned_data["certificate"])
+#
+#     @my_certificate.setter
+#     def my_certificate(self, value):
+#         self.initial['certificate'] = value
+#         IdentityChoice.load_identities(self, "certificate", "identity")
+#
+#     @property
+#     def my_identity(self):
+#         return AbstractIdentity.objects.get(pk=self.cleaned_data["identity"])
+#
+#     @my_identity.setter
+#     def my_identity(self, value):
+#         self.initial['identity'] = value
+#
+#     def fill(self, connection):
+#         remote_auth = None
+#         for remote in connection.server_remote.all():
+#             subclass = remote.subclass()
+#             if isinstance(subclass, CertificateAuthentication):
+#                 remote_auth = subclass
+#                 break
+#         if remote_auth is None:
+#             assert False
+#         self.my_certificate = remote_auth.identity.certificate.pk
+#         self.my_identity = remote_auth.identity.pk
+#
+#     def create_connection(self, connection):
+#         CertificateAuthentication(name='remote-cert', auth='pubkey', remote=connection,
+#                                   identity=self.my_identity).save()
+#
+#     def update_connection(self, connection):
+#         for remote in connection.server_remote.all():
+#             sub = remote.subclass()
+#             if isinstance(sub, CertificateAuthentication):
+#                 sub.identity = self.my_identity
+#                 sub.save()
 
 
 class EapTlsForm(UserCertificateForm):
@@ -301,7 +363,8 @@ class EapTlsForm(UserCertificateForm):
         self.initial['remote_auth'] = remote_auth.auth
 
     def create_connection(self, connection):
-        EapTlsAuthentication(name='remote-eap-tls', auth=self.cleaned_data['remote_auth'], remote=connection, identity=self.my_identity).save()
+        EapTlsAuthentication(name='remote-eap-tls', auth=self.cleaned_data['remote_auth'], remote=connection,
+                             identity=self.my_identity).save()
 
     def update_connection(self, connection):
         for remote in connection.server_remote.all():
@@ -341,7 +404,8 @@ class EapForm(forms.Form):
             if remote.round > max_round:
                 max_round = remote.round
 
-        auth = EapAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection, round=max_round + 1)
+        auth = EapAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection,
+                                 round=max_round + 1)
         auth.save()
 
     def update_connection(self, connection):
@@ -378,7 +442,8 @@ class EapCertificateForm(forms.Form):
             if remote.round > max_round:
                 max_round = remote.round
 
-        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection, round=max_round + 1)
+        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection,
+                                            round=max_round + 1)
         auth.save()
 
     def update_connection(self, connection):

@@ -70,10 +70,10 @@ class Connection(models.Model):
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
 
-        for child in self.server_children.all():
-            logs = vici_wrapper.initiate(child.name, self.profile)
-            for log in logs:
-                LogMessage(connection=self, message=log['message']).save()
+        # for child in self.server_children.all():
+        #     logs = vici_wrapper.initiate(child.name, self.profile)
+        #     for log in logs:
+        #         LogMessage(connection=self, message=log['message']).save()
 
     def stop(self):
         self.enabled = False

@@ -41,6 +41,7 @@ class Child(models.Model):
 
     def dict(self):
         child = OrderedDict()
+        child['local_ts'] = [local_t.value for local_t in self.server_local_ts.all()]
         child['remote_ts'] = [remote_t.value for remote_t in self.server_remote_ts.all()]
         child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.server_esp_proposals.all()]
         return child
