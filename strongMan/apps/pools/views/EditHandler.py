@@ -70,7 +70,6 @@ class EditHandler:
 
     def delete_pool(self, vici):
         vici_poolname = {'name': self.poolname}
-        # check if online leases!!!
         try:
             vici.unload_pool(vici_poolname)
             self.pool.delete()
