@@ -14,7 +14,16 @@
         <b>Virtual IP pool base addr:</b> {{ base }}<br />
         <b># of online:</b> {{ online }}<br />
         <b># of offline:</b> {{ offline }}<br />
-        <b>Leases in pool:</b> {{ leases }}<br />
+        <b>Leases in pool:</b>
+                    {% if leases %}
+                        {%  for k, v in  leases.items %}
+                        Address: {{ v.address }}<br />
+                        Identity: {{ v.identity }}<br />
+                        Status: {{ v.status }}<br />
+                        {% endfor %}
+                    {% else %}
+                        No leases.
+                    {% endif %}
                 </div>
     </td>
 </div>

@@ -46,7 +46,6 @@ class EditHandler:
                                          'Won\'t update: Attribute values unclear for Attribute "None"')
                     return render(self.request, 'pools/edit.html', {"form": self.form})
                 vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
-                msg = 'Successfully updated pool'
 
             else:
                 if self.form.my_attributevalues == "":
@@ -55,7 +54,7 @@ class EditHandler:
                     return render(self.request, 'pools/edit.html', {"form": self.form})
                 vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses,
                                                      self.form.my_attribute: [self.form.my_attributevalues]}}
-                msg = 'Successfully updated pool'
+            msg = 'Successfully updated pool'
 
             try:
                 vici.load_pool(vici_pool)

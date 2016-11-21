@@ -29,7 +29,7 @@ class AddHandler:
             return render(self.request, 'pools/add.html', {"form": self.form})
 
         if self.form.my_poolname.lower() == 'dhcp' or self.form.my_poolname.lower() == 'radius':
-            vici_pool = {self.form.my_poolname}
+            vici_pool = {self.form.my_poolname: {'addrs': ''}}
             pool = Pool(poolname=self.form.my_poolname)
 
         else:

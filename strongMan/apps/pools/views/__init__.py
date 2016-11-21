@@ -1,12 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import render
 from .OverviewHandler import OverviewHandler
 from ..forms import AddOrEditForm
 from .AddHandler import AddHandler
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from .EditHandler import EditHandler
-from ..models import Pool
 
 
 @login_required

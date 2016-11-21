@@ -4,7 +4,7 @@ from strongMan.apps.pools.models.pools import ATTRIBUTE_CHOICES
 
 class AddOrEditForm(forms.Form):
     poolname = forms.RegexField(max_length=50, initial="", regex=r'^[0-9a-zA-Z]+$')
-    addresses = forms.CharField(initial="")
+    addresses = forms.CharField(initial="", required=None)
     attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES)
     attributevalues = forms.CharField(initial="", required=None)
 
@@ -65,56 +65,56 @@ class AddOrEditForm(forms.Form):
         self.initial['attributevalues'] = value
 
 
-class OverviewDetailForm(forms.Form):
-    base = forms.CharField(max_length=50, initial="")
-    size = forms.CharField(max_length=50, initial="")
-    online = forms.CharField(max_length=50, initial="")
-    offline = forms.CharField(max_length=50, initial="")
-    leases = forms.CharField(max_length=50, initial="")
-
-    def fill(self, pool_details):
-        self.initial['base'] = pool_details.base
-        self.initial['size'] = pool_details.size
-        self.initial['online'] = pool_details.online
-        self.initial['offline'] = pool_details.offline
-        self.initial['leases'] = pool_details.leases
-
-    @property
-    def my_base(self):
-        return self.cleaned_data["base"]
-
-    @my_base.setter
-    def my_base(self, value):
-        self.initial['base'] = value
-
-    @property
-    def my_size(self):
-        return self.cleaned_data["size"]
-
-    @my_base.setter
-    def my_size(self, value):
-        self.initial['size'] = value
-
-    @property
-    def my_online(self):
-        return self.cleaned_data["online"]
-
-    @my_online.setter
-    def my_online(self, value):
-        self.initial['online'] = value
-
-    @property
-    def my_offline(self):
-        return self.cleaned_data["offline"]
-
-    @my_offline.setter
-    def my_offline(self, value):
-        self.initial['offline'] = value
-
-    @property
-    def my_leases(self):
-        return self.cleaned_data["leases"]
-
-    @my_leases.setter
-    def my_leases(self, value):
-        self.initial['leases'] = value
+# class OverviewDetailForm(forms.Form):
+#     base = forms.CharField(max_length=50, initial="")
+#     size = forms.CharField(max_length=50, initial="")
+#     online = forms.CharField(max_length=50, initial="")
+#     offline = forms.CharField(max_length=50, initial="")
+#     leases = forms.CharField(max_length=50, initial="")
+#
+#     def fill(self, pool_details):
+#         self.initial['base'] = pool_details.base
+#         self.initial['size'] = pool_details.size
+#         self.initial['online'] = pool_details.online
+#         self.initial['offline'] = pool_details.offline
+#         self.initial['leases'] = pool_details.leases
+#
+#     @property
+#     def my_base(self):
+#         return self.cleaned_data["base"]
+#
+#     @my_base.setter
+#     def my_base(self, value):
+#         self.initial['base'] = value
+#
+#     @property
+#     def my_size(self):
+#         return self.cleaned_data["size"]
+#
+#     @my_base.setter
+#     def my_size(self, value):
+#         self.initial['size'] = value
+#
+#     @property
+#     def my_online(self):
+#         return self.cleaned_data["online"]
+#
+#     @my_online.setter
+#     def my_online(self, value):
+#         self.initial['online'] = value
+#
+#     @property
+#     def my_offline(self):
+#         return self.cleaned_data["offline"]
+#
+#     @my_offline.setter
+#     def my_offline(self, value):
+#         self.initial['offline'] = value
+#
+#     @property
+#     def my_leases(self):
+#         return self.cleaned_data["leases"]
+#
+#     @my_leases.setter
+#     def my_leases(self, value):
+#         self.initial['leases'] = value
