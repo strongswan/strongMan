@@ -4,17 +4,17 @@
     <a role="button" data-toggle="collapse" href="#collapse{{ record.poolname }}"
          class="accordion-toggle collapsed" ></a>
 
-            <td colspan="2"  class="hiddenRow">
-                <div id="collapse{{ record.poolname }}" class="collapse">
+        <td colspan="2"  class="hiddenRow">
+            <div id="collapse{{ record.poolname }}" class="collapse">
 
-        <h4>{{ record.poolname }}</h4>
-        <b>Attribute:</b> {{ record.attribute }}<br />
-        <b>Attributevalue(s):</b> {{ record.attributevalues }}<br />
-        <b>Nof addresses in pool:</b> {{ size }}<br />
-        <b>Virtual IP pool base addr:</b> {{ base }}<br />
-        <b># of online:</b> {{ online }}<br />
-        <b># of offline:</b> {{ offline }}<br />
-        <b>Leases in pool:</b>
+                <h4>{{ record.poolname }}</h4>
+                <b>Attribute:</b> {{ record.attribute }}<br />
+                <b>Attributevalue(s):</b> {{ record.attributevalues }}<br />
+                <b>Nof addresses in pool:</b> {{ size }}<br />
+                <b>Virtual IP pool base addr:</b> {{ base }}<br />
+                <b># of online:</b> {{ online }}<br />
+                <b># of offline:</b> {{ offline }}<br />
+                <b>Leases in pool:</b>
                     {% if leases %}
                         {%  for k, v in  leases.items %}
                         Address: {{ v.address }}<br />
@@ -24,20 +24,23 @@
                     {% else %}
                         No leases.
                     {% endif %}
-                </div>
-    </td>
+            </div>
+        </td>
 </div>
-{#<script>#}
-{#        $(document).ready(setInterval(function () { autoloadpage(); }, 5000) )#}
+
+<script>
+        $(document).ready(setInterval(function () { autoloadpage(); }, 3000) )
+
+
+        function autoloadpage() {
 {#        var poolname = {{ record.poolname }};#}
-{#        alert(poolname);#}
-{#        function autoloadpage() {#}
-{#            $.ajax({#}
-{#                url: "/pools",#}
-{#                type: "GET",#}
-{#                success: function() {#}
-{#                    $("div#collapse"+poolname).html();#}
-{#                }#}
-{#            });#}
-{#        }#}
-{#        </script>#}
+{#        alert(poolname)#}
+            $.ajax({
+                url: "/pools",
+                type: "GET",
+                success: function() {
+                    $("div#collapse"+poolname).html();
+                }
+            });
+        }
+</script>
