@@ -5,21 +5,23 @@ from strongMan.apps.server_connections.models import Connection, Child, Address,
     EapTlsAuthentication, IKEv2CertificateEAP, IKEv2EAP, IKEv2EapTls
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
+from itertools import chain
 
 
 class HeaderForm(forms.Form):
     connection_id = forms.IntegerField(required=False)
     profile = forms.CharField(max_length=50, initial="")
-    gateway = forms.CharField(max_length=50, initial="")
+    local_addrs = forms.CharField(max_length=50, initial="")
+    remote_addrs = forms.CharField(max_length=50, initial="", required=False)
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
     pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", required=False)
     send_cert_req = forms.BooleanField(required=False)
-    local_ts = forms.CharField(max_length=50, required=False)
-    remote_ts = forms.CharField(max_length=50, required=False)
+    local_ts = forms.CharField(max_length=50, initial="")
+    remote_ts = forms.CharField(max_length=50, initial="")
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
-        self.fields['pool'].queryset = Pool.objects.all()
+        self.fields['pool'].queryset = chain({'-------------'}, Pool.objects.all())
 
     def clean_profile(self):
         profile = self.cleaned_data['profile']
@@ -33,7 +35,8 @@ class HeaderForm(forms.Form):
 
     def fill(self, connection):
         self.initial['profile'] = connection.profile
-        self.initial['gateway'] = connection.server_remote_addresses.first().value
+        self.initial['local_addrs'] = connection.server_local_addresses.first().value
+        self.initial['remote_addrs'] = connection.server_remote_addresses.first().value
         self.initial['version'] = connection.version
         self.initial['pool'] = connection.pool
         self.initial['send_cert_req'] = connection.send_cert_req
@@ -44,11 +47,13 @@ class HeaderForm(forms.Form):
         child = Child(name=self.cleaned_data['profile'], connection=connection)
         child.save()
         self._set_proposals(connection, child)
-        self._set_addresses(connection, child, self.cleaned_data['gateway'], self.cleaned_data['local_ts'],
-                            self.cleaned_data['remote_ts'])
+        self._set_addresses(connection, child, self.cleaned_data['local_addrs'], self.cleaned_data['remote_addrs'],
+                            self.cleaned_data['local_ts'], self.cleaned_data['remote_ts'])
 
     def update_connection(self, connection):
         Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
+        Address.objects.filter(local_addresses=connection).update(value=self.cleaned_data['local_addrs'])
+        Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['remote_addrs'])
         Address.objects.filter(local_ts=connection.server_children.first()).update(value=self.cleaned_data['local_ts'])
         Address.objects.filter(remote_ts=connection.server_children.first()).update(value=self.cleaned_data['remote_ts'])
         connection.profile = self.cleaned_data['profile']
@@ -66,14 +71,14 @@ class HeaderForm(forms.Form):
     @staticmethod
     def _set_proposals(connection, child):
         #Proposal(type="aes128-sha256-modp2048", connection=connection).save()
-        Proposal(type="default", connection=connection).save()
+        Proposal(type="aes128-sha256-modp2048", connection=connection).save()
         Proposal(type="aes128gcm128-modp2048", child=child).save()
         #Proposal(type="default", child=child).save()
 
     @staticmethod
-    def _set_addresses(connection, child, gateway, local_ts, remote_ts):
-        Address(value=gateway, remote_addresses=connection).save()
-        Address(value='localhost', local_addresses=connection).save()
+    def _set_addresses(connection, child, local_addrs, remote_addrs, local_ts, remote_ts):
+        Address(value=local_addrs, local_addresses=connection).save()
+        Address(value=remote_addrs, remote_addresses=connection).save()
         Address(value='0.0.0.0', vips=connection).save()
         Address(value='::', vips=connection).save()
         Address(value=local_ts, local_ts=child).save()
@@ -171,21 +176,21 @@ class CaCertificateForm(forms.Form):
 class ServerIdentityForm(forms.Form):
     """
     Manages the server identity field.
-    Containes a checkbox to take the gateway field as identity and a field to fill a own identity.
+    Containes a checkbox to take the local address field as identity and a field to fill a own identity.
     Either the checkbox is checked or a own identity is field in the textbox.
     """
     identity_ca = forms.CharField(max_length=200, label="Server identity", required=False, initial="")
-    is_server_identity = forms.BooleanField(initial=True, required=False)
+    is_server_identity = forms.BooleanField(initial=False, required=False)
 
-    def clean_identity_ca(self):
-        if "is_server_identity" in self.data:
-            return ""
-        if not "identity_ca" in self.data:
-            raise forms.ValidationError("This field is required!", code='invalid')
-        ident = self.data["identity_ca"]
-        if ident == "":
-            raise forms.ValidationError("This field is required!", code='invalid')
-        return ident
+    # def clean_identity_ca(self):
+        # if "is_server_identity" in self.data:
+        #     return ""
+        # if not "identity_ca" in self.data:
+        #     raise forms.ValidationError("This field is required!", code='invalid')
+        # ident = self.data["identity_ca"]
+        # if ident == "":
+        #     raise forms.ValidationError("This field is required!", code='invalid')
+        # return ident
 
     @property
     def is_server_identity_checked(self):
@@ -198,9 +203,9 @@ class ServerIdentityForm(forms.Form):
     @property
     def ca_identity(self):
         if self.is_server_identity_checked:
-            if 'gateway' not in self.cleaned_data:
-                raise Exception("No gateway has been found in this form!")
-            return self.cleaned_data['gateway']
+            if 'local_addrs' not in self.cleaned_data:
+                raise Exception("No local address has been found in this form!")
+            return self.cleaned_data['local_addrs']
         else:
             return self.cleaned_data['identity_ca']
 
@@ -212,10 +217,11 @@ class ServerIdentityForm(forms.Form):
         for remote in connection.server_remote.all():
             sub = remote.subclass()
             if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
-                is_server_identity_checked = sub.ca_identity == connection.server_remote_addresses.first().value
-                self.is_server_identity_checked = is_server_identity_checked
-                if not is_server_identity_checked:
-                    self.ca_identity = sub.ca_identity
+                if connection.server_remote_addresses.first() is not None:
+                    is_server_identity_checked = sub.ca_identity == connection.server_remote_addresses.first().value
+                    self.is_server_identity_checked = is_server_identity_checked
+                    if not is_server_identity_checked:
+                        self.ca_identity = sub.ca_identity
 
     def create_connection(self, connection):
         for remote in connection.server_remote.all():
@@ -239,7 +245,7 @@ class UserCertificateForm(forms.Form):
     """
     Form to choose the Usercertifite. Only shows the certs which contains a private key
     """
-    certificate = CertificateChoice(queryset=UserCertificate.objects.none(), label="User certificate",
+    certificate = CertificateChoice(queryset=UserCertificate.objects.none(), label="Server certificate",
                                     required=True)
     identity = IdentityChoice(choices=(), required=True)
 

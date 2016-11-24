@@ -17,15 +17,15 @@ from .authentication import Authentication, AutoCaAuthentication
 
 class Connection(models.Model):
     VERSION_CHOICES = (
-        ('0', "IKEv1"),
-        ('1', "IKEv2"),
-        ('2', "Any IKE version"),
+        ('0', "Any IKE version"),
+        ('1', "IKEv1"),
+        ('2', "IKEv2"),
     )
 
     profile = models.TextField(unique=True)
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='2')
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
-    send_cert_req = models.BooleanField(default=False)
+    send_cert_req = models.NullBooleanField(null=True, blank=True, default=None)
     enabled = models.BooleanField(default=False)
 
     def dict(self):
@@ -34,6 +34,8 @@ class Connection(models.Model):
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
+        ike_sa['pools'] = [self.pool.poolname]
+        ike_sa['local_addrs'] = [local_address.value for local_address in self.server_local_addresses.all()]
         ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.server_remote_addresses.all()]
         ike_sa['vips'] = [vip.value for vip in self.server_vips.all()]
         ike_sa['version'] = self.version

@@ -61,14 +61,26 @@
         </div>
 
         <div class="row">
-            <label class="control-label col-sm-3 col-xs-12">Remote Address</label>
+            <label class="control-label col-sm-3 col-xs-12">Server Address</label>
             <div class="controls col-sm-8 col-xs-10">
-                <input type="text" class="form-control" name="gateway" value="{{ form.gateway.value }}"
-                       placeholder="Remote Hostname or IP" id="gateway"/>
-                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.gateway %}
+                <input type="text" class="form-control" name="local_addrs" value="{{ form.local_addrs.value }}"
+                       placeholder="Server Hostname or IP" id="local_addrs"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_addrs %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote Address help" content="The opposite endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Server address help" content="The local server endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Remote Address</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="remote_addrs" value="{{ form.remote_addrs.value }}"
+                       placeholder="Remote Hostname or IP" id="remote_addrs"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_addrs %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote address help" content="The remote endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
             </div>
         </div>
 
@@ -78,13 +90,13 @@
                 <select class="selectpicker" data-live-search="true"
                         name="{{ form.pool.name }}"
                         id="id_{{ form.pool.name }}" data-show-subtext="True">
-                    {% if form.pool.value == None or form.pool.value == '-1' %}
-                        <option value="-1" selected="selected">Nothing selected</option>
-                    {% endif %}
-                    {% for choise in form.pool.field.queryset %}
-                        <option value="{{ choise.id }}"
-                                {% if form.pool.value|slugify == choise.id|slugify %}
-                                selected="selected"{% endif %}>{{ choise }}</option>
+                    {#% if form.pool.value == None or form.pool.value == '-1' %#}
+                        <!--<option value="-1" selected="selected">Nothing selected</option>-->
+                    {#% endif %#}
+                    {% for choice in form.pool.field.queryset %}
+                        <option value="{{ choice.id }}"
+                                {% if form.pool.value|slugify == choice.id|slugify %}
+                                selected="selected"{% endif %}>{{ choice }}</option>
                     {% endfor %}
                 </select>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.pool %}
@@ -114,11 +126,11 @@
         {% block form_content %}{% endblock form_content %}
 
         <div class="row">
-            <p class="col-xs-12">Child settings</p>
-            <label class="control-label col-sm-3 col-xs-12">local ts</label>
+            <p class="col-xs-12">Traffic selectors</p>
+            <label class="control-label col-sm-3 col-xs-12">Local trafic selector</label>
             <div class="controls col-sm-8 col-xs-10">
-                <input type="text" class="form-control" name="local_ts" value=""
-                       placeholder="local_ts"/>
+                <input type="text" class="form-control" name="local_ts" value="{{ form.local_ts.value }}"
+                       placeholder="Local traffic selector" id="local_ts"/>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_ts %}
             </div>
             <div class="col-sm-1 col-xs-2">
@@ -127,10 +139,10 @@
         </div>
 
         <div class="row">
-            <label class="control-label col-sm-3 col-xs-12">remote ts</label>
+            <label class="control-label col-sm-3 col-xs-12">Remote trafic selector</label>
             <div class="controls col-sm-8 col-xs-10">
-                <input type="text" class="form-control" name="remote_ts" value=""
-                       placeholder="remote_ts"/>
+                <input type="text" class="form-control" name="remote_ts" value="{{ form.remote_ts.value }}"
+                       placeholder="Remote traffic selector" id="remote_ts"/>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_ts %}
             </div>
             <div class="col-sm-1 col-xs-2">

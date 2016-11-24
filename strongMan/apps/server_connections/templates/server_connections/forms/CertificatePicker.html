@@ -41,7 +41,6 @@
                             {% endif %}>{{ identity_choice }}
                     </option>
                 {% endfor %}
-
             </select>
             {% include "server_connections/forms/../widgets/errormsg.html" with field=identity %}
         </div>
@@ -68,6 +67,7 @@
             </div>
         </div>
     </div>
+
     <script>
         var picker = new CertificatePicker("certificateident_picker_{{ certificate.name }}", "{% url "server_connections:certificatepicker" %}", "{{ csrf_token }}");
     </script>
