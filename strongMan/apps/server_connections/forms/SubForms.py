@@ -5,7 +5,6 @@ from strongMan.apps.server_connections.models import Connection, Child, Address,
     EapTlsAuthentication, IKEv2CertificateEAP, IKEv2EAP, IKEv2EapTls
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
-from itertools import chain
 
 
 class HeaderForm(forms.Form):
@@ -91,23 +90,24 @@ class CaCertificateForm(forms.Form):
     Contains a checkbox for 'auto choosing' the ca certificate and a select field for selecting the certificate manually.
     Either the checkbox is checked or the certificate is selected.
     """
-    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate", required=False)
+    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA/Peer certificate",
+                                       empty_label="Nothing selected", required=False)
     certificate_ca_auto = forms.BooleanField(initial=True, required=False)
 
     def __init__(self, *args, **kwargs):
         super(CaCertificateForm, self).__init__(*args, **kwargs)
         self.fields['certificate_ca'].queryset = UserCertificate.objects.all()
 
-    def clean_certificate_ca(self):
-        if "certificate_ca_auto" in self.data:
-            return ""
-        if not "certificate_ca" in self.data:
-            raise forms.ValidationError("This field is required!")
-        identity_ca = self.data["certificate_ca"]
-        if identity_ca == "":
-            raise forms.ValidationError("This field is required!")
-        else:
-            return identity_ca
+    # def clean_certificate_ca(self):
+    #     if "certificate_ca_auto" in self.data:
+    #         return ""
+    #     if "certificate_ca" not in self.data:
+    #         raise forms.ValidationError("This field is required!")
+    #     identity_ca = self.data["certificate_ca"]
+    #     if identity_ca == "":
+    #         raise forms.ValidationError("This field is required!")
+    #     else:
+    #         return identity_ca
 
     @property
     def is_auto_choose(self):
@@ -120,7 +120,7 @@ class CaCertificateForm(forms.Form):
     @property
     def chosen_certificate(self):
         pk = self.cleaned_data["certificate_ca"]
-        if pk == '':
+        if pk is None or pk is '':
             return None
         return UserCertificate.objects.get(pk=pk)
 
@@ -140,7 +140,8 @@ class CaCertificateForm(forms.Form):
                 self.is_auto_choose = True
                 break
             if isinstance(sub, CaCertificateAuthentication):
-                self.chosen_certificate = sub.ca_cert.pk
+                if sub.ca_cert is not None:
+                    self.chosen_certificate = sub.ca_cert.pk
                 self.is_auto_choose = False
                 break
 
@@ -152,8 +153,11 @@ class CaCertificateForm(forms.Form):
         if self.is_auto_choose:
             AutoCaAuthentication(name='remote-cert', auth=auth, remote=connection).save()
         else:
-            CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
-                                        ca_cert=self.chosen_certificate).save()
+            if self.chosen_certificate is None:
+                CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection).save()
+            else:
+                CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
+                                            ca_cert=self.chosen_certificate).save()
 
     def update_connection(self, connection):
         for remote in connection.server_remote.all():
@@ -179,7 +183,7 @@ class ServerIdentityForm(forms.Form):
     Containes a checkbox to take the local address field as identity and a field to fill a own identity.
     Either the checkbox is checked or a own identity is field in the textbox.
     """
-    identity_ca = forms.CharField(max_length=200, label="Server identity", required=False, initial="")
+    identity_ca = forms.CharField(max_length=200, label="Peer identity", required=False, initial="")
     is_server_identity = forms.BooleanField(initial=False, required=False)
 
     # def clean_identity_ca(self):
@@ -203,9 +207,9 @@ class ServerIdentityForm(forms.Form):
     @property
     def ca_identity(self):
         if self.is_server_identity_checked:
-            if 'local_addrs' not in self.cleaned_data:
-                raise Exception("No local address has been found in this form!")
-            return self.cleaned_data['local_addrs']
+            if 'remote_addrs' not in self.cleaned_data:
+                raise Exception("No remote address has been found in this form!")
+            return self.cleaned_data['remote_addrs']
         else:
             return self.cleaned_data['identity_ca']
 
@@ -217,11 +221,10 @@ class ServerIdentityForm(forms.Form):
         for remote in connection.server_remote.all():
             sub = remote.subclass()
             if isinstance(sub, CaCertificateAuthentication) or isinstance(sub, AutoCaAuthentication):
-                if connection.server_remote_addresses.first() is not None:
-                    is_server_identity_checked = sub.ca_identity == connection.server_remote_addresses.first().value
-                    self.is_server_identity_checked = is_server_identity_checked
-                    if not is_server_identity_checked:
-                        self.ca_identity = sub.ca_identity
+                is_checked = sub.ca_identity == connection.server_remote_addresses.first().value
+                self.is_server_identity_checked = is_checked
+                if is_checked is False:
+                    self.ca_identity = sub.ca_identity
 
     def create_connection(self, connection):
         for remote in connection.server_remote.all():
