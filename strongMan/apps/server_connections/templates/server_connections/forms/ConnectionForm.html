@@ -90,9 +90,7 @@
                 <select class="selectpicker" data-live-search="true"
                         name="{{ form.pool.name }}"
                         id="id_{{ form.pool.name }}" data-show-subtext="True">
-                    {#% if form.pool.value == None or form.pool.value == '-1' %#}
-                        <!--<option value="-1" selected="selected">Nothing selected</option>-->
-                    {#% endif %#}
+                    <option value="">{{ form.fields.pool.empty_label }}</option>
                     {% for choice in form.pool.field.queryset %}
                         <option value="{{ choice.id }}"
                                 {% if form.pool.value|slugify == choice.id|slugify %}

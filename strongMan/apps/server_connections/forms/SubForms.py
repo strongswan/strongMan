@@ -14,14 +14,14 @@ class HeaderForm(forms.Form):
     local_addrs = forms.CharField(max_length=50, initial="")
     remote_addrs = forms.CharField(max_length=50, initial="", required=False)
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
-    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", required=False)
+    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected", required=False)
     send_cert_req = forms.BooleanField(required=False)
     local_ts = forms.CharField(max_length=50, initial="")
     remote_ts = forms.CharField(max_length=50, initial="")
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
-        self.fields['pool'].queryset = chain({'-------------'}, Pool.objects.all())
+        self.fields['pool'].queryset = Pool.objects.all()
 
     def clean_profile(self):
         profile = self.cleaned_data['profile']
