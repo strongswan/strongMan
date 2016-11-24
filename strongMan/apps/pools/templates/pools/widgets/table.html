@@ -31,23 +31,31 @@
                             {% for column, cell in row.items %}
                                 <td {{ column.attrs.td.as_html }}>
                                     {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}
-                                        {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
+                                        {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}
+                                </td>
                             {% endfor %}
                         </tr>
 
 {#                         <tr >#}
-{#                            <td colspan="4" class="hiddenRow">#}
-{#                                <div class="accordian-body collapse" id="collapse{{ pools.poolname }}">#}
-{#                                        <h4>Poolname: {{ pools.poolname }}</h4>#}
-{#                                        <b>Attribute:</b> {{ pools.attribute }}<br />#}
-{#                                        <b>Attributevalue(s):</b> {{ pools.attributevalues }}<br />#}
-{#                                        <b>Nof addresses in pool:</b> {{ pools.size }}<br />#}
-{#                                        <b>Virtual IP pool base addr:</b> {{ pools.base }}<br />#}
-{#                                        <b># of online:</b> {{ pools.online }}<br />#}
-{#                                        <b># of offline:</b> {{ pools.offline }}<br />#}
-{#                                        <b>Leases in pool:</b> {{ pools.leases }}<br />#}
-{#                                </div>#}
-{#                            </td>#}
+{#                            <div id="collapse{{ record.poolname }}" class="collapse indent">#}
+{#                                <h4>{{ record.poolname }}</h4>#}
+{#                                <b>Attribute:</b> {{ record.attribute }}<br />#}
+{#                                <b>Attributevalue(s):</b> {{ record.attributevalues }}<br />#}
+{#                                <b>Nof addresses in pool:</b> {{ size }}<br />#}
+{#                                <b>Virtual IP pool base addr:</b> {{ base }}<br />#}
+{#                                <b># of online:</b> {{ online }}<br />#}
+{#                                <b># of offline:</b> {{ offline }}<br />#}
+{#                                <b>Leases in pool:</b>#}
+{#                                    {% if leases %}#}
+{#                                        {%  for k, v in  leases.items %}#}
+{#                                        Address: {{ v.address }}<br />#}
+{#                                        Identity: {{ v.identity }}<br />#}
+{#                                        Status: {{ v.status }}<br />#}
+{#                                        {% endfor %}#}
+{#                                    {% else %}#}
+{#                                        No leases.#}
+{#                                    {% endif %}#}
+{#                            </div>#}
 {#                        </tr>#}
                     {% endblock table.tbody.row %}
 

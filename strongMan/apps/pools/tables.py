@@ -47,9 +47,9 @@ class PoolsTable(tables.Table):
                     offline = value
                 elif key == 'leases':
                     leases = value
-            # leases = {0: {'address': '1.2.1.1',
-            #               'identity': 'kdhjflkdhd@mail.com',
-            #               'status': 'online'}}
+            leases = {0: {'address': '1.2.1.2',
+                          'identity': 'kdhjflkdhd@mail.com',
+                          'status': 'online'}}
             return render_to_string('pools/widgets/detail_collapse_column.html', {'record': record,
                                                                                   'detail': pool_details,
                                                                                   'size': size, 'base': base,
