@@ -89,9 +89,7 @@
 
 #ConnectionForm a {
   cursor: pointer; }
-#ConnectionForm input, #ConnectionForm .identity_picker, #ConnectionForm .picker {
-  margin-bottom: 10px; }
-#ConnectionForm .cert_upload {
+#ConnectionForm input, #ConnectionForm .identity_picker, #ConnectionForm .picker, #ConnectionForm .cert_upload {
   margin-bottom: 10px; }
 
 /*# sourceMappingURL=connections.css.map */

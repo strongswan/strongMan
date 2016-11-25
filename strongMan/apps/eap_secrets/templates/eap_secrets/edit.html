@@ -12,6 +12,7 @@
             <div class="panel-body" id="upload-area">
                 <form method="post" action="{% url "eap_secrets:edit" form.username.value %}">
                     {% csrf_token %}
+
                     <div class="row">
                         <label class="control-label col-sm-3 col-xs-12">Username</label>
                         <div class="controls col-sm-8 col-xs-10">
@@ -22,6 +23,9 @@
                         <div class="col-sm-1 col-xs-2">
                             {% include "eap_secrets/widgets/QuestionPopover.html" with title="Username help" content="Enter the username that authenticates the user." %}
                         </div>
+                    </div>
+
+                    <div class="row">
                         <label class="control-label col-sm-3 col-xs-12">Password</label>
                         <div class="controls col-sm-8 col-xs-10">
                             <input type="password" class="form-control" name="password" value="{{ form.password.value }}"
@@ -32,6 +36,7 @@
                             {% include "eap_secrets/widgets/QuestionPopover.html" with title="Password help" content="Enter the corresponding password. Use a safe and strong password." %}
                         </div>
                     </div>
+
                     <div class="row form-row">
                         <div class="col-md-11 col-xs-12">
                             <button type="submit" class="btn btn-default pull-right add_button">

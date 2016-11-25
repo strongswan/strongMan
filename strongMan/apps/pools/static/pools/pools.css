@@ -21,6 +21,8 @@
 #pools-overview th:first-child, #pools-overview td:first-child {
   width: 5%; }
 
+#pools-add .row {
+  margin-bottom: 10px; }
 #pools-add .form-row {
   margin-bottom: 10px;
   margin-top: 5px; }
