@@ -16,7 +16,7 @@ class HeaderForm(forms.Form):
     pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected", required=False)
     send_cert_req = forms.BooleanField(required=False)
     local_ts = forms.CharField(max_length=50, initial="")
-    remote_ts = forms.CharField(max_length=50, initial="")
+    remote_ts = forms.CharField(max_length=50, initial="", required=False)
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
@@ -147,7 +147,7 @@ class CaCertificateForm(forms.Form):
 
     def create_connection(self, connection):
         if isinstance(connection, IKEv2EapTls):
-            auth = self.cleaned_data['remote_auth']
+            auth = self.cleaned_data['local_auth']
         else:
             auth = 'pubkey'
         if self.is_auto_choose:
@@ -356,31 +356,31 @@ class UserCertificateForm(forms.Form):
 
 
 class EapTlsForm(UserCertificateForm):
-    remote_auth = forms.ChoiceField(widget=forms.Select(), choices=EapTlsAuthentication.AUTH_CHOICES)
+    local_auth = forms.ChoiceField(widget=forms.Select(), choices=EapTlsAuthentication.AUTH_CHOICES)
 
     def fill(self, connection):
-        remote_auth = None
-        for remote in connection.server_remote.all():
-            subclass = remote.subclass()
+        local_auth = None
+        for local in connection.server_local.all():
+            subclass = local.subclass()
             if isinstance(subclass, EapTlsAuthentication):
-                remote_auth = subclass
+                local_auth = subclass
                 break
-        if remote_auth is None:
+        if local_auth is None:
             assert False
-        self.my_certificate = remote_auth.identity.certificate.pk
-        self.my_identity = remote_auth.identity.pk
-        self.initial['remote_auth'] = remote_auth.auth
+        self.my_certificate = local_auth.identity.certificate.pk
+        self.my_identity = local_auth.identity.pk
+        self.initial['local_auth'] = local_auth.auth
 
     def create_connection(self, connection):
-        EapTlsAuthentication(name='remote-eap-tls', auth=self.cleaned_data['remote_auth'], remote=connection,
+        EapTlsAuthentication(name='local-eap-tls', auth=self.cleaned_data['local_auth'], local=connection,
                              identity=self.my_identity).save()
 
     def update_connection(self, connection):
-        for remote in connection.server_remote.all():
-            sub = remote.subclass()
+        for local in connection.server_local.all():
+            sub = local.subclass()
             if isinstance(sub, EapTlsAuthentication):
                 sub.identity = self.my_identity
-                sub.auth = self.cleaned_data['remote_auth']
+                sub.auth = self.cleaned_data['local_auth']
                 sub.save()
 
 

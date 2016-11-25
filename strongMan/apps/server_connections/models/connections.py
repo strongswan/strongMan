@@ -36,8 +36,10 @@ class Connection(models.Model):
         ike_sa = OrderedDict()
         ike_sa['pools'] = [self.pool.poolname]
         ike_sa['local_addrs'] = [local_address.value for local_address in self.server_local_addresses.all()]
-        ike_sa['remote_addrs'] = [remote_address.value for remote_address in self.server_remote_addresses.all()]
-        ike_sa['vips'] = [vip.value for vip in self.server_vips.all()]
+        remote_address = [remote_address.value for remote_address in self.server_remote_addresses.all()]
+        if remote_address[0] is not '':
+            ike_sa['remote_addrs'] = remote_address
+        #ike_sa['vips'] = [vip.value for vip in self.server_vips.all()]
         ike_sa['version'] = self.version
         ike_sa['proposals'] = [proposal.type for proposal in self.server_proposals.all()]
         ike_sa['children'] = children
