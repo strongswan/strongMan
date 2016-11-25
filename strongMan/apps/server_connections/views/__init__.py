@@ -11,6 +11,7 @@ from .LogHandler import LogHandler
 from .SaInfoHandler import SaInfoHandler
 from .CertificatePickerHandler import CertificatePickerHandler
 from .CaPickerHandler import CaPickerHandler
+from .PoolPickerHandler import PoolPickerHandler
 
 
 @require_http_methods('GET')
@@ -64,6 +65,13 @@ def get_log(request):
 @require_http_methods('POST')
 def get_sa_info(request):
     handler = SaInfoHandler(request)
+    return handler.handle()
+
+
+@login_required
+@require_http_methods(['POST'])
+def get_poolpicker(request):
+    handler = PoolPickerHandler(request)
     return handler.handle()
 
 

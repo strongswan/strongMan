@@ -24,6 +24,10 @@ class Pool(models.Model):
         pool = cls(poolname=poolname, addresses=addresses, attribute=attribute, attributevalues=attributevalues)
         return pool
 
+    def dict(self):
+        vici_pool = {'name': self.poolname, 'items': {'addrs': self.addresses, self.attribute: [self.attributevalues]}}
+        return vici_pool
+
     def __str__(self):
         return str(self.poolname)
 

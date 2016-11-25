@@ -17,6 +17,16 @@ def add(request):
         return render(request, 'pools/add.html', {"form": AddOrEditForm()})
 
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def add_form(request):
+    if request.method == 'POST':
+        handler = AddHandler.by_request(request, True)
+        return handler.handle()
+    elif request.method == 'GET':
+        return render(request, 'pools/add_form.html', {"form": AddOrEditForm()})
+
+
 @require_http_methods('GET')
 @login_required
 def overview(request):

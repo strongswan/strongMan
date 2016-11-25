@@ -10,7 +10,7 @@ CertificatePicker = function (certificateIdentPickerId, certificatePickerUrl, cs
             var element = $(selector);
         }
         if (!element.length) {
-            throw select + " not found!"
+            throw selector + " not found!"
         }
         return element;
     };
@@ -210,3 +210,33 @@ CaAuto = function (caPickerId) {
     addEventHandler();
 };
 
+
+PoolPicker = function (poolPickerId, poolPickerUrl, csrf_token) {
+    var addPoolModal = $("#" + poolPickerId).find(".modal");
+    var poolSelect = $("#" + poolPickerId).find(".selectpicker");
+    var addEventHandler = function () {
+        //Event for disappear modal.
+        addPoolModal.on('hidden.bs.modal', refreshMe);
+    };
+    var refreshMe = function () {
+        $.ajax({
+                type: 'POST',
+                url: poolPickerUrl,
+                data: {
+                    csrfmiddlewaretoken: csrf_token
+                },
+                success: function (data) {
+                    //Replace bootstrap selects with new rendered selects
+                    var newPoolSelect = $('<div />').html(data).find('.selectpicker').html();
+                    poolSelect.html(newPoolSelect);
+                    $('.selectpicker').selectpicker('refresh');
+                },
+                error: function (data) {
+                    throw data;
+                }
+
+            }
+        );
+    };
+    addEventHandler();
+};

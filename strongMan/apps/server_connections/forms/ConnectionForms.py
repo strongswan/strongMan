@@ -2,7 +2,7 @@ import sys
 
 from django import forms
 from strongMan.apps.server_connections.forms.SubForms import HeaderForm, CaCertificateForm, \
-    ServerIdentityForm, UserCertificateForm, EapForm, EapCertificateForm, EapTlsForm
+    ServerIdentityForm, UserCertificateForm, EapForm, EapCertificateForm, EapTlsForm, PoolForm
 from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
     IKEv2EapTls
 
@@ -114,7 +114,7 @@ class AbstractConnectionForm(AbstractDynamicForm):
 
 
 class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
-                          ServerIdentityForm):
+                          ServerIdentityForm, PoolForm):
     @property
     def model(self):
         return IKEv2Certificate
@@ -127,7 +127,7 @@ class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateFor
         self.update_certificates()
 
 
-class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapForm):
+class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapForm, PoolForm):
     @property
     def model(self):
         return IKEv2EAP
@@ -138,7 +138,7 @@ class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerI
 
 
 class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
-                             ServerIdentityForm, EapCertificateForm):
+                             ServerIdentityForm, EapCertificateForm, PoolForm):
     @property
     def model(self):
         return IKEv2CertificateEAP
@@ -151,7 +151,7 @@ class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificate
         self.update_certificates()
 
 
-class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapTlsForm):
+class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapTlsForm, PoolForm):
     @property
     def model(self):
         return IKEv2EapTls

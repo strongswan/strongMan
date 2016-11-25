@@ -13,14 +13,12 @@ class HeaderForm(forms.Form):
     local_addrs = forms.CharField(max_length=50, initial="")
     remote_addrs = forms.CharField(max_length=50, initial="", required=False)
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
-    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected", required=False)
     send_cert_req = forms.BooleanField(required=False)
     local_ts = forms.CharField(max_length=50, initial="")
     remote_ts = forms.CharField(max_length=50, initial="", required=False)
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
-        self.fields['pool'].queryset = Pool.objects.all()
 
     def clean_profile(self):
         profile = self.cleaned_data['profile']
@@ -37,7 +35,6 @@ class HeaderForm(forms.Form):
         self.initial['local_addrs'] = connection.server_local_addresses.first().value
         self.initial['remote_addrs'] = connection.server_remote_addresses.first().value
         self.initial['version'] = connection.version
-        self.initial['pool'] = connection.pool
         self.initial['send_cert_req'] = connection.send_cert_req
         self.initial['local_ts'] = connection.server_children.first().server_local_ts.first().value
         self.initial['remote_ts'] = connection.server_children.first().server_remote_ts.first().value
@@ -57,7 +54,6 @@ class HeaderForm(forms.Form):
         Address.objects.filter(remote_ts=connection.server_children.first()).update(value=self.cleaned_data['remote_ts'])
         connection.profile = self.cleaned_data['profile']
         connection.version = self.cleaned_data['version']
-        connection.pool = self.cleaned_data['pool']
         connection.send_cert_req = self.cleaned_data['send_cert_req']
         connection.save()
 
@@ -82,6 +78,20 @@ class HeaderForm(forms.Form):
         Address(value='::', vips=connection).save()
         Address(value=local_ts, local_ts=child).save()
         Address(value=remote_ts, remote_ts=child).save()
+
+
+class PoolForm(forms.Form):
+    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(PoolForm, self).__init__(*args, **kwargs)
+        self.fields['pool'].queryset = Pool.objects.all()
+
+    def fill(self, connection):
+        self.initial['pool'] = connection.pool
+
+    def update_connection(self, connection):
+        connection.pool = self.cleaned_data['pool']
 
 
 class CaCertificateForm(forms.Form):

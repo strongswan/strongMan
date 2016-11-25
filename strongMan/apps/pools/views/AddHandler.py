@@ -21,32 +21,38 @@ class AddHandler:
         handler.request = request
         return handler
 
+    def _render(self, form):
+        if self.is_add_form:
+            return render(self.request, 'pools/add_form.html', {"form": form})
+        else:
+            return render(self.request, 'pools/add.html', {"form": form})
+
     def handle(self):
         self.form = AddOrEditForm(self.request.POST)
         if not self.form.is_valid():
             messages.add_message(self.request, messages.ERROR,
                                  'Form was not valid')
-            return render(self.request, 'pools/add.html', {"form": self.form})
+            return self._render(self.form)
 
         if self.form.my_poolname.lower() == 'dhcp' or self.form.my_poolname.lower() == 'radius':
             messages.add_message(self.request, messages.ERROR,
                                  'Poolname "' + self.form.my_poolname + '" not allowed in pool creation. '
                                  'To use this name, please reference it directly from the connection wizard.')
-            return render(self.request, 'pools/add.html', {"form": self.form})
+            return self._render(self.form)
 
         else:
             if self.form.my_attribute == 'None':
                 if self.form.my_attributevalues != "":
                     messages.add_message(self.request, messages.ERROR,
                                          'Can\'t add pool: Attribute values unclear for Attribute "None"')
-                    return render(self.request, 'pools/add.html', {"form": self.form})
+                    return self._render(self.form)
                 pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
                 vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
             else:
                 if self.form.my_attributevalues == "":
                     messages.add_message(self.request, messages.ERROR,
                                          'Can\'t add pool: Attribute values mandatory if attribute is set.')
-                    return render(self.request, 'pools/add.html', {"form": self.form})
+                    return self._render(self.form)
                 attr = self.form.my_attribute
                 pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
                             attribute=attr,
@@ -62,12 +68,15 @@ class AddHandler:
         except ViciException as e:
             messages.add_message(self.request, messages.ERROR, str(e))
             pool.delete()
-            return render(self.request, 'pools/add.html', {"form": self.form})
+            return self._render(self.form)
         except IntegrityError:
             messages.add_message(self.request, messages.ERROR,
                                  'Poolname already in use.')
-            return render(self.request, 'pools/add.html', {"form": self.form})
+            return self._render(self.form)
 
         messages.add_message(self.request, messages.SUCCESS, 'Successfully added pool')
-        return redirect(reverse("pools:index"))
+        if self.is_add_form:
+            return render(self.request, 'pools/add_form.html', {"form": AddOrEditForm()})
+        else:
+            return redirect(reverse("pools:index"))
 
