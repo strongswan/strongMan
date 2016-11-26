@@ -1,19 +1,9 @@
 {% extends "server_connections/forms/ConnectionForm.html" %}
 {% load connections_extras %}
 {% block form_content %}
-    <div class="row">
-        <p class="col-xs-12">Local settings</p>
-        <div class="col-xs-12">
-            <p>Choose the certification authority (CA) certificate which authenticates the server.</p>
-        </div>
-    </div>
-    {% include "server_connections/forms/CaPicker.html" with form=form %}
-
-    <hr>
-
     <div class="row picker">
         <p class="col-xs-12">Remote settings</p>
-        <label class="control-label col-sm-3 col-xs-12">Remote Auth</label>
+        <label class="control-label col-sm-3 col-xs-12">Remote authentication</label>
         <div class="controls col-sm-8 col-xs-10">
             <select class="selectpicker" name="remote_auth">
                 {% if form.remote_auth.value == None or form.remote_auth.value == '-1' %}
@@ -31,18 +21,6 @@
         </div>
         <div class="col-sm-1 col-xs-2">
             {% include "server_connections/widgets/QuestionPopover.html" with title="Remote Authentication help" content="Select a remote authentication." %}
-        </div>
-    </div>
-
-    <div class="row">
-        <label class="control-label col-sm-3 col-xs-12">Remote CA Certs</label>
-        <div class="controls col-sm-8 col-xs-10">
-            <input type="text" class="form-control" name="remotecacerts" value=""
-                   placeholder="remote cacerts"/>
-            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remotecacerts %}
-        </div>
-        <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
         </div>
     </div>
 
