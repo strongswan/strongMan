@@ -25,8 +25,13 @@ class Pool(models.Model):
         return pool
 
     def dict(self):
-        vici_pool = {'name': self.poolname, 'items': {'addrs': self.addresses, self.attribute: [self.attributevalues]}}
-        return vici_pool
+        if self.poolname == 'radius' or self.poolname == 'dhcp':
+            pools = None
+        elif self.attribute is None:
+            pools = {self.poolname: {'addrs': self.addresses}}
+        else:
+            pools = {self.poolname: {'addrs': self.addresses, self.attribute: [self.attributevalues]}}
+        return pools
 
     def __str__(self):
         return str(self.poolname)

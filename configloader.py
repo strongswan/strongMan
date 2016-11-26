@@ -7,7 +7,7 @@ from collections import OrderedDict
 from strongMan.apps.server_connections.models import Connection
 from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
 from strongMan.apps.eap_secrets.models import Secret
-# from strongMan.apps.pools.models.pools import Pool
+from strongMan.apps.pools.models.pools import Pool
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
@@ -32,9 +32,9 @@ def load_connections():
             connection.start()
 
 
-# def load_pools(vici=ViciWrapper()):
-#   for pool in Pools:
-#       vici.load_pools(pool.dict())
+def load_pools(vici=ViciWrapper()):
+    for pool in Pool.objects.all():
+        vici.load_pool(pool.dict())
 
 
 def load_credentials(vici=ViciWrapper()):
@@ -46,7 +46,7 @@ def load_credentials(vici=ViciWrapper()):
 def main():
     vici = ViciWrapper()
     load_secrets(vici)
-    # load_pools(vici)
+    load_pools(vici)
     load_connections()
 
 
