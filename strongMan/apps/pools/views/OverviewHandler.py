@@ -34,38 +34,36 @@ class OverviewHandler:
 
         queryset = Pool.objects.exclude(poolname__contains='dhcp')
         q2 = queryset.exclude(poolname__contains='radius')
-        table = tables.PoolsTable(q2, request=self.request)
-
-        # pools = ViciWrapper().get_pools()
+        pools = ViciWrapper().get_pools()
+        table = tables.PoolsTable(q2, request=self.request, pools=pools)
 
         RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
         if len(queryset) == 0:
             table = None
         return render(self.request, 'pools/overview.html', {'table': table})
-        # return render(self.request, 'pools/overview.html', {'table': table, 'pools': pools})
 
-    def handle_collapse(self, record):
-        pools = ViciWrapper().get_pools()
-        pool_details = {k: v for k, v in pools.items() if str(k) == str(record)}
-        size = 0
-        base = None
-        online = 0
-        offline = 0
-        leases = None
-
-        for key, value in pool_details[str(record)].items():
-            if key == 'size':
-                size = value
-            elif key == 'base':
-                base = value
-            elif key == 'online':
-                online = value
-            elif key == 'offline':
-                offline = value
-            elif key == 'leases':
-                leases = value
-        return render_to_string('pools/overview.html', {'record': record, 'detail': pool_details,
-                                                        'size': size, 'base': base,
-                                                        'online': online, 'offline': offline,
-                                                        'leases': leases},
-                                request=self.request)
+    # def handle_collapse(self, record):
+    #     pools = ViciWrapper().get_pools()
+    #     pool_details = {k: v for k, v in pools.items() if str(k) == str(record)}
+    #     size = 0
+    #     base = None
+    #     online = 0
+    #     offline = 0
+    #     leases = None
+    #
+    #     for key, value in pool_details[str(record)].items():
+    #         if key == 'size':
+    #             size = value
+    #         elif key == 'base':
+    #             base = value
+    #         elif key == 'online':
+    #             online = value
+    #         elif key == 'offline':
+    #             offline = value
+    #         elif key == 'leases':
+    #             leases = value
+    #     return render_to_string('pools/overview.html', {'record': record, 'detail': pool_details,
+    #                                                     'size': size, 'base': base,
+    #                                                     'online': online, 'offline': offline,
+    #                                                     'leases': leases},
+    #                             request=self.request)
