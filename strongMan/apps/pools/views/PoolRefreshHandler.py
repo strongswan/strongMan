@@ -7,7 +7,7 @@ from .. import tables
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class OverviewHandler:
+class PoolRefreshHandler:
     def __init__(self, request):
         self.request = request
         self.ENTRIES_PER_PAGE = 50
@@ -33,11 +33,9 @@ class OverviewHandler:
 
         queryset = Pool.objects.exclude(poolname__contains='dhcp')
         q2 = queryset.exclude(poolname__contains='radius')
-        pools = ViciWrapper().get_pools()
-        table = tables.PoolsTable(q2, request=self.request, pools=pools)
+        pooldetails = ViciWrapper().get_pools()
+        table = tables.PoolDetailsTable(q2, request=self.request, pooldetails=pooldetails)
 
         RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
-        if len(queryset) == 0:
-            table = None
-        return render(self.request, 'pools/overview.html', {'table': table})
+        return render(self.request, 'pools/widgets/table.html', {'table': table})
 

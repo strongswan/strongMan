@@ -32,57 +32,17 @@
                                 </td>
                             {% endfor %}
                         </tr>
-                        <tr id="collapse{{ row.record.poolname }}" class="collapse" >
-                            <td colspan="4" >
+
+                        <tr id="collapse{{ row.record.poolname }}" class="collapse refreshpools" >
+                            <td colspan="4">
                                 {% for key, value in table.pools.items %}
                                     {% if row.record.poolname == key %}
-                                        <table>
-                                            <tr><td><b>Attribute:</b></td> <td> {{ row.record.attribute }}<br /></td></tr>
-                                            <tr><td><b>Attributevalue(s):</b> </td> <td> {{ row.record.attributevalues }}<br /></td></tr>
-                                            <tr><td><b>Nof addresses in pool:</b> </td> <td> {{ value.size }}<br /></td></tr>
-                                            <tr><td><b>Virtual IP pool base addr:</b> </td> <td> {{ value.base }}<br /></td></tr>
-                                            <tr><td><b># of online:</b> </td> <td> {{ value.online }}<br /></td></tr>
-                                            <tr><td><b># of offline:</b> </td> <td> {{ value.offline }}<br /></td></tr>
-                                            <tr><td><b>Leases in pool:</b> </td> <td>
-                                                {% if value.leases %}
-                                                    {%  for k, v in  value.leases.items %}
-                                                        <tr><td>Address: </td> <td>{{ v.address }}<br /></td></tr>
-                                                        <tr><td>Identity: </td> <td>{{ v.identity }}<br /></td></tr>
-                                                        <tr><td>Status: </td> <td>{{ v.status }}<br /></td></tr>
-                                                    {% endfor %}
-                                                {% else %}
-                                                    No leases.
-                                                {% endif %}
-                                            </td></tr>
-                                        </table>
+                                        {% include "pools/widgets/detailPoolTable.html" with table=table record=row.record %}
                                     {% endif %}
-
                                 {% endfor %}
-
                             </td>
                         </tr>
-{#                        </div>#}
-{#                         <tr >#}
-{#                            <div id="collapse{{ record.poolname }}" class="collapse indent">#}
-{#                                <h4>{{ record.poolname }}</h4>#}
-{#                                <b>Attribute:</b> {{ record.attribute }}<br />#}
-{#                                <b>Attributevalue(s):</b> {{ record.attributevalues }}<br />#}
-{#                                <b>Nof addresses in pool:</b> {{ size }}<br />#}
-{#                                <b>Virtual IP pool base addr:</b> {{ base }}<br />#}
-{#                                <b># of online:</b> {{ online }}<br />#}
-{#                                <b># of offline:</b> {{ offline }}<br />#}
-{#                                <b>Leases in pool:</b>#}
-{#                                    {% if leases %}#}
-{#                                        {%  for k, v in  leases.items %}#}
-{#                                        Address: {{ v.address }}<br />#}
-{#                                        Identity: {{ v.identity }}<br />#}
-{#                                        Status: {{ v.status }}<br />#}
-{#                                        {% endfor %}#}
-{#                                    {% else %}#}
-{#                                        No leases.#}
-{#                                    {% endif %}#}
-{#                            </div>#}
-{#                        </tr>#}
+
                     {% endblock table.tbody.row %}
 
 
@@ -150,3 +110,26 @@
         {% endwith %}
     {% endif %}
 </div>
+<script>
+    var intervalID = setInterval(function() {
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url "pools:refreshdetails" %}",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (data) {
+                //Replace bootstrap selects with new rendered selects
+                $('.refreshpools').each(function () {
+                    var PoolDetails = $('<div />').html(data).find($(this).children('table').attr("id")).html();
+                    $(this).children('table').html(PoolDetails);
+
+                })
+            },
+            error: function (data) {
+                alert(data);
+            }
+        });
+    }, 5000);
+</script>

@@ -1,0 +1,25 @@
+
+{{ table.pools.items}}
+{% for key, val in table.pools.items %}
+    {% if record.poolname == key %}
+        <table id="{{ record.poolname }}">
+            <tr><td><b>Attribute:</b></td> <td> {{ record.attribute }}<br /></td></tr>
+            <tr><td><b>Attributevalue(s):</b> </td> <td> {{ record.attributevalues }}<br /></td></tr>
+            <tr><td><b>Nof addresses in pool:</b> </td> <td> {{ val.size }}<br /></td></tr>
+            <tr><td><b>Virtual IP pool base address:</b> </td> <td> {{ val.base }}<br /></td></tr>
+            <tr><td><b># of online:</b> </td> <td> {{ val.online }}<br /></td></tr>
+            <tr><td><b># of offline:</b> </td> <td> {{ val.offline }}<br /></td></tr>
+            <tr><td><b>Leases in {{ record.poolname }}:</b> </td> <td>
+                {% if val.leases %}
+                    {%  for k, v in  val.leases.items %}
+                        <tr><td>Address: </td> <td>{{ v.address }}<br /></td></tr>
+                        <tr><td>Identity: </td> <td>{{ v.identity }}<br /></td></tr>
+                        <tr><td>Status: </td> <td>{{ v.status }}<br /></td></tr>
+                    {% endfor %}
+                {% else %}
+                    No leases.
+                {% endif %}
+            </td></tr>
+        </table>
+    {% endif %}
+{% endfor %}

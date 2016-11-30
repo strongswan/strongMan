@@ -5,6 +5,7 @@ from ..forms import AddOrEditForm
 from .AddHandler import AddHandler
 from django.shortcuts import render
 from .EditHandler import EditHandler
+from .PoolRefreshHandler import PoolRefreshHandler
 
 
 @login_required
@@ -38,6 +39,13 @@ def overview(request):
 @require_http_methods(["GET", "POST"])
 def edit(request, poolname):
     handler = EditHandler(request, poolname)
+    return handler.handle()
+
+
+@login_required
+@require_http_methods(["POST"])
+def refreshdetails(request):
+    handler = PoolRefreshHandler(request)
     return handler.handle()
 
 

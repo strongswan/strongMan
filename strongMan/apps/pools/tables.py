@@ -28,3 +28,9 @@ class PoolsTable(tables.Table):
     class Meta:
         attrs = {"class": "table"}
 
+
+class PoolDetailsTable(tables.Table):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        self.pools = kwargs.pop("pooldetails")
+        super(PoolDetailsTable, self).__init__(*args, **kwargs)
