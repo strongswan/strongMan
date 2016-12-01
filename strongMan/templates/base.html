@@ -22,6 +22,8 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="{% static 'css/font-awesome-4.6.1/css/font-awesome.min.css' %}">
 
+    <!-- Mode Switch -->
+    <script src="{% static 'js/modeswitch.js' %}"></script>
     <!-- JQuerry -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <!-- Bootstrap core JavaScript -->
@@ -48,17 +50,17 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="{% url "connections:index" %}">Connections</a></li>
-                        <li><a href="{% url "certificates:overview" %}">Certificates</a></li>
-                        <li><a href="{% url "server_connections:index" %}">Server Connections</a></li>
-                        <li><a href="{% url "eap_secrets:overview" %}">EAP Secrets</a></li>
-                        <li><a href="{% url "pools:index" %}">Pools</a></li>
+                        <li class="client-mode" ><a href="{% url "connections:index" %}">Connections</a></li>
+                        <li class="" ><a href="{% url "certificates:overview" %}">Certificates</a></li>
+                        <li class="server-mode" ><a href="{% url "server_connections:index" %}">Server Connections</a></li>
+                        <li class="server-mode" ><a href="{% url "eap_secrets:overview" %}">EAP Secrets</a></li>
+                        <li class="server-mode" ><a href="{% url "pools:index" %}">Pools</a></li>
                         <li><a href="{% url "about" %}">About</a></li>
                     </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
 
-                        <li><a href="{% url "index" %}">Switch to Server mode</a></li>
+                        <li><a id="mode-switcher" href="#" onclick="toggle_navbar_visibility();">Switch to Client mode</a></li>
 
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -156,3 +158,21 @@
 
 </body>
 </html>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        loadCurrentMode()
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

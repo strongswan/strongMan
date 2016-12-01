@@ -145,4 +145,10 @@ html {
   padding: 10px;
   margin-bottom: 40px; }
 
+.visible-mode {
+  display: block !important; }
+
+.invisible-mode {
+  display: none !important; }
+
 /*# sourceMappingURL=main.css.map */
