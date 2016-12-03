@@ -19,23 +19,6 @@ class PoolRefreshHandler:
             messages.warning(self.request, str(e))
 
     def _render(self):
-        dhcpdbvalue = Pool.objects.all().filter(poolname__contains='dhcp')
-        if not dhcpdbvalue:
-            dhcppool = Pool(poolname='dhcp')
-            dhcppool.clean()
-            dhcppool.save()
-
-        radiusdbvalue = Pool.objects.all().filter(poolname__contains='radius')
-        if not radiusdbvalue:
-            radiuspool = Pool(poolname='radius')
-            radiuspool.clean()
-            radiuspool.save()
-
-        queryset = Pool.objects.exclude(poolname__contains='dhcp')
-        q2 = queryset.exclude(poolname__contains='radius')
         pooldetails = ViciWrapper().get_pools()
-        table = tables.PoolDetailsTable(q2, request=self.request, pooldetails=pooldetails)
-
-        RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
-        return render(self.request, 'pools/widgets/table.html', {'table': table})
-
+        table = {"pools": pooldetails}
+        return render(self.request, 'pools/widgets/detailPoolTable.html', {'table': table, 'is_refresh': True})

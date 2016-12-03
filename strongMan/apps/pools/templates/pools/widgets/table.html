@@ -35,11 +35,7 @@
 
                         <tr id="collapse{{ row.record.poolname }}" class="collapse refreshpools" >
                             <td colspan="4">
-                                {% for key, value in table.pools.items %}
-                                    {% if row.record.poolname == key %}
-                                        {% include "pools/widgets/detailPoolTable.html" with table=table record=row.record %}
-                                    {% endif %}
-                                {% endfor %}
+                                {% include "pools/widgets/detailPoolTable.html" with record=row.record %}
                             </td>
                         </tr>
 
@@ -112,7 +108,6 @@
 </div>
 <script>
     var intervalID = setInterval(function() {
-
         $.ajax({
             type: 'POST',
             url: "{% url "pools:refreshdetails" %}",
@@ -122,14 +117,17 @@
             success: function (data) {
                 //Replace bootstrap selects with new rendered selects
                 $('.refreshpools').each(function () {
-                    var PoolDetails = $('<div />').html(data).find($(this).children('table').attr("id")).html();
-                    $(this).children('table').html(PoolDetails);
-
+                    var table = $(this).find('tbody');
+                    var poolname = "#"+table.attr("id");
+                    var attribute = table.find('tr').first();
+                    var attributevalues = attribute.next();
+                    var poolDetails = $('<div />').html(data).find(poolname).html();
+                    table.html(attribute.add(attributevalues).add(poolDetails));
                 })
             },
             error: function (data) {
-                alert(data);
+               throw data;
             }
         });
-    }, 5000);
+    }, 10000);
 </script>
