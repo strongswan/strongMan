@@ -148,4 +148,20 @@
   }
 }
 
+.filter-table {
+  .quick {
+    margin-left: 0.5em;
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+  .quick:hover {
+    text-decoration: underline;
+  }
+}
+td.alt {
+  background-color: #ffc;
+  background-color: rgba(255, 255, 0, 0.2);
+}
+
+
 

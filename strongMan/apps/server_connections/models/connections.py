@@ -9,6 +9,7 @@ from django.dispatch import receiver
 
 from strongMan.apps.server_connections.models.common import State
 from strongMan.apps.pools.models import Pool
+from strongMan.apps.certificates.models import Certificate
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 from .specific import Child, Address, Proposal, LogMessage
@@ -25,8 +26,9 @@ class Connection(models.Model):
     profile = models.TextField(unique=True)
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='2')
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
-    send_cert_req = models.NullBooleanField(null=True, blank=True, default=None)
+    send_certreq = models.NullBooleanField(null=True, blank=True, default=None)
     enabled = models.BooleanField(default=False)
+    connection_type = models.TextField()
 
     def dict(self):
         children = OrderedDict()
@@ -39,10 +41,10 @@ class Connection(models.Model):
         remote_address = [remote_address.value for remote_address in self.server_remote_addresses.all()]
         if remote_address[0] is not '':
             ike_sa['remote_addrs'] = remote_address
-        #ike_sa['vips'] = [vip.value for vip in self.server_vips.all()]
         ike_sa['version'] = self.version
         ike_sa['proposals'] = [proposal.type for proposal in self.server_proposals.all()]
         ike_sa['children'] = children
+        ike_sa['send_certreq'] = self.send_certreq
 
         for local in self.server_local.all():
             local = local.subclass()
@@ -56,7 +58,7 @@ class Connection(models.Model):
         connection[self.profile] = ike_sa
         return connection
 
-    def start(self):
+    def load(self):
         self.enabled = True
         self.save()
         vici_wrapper = ViciWrapper()
@@ -74,16 +76,23 @@ class Connection(models.Model):
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
 
-        # for child in self.server_children.all():
-        #     logs = vici_wrapper.initiate(child.name, self.profile)
-        #     for log in logs:
-        #         LogMessage(connection=self, message=log['message']).save()
+    def start(self):
+        self.load()
+        vici_wrapper = ViciWrapper()
+        for child in self.server_children.all():
+            logs = vici_wrapper.initiate(child.name, self.profile)
+            for log in logs:
+                LogMessage(connection=self, message=log['message']).save()
 
-    def stop(self):
+    def unload(self):
         self.enabled = False
         self.save()
         vici_wrapper = ViciWrapper()
         vici_wrapper.unload_connection(self.profile)
+
+    def stop(self):
+        self.unload()
+        vici_wrapper = ViciWrapper()
         logs = vici_wrapper.terminate_connection(self.profile)
         for log in logs:
             LogMessage(connection=self, message=log['message']).save()
@@ -95,6 +104,15 @@ class Connection(models.Model):
 
     def get_typ(self):
         return type(self).__name__
+
+    def get_connection_type(self):
+        return self.connection_type
+
+    def is_remote_access(self):
+        return self.connection_type == 'remote_access'
+
+    def is_site_to_site(self):
+        return self.connection_type == 'site_to_site'
 
     def subclass(self):
         for cls in self.get_types():
@@ -110,17 +128,28 @@ class Connection(models.Model):
 
     @property
     def state(self):
-        try:
-            vici_wrapper = ViciWrapper()
-            state = vici_wrapper.get_connection_state(self.profile)
-            if state == State.DOWN.value:
+        if self.is_remote_access():
+            try:
+                vici_wrapper = ViciWrapper()
+                loaded = vici_wrapper.is_connection_loaded(self.profile)
+                if loaded:
+                    return State.LOADED.value
+                else:
+                    return State.UNLOADED.value
+            except:
+                return State.UNLOADED.value
+        else:
+            try:
+                vici_wrapper = ViciWrapper()
+                state = vici_wrapper.get_connection_state(self.profile)
+                if state == State.DOWN.value:
+                    return State.DOWN.value
+                elif state == State.ESTABLISHED.value:
+                    return State.ESTABLISHED.value
+                elif state == State.CONNECTING.value:
+                    return State.CONNECTING.value
+            except:
                 return State.DOWN.value
-            elif state == State.ESTABLISHED.value:
-                return State.ESTABLISHED.value
-            elif state == State.CONNECTING.value:
-                return State.CONNECTING.value
-        except:
-            return State.DOWN.value
 
     @property
     def has_auto_ca_authentication(self):

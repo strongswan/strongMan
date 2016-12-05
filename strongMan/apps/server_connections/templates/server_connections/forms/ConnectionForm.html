@@ -132,14 +132,32 @@
             <label class="control-label col-sm-3 col-xs-12">Send Certificate Request</label>
             <div class="controls col-sm-8 col-xs-10">
                 <label class="checkbox-inline">
-                    <input type="checkbox" name="send_cert_req" {% if form.send_cert_req.value == True %}
+                    <input type="checkbox" name="send_certreq" {% if form.send_certreq.value == True %}
                              checked="checked"
                         {% endif %}>Send certificate request
                 </label>
-                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_cert_req %}
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_certreq %}
             </div>
             <div class="col-sm-1 col-xs-2">
                 {% include "server_connections/widgets/QuestionPopover.html" with title="Certificate request help" content="Select if certificate request is enabled." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Start Action</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <select class="selectpicker" name="start_action">
+                    {% for choice in form.start_action.field.choices %}
+                        <option value="{{choice.0}}"
+                            {% ifequal form.start_action.value|slugify choice.0|slugify %}selected="selected"{% endifequal %}>
+                            {{choice.1}}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.start_action %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Select Start Action for this connection." %}
             </div>
         </div>
 
@@ -174,7 +192,7 @@
 
         <div class="pull-right">
             {% if connection %}
-                {% if connection.state == "DOWN" %}
+                {% if connection.state == 'DOWN' or connection.state == 'UNLOADED' %}
                     <span title="Remove connection">
                     <a href="{% url 'server_connections:delete' connection.id %}"
                        id="delete-{{ connection.id }}"
@@ -186,7 +204,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if connection and connection.state == 'DOWN' or not connection %}
+            {% if connection and connection.state == 'DOWN' or connection and connection.state == 'UNLOADED' or not connection %}
                 <button type="submit" name="save" id="configuration"
                         class="btn btn-primary"><span
                         class="glyphicon glyphicon-floppy-disk"></span> Save

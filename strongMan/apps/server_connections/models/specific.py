@@ -34,8 +34,15 @@ def prevent_key_delete_if_cert_is_in_use(sender, **kwargs):
 
 
 class Child(models.Model):
+    START_ACTION_CHOICES = (
+        ('', "none"),
+        ('start', "start"),
+        ('trap', "trap"),
+    )
+
     name = models.TextField()
     mode = models.TextField()
+    start_action = models.CharField(max_length=5, choices=START_ACTION_CHOICES, null=True, blank=True, default=None)
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
                                    related_name='server_children')
 
@@ -46,6 +53,8 @@ class Child(models.Model):
         if remote_ts[0] is not '':
             child['remote_ts'] = remote_ts
         child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.server_esp_proposals.all()]
+        if self.start_action is not '':
+            child['start_action'] = self.start_action
         return child
 
 

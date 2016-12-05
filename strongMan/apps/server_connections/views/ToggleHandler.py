@@ -20,6 +20,10 @@ class ToggleHandler:
                 connection.stop()
             elif state == State.CONNECTING.value:
                 connection.stop()
+            elif state == State.UNLOADED.value:
+                connection.load()
+            elif state == State.LOADED.value:
+                connection.unload()
             response['success'] = True
         except ViciException as e:
             print(e)

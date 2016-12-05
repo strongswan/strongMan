@@ -4,9 +4,9 @@ from strongMan.apps.pools.models.pools import ATTRIBUTE_CHOICES
 
 class AddOrEditForm(forms.Form):
     poolname = forms.RegexField(max_length=50, initial="", regex=r'^[0-9a-zA-Z]+$')
-    addresses = forms.CharField(initial="", required=None)
+    addresses = forms.CharField(initial="", required=False)
     attribute = forms.ChoiceField(widget=forms.Select(), choices=ATTRIBUTE_CHOICES)
-    attributevalues = forms.CharField(initial="", required=None)
+    attributevalues = forms.CharField(initial="", required=False)
 
     def fill(self, pool):
         self.initial['poolname'] = pool.poolname

@@ -13,9 +13,10 @@ class HeaderForm(forms.Form):
     local_addrs = forms.CharField(max_length=50, initial="")
     remote_addrs = forms.CharField(max_length=50, initial="", required=False)
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
-    send_cert_req = forms.BooleanField(required=False)
+    send_certreq = forms.BooleanField(required=False)
     local_ts = forms.CharField(max_length=50, initial="")
     remote_ts = forms.CharField(max_length=50, initial="", required=False)
+    start_action = forms.ChoiceField(widget=forms.Select(), choices=Child.START_ACTION_CHOICES, required=False)
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
@@ -35,26 +36,29 @@ class HeaderForm(forms.Form):
         self.initial['local_addrs'] = connection.server_local_addresses.first().value
         self.initial['remote_addrs'] = connection.server_remote_addresses.first().value
         self.initial['version'] = connection.version
-        self.initial['send_cert_req'] = connection.send_cert_req
+        self.initial['send_certreq'] = connection.send_certreq
         self.initial['local_ts'] = connection.server_children.first().server_local_ts.first().value
         self.initial['remote_ts'] = connection.server_children.first().server_remote_ts.first().value
+        self.initial['start_action'] = connection.server_children.first().start_action
 
     def create_connection(self, connection):
-        child = Child(name=self.cleaned_data['profile'], connection=connection)
+        child = Child(name=self.cleaned_data['profile'], connection=connection,
+                      start_action=self.cleaned_data['start_action'])
         child.save()
         self._set_proposals(connection, child)
         self._set_addresses(connection, child, self.cleaned_data['local_addrs'], self.cleaned_data['remote_addrs'],
                             self.cleaned_data['local_ts'], self.cleaned_data['remote_ts'])
 
     def update_connection(self, connection):
-        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'])
+        Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'],
+                                                           start_action=self.cleaned_data['start_action'])
         Address.objects.filter(local_addresses=connection).update(value=self.cleaned_data['local_addrs'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['remote_addrs'])
         Address.objects.filter(local_ts=connection.server_children.first()).update(value=self.cleaned_data['local_ts'])
         Address.objects.filter(remote_ts=connection.server_children.first()).update(value=self.cleaned_data['remote_ts'])
         connection.profile = self.cleaned_data['profile']
         connection.version = self.cleaned_data['version']
-        connection.send_cert_req = self.cleaned_data['send_cert_req']
+        connection.send_certreq = self.cleaned_data["send_certreq"]
         connection.save()
 
     def model(self):

@@ -2,7 +2,30 @@
 {% load i18n %}
 <div class="old table-container">
     {% block table %}
-        <table{% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+        <div class="well" style="margin-top: 24px">
+            <table class="table-hover table-condensed table-responsive" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Remote host</th>
+                        <th>Remote ID</th>
+                        <th>Remote ts</th>
+                        <th>Local ts</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input class="form-control input-sm" type="search" placeholder="Remote host"></td>
+                        <td><input class="form-control input-sm" type="text" placeholder="Remote ID"></td>
+                        <td><input class="form-control input-sm" type="text" placeholder="Remote ts"></td>
+                        <td><input class="form-control input-sm" type="text" placeholder="Local ts"></td>
+                        <td><button type="button" class="btn btn-default btn-sm">search</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <table id="connections-table" {% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
             {% block table.thead %}
                 {% if table.show_header %}
                     <thead>
@@ -37,58 +60,18 @@
                             <td colspan="4" class="connection-info-span">
                                 <div class="panel panel-default connection-info">
                                     <div class="panel-body">
-                                        <div class="col-sm-6">
-                                            <table>
+                                        <table class="table-hover table-condensed table-responsive" style="width: 100%">
+                                            <thead>
                                                 <tr>
-                                                    <td>
-                                                        <i class="fa fa-desktop" aria-hidden="True"></i>
-                                                        Local selectors:
-                                                    </td>
-                                                    <td id="local-ts-{{ row.record.id }}">
-                                                    </td>
+                                                    <th>Ike SA id {% csrf_token %}</th>
+                                                    <th>Remote host</th>
+                                                    <th>Remote ID</th>
+                                                    <th></th>
                                                 </tr>
-                                                <tr>
-                                                    <td style="min-width: 140px;">
-                                                        <i class="fa fa-server" aria-hidden="true"></i>
-                                                        Remote selectors:
-                                                    </td>
-                                                    <td id="remote-ts-{{ row.record.id }}">
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <table>
-                                                <tr>
-                                                    <td>
-                                                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
-                                                        In:
-                                                    </td>
-                                                    <td>
-                                                        <div id="packets-in-{{ row.record.id }}"></div>
-                                                        Packets totaling
-                                                        <div id="bytes-in-{{ row.record.id }}"></div>
-                                                        Bytes
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="min-width: 50px;">
-                                                        <i class="fa fa-arrow-right" aria-hidden="true"></i> Out:
-                                                    </td>
-                                                    <td>
-                                                        <div id="packets-out-{{ row.record.id }}"></div>
-                                                        Packets totaling
-                                                        <div id="bytes-out-{{ row.record.id }}"></div>
-                                                        Bytes
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                            </thead>
+                                            <tbody id="connection-{{ row.record.id }}-sas"></tbody>
+                                        </table>
                                     </div>
-                                    <div class="panel-footer" style="width:100%;">
-                                        <i class="fa fa-exchange" aria-hidden="true"></i> Traffic
-                                    </div>
-
                                 </div>
                             </td>
 
@@ -160,3 +143,8 @@
         {% endwith %}
     {% endif %}
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#connections-table').filterTable();
+    });
+</script>

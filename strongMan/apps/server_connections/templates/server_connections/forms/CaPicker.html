@@ -22,7 +22,7 @@
                     {% for choise in certificate.field.queryset %}
                         <option value="{{ choise.id }}"
                                 {% if certificate.value|slugify == choise.id|slugify %}
-                                selected{% endif %}
+                                selected="selected"{% endif %}
                                 data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
                     {% endfor %}
                 </select>

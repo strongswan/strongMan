@@ -13,6 +13,8 @@ class State(DjangoEnum):
     DOWN = 'DOWN'
     CONNECTING = 'CONNECTING'
     ESTABLISHED = 'ESTABLISHED'
+    LOADED = 'LOADED'
+    UNLOADED = 'UNLOADED'
 
 
 class CertConDoNotDeleteMessage(MessageObj):

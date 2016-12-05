@@ -43,5 +43,5 @@ class AddHandler:
                 return self._render(form=form.selected_form_class())
 
             if isinstance(form, HeaderForm):
-                form.create_connection()
+                form.create_connection(self.connection_type)
                 return redirect(reverse("server_connections:index"))

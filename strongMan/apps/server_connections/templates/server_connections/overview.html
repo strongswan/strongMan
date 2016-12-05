@@ -8,6 +8,7 @@
     <script src="{% static 'server_connections/bootstrap-toggle.min.js' %}"></script>
     <script src="{% static 'server_connections/toggle_connection.js' %}"></script>
     <script src="{% static 'server_connections/logger.js' %}"></script>
+    <script src="{% static 'server_connections/jquery.filtertable.min.js' %}"></script>
 {% endblock html-head %}
 {% block title %}Connection{% endblock title %}
 {% block small-title %}Overview{% endblock small-title %}
@@ -62,7 +63,9 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript"> $(function () {
-        logger('{{ csrf_token }}');
-    });</script>
+    <script type="text/javascript">
+        $(function () {
+            logger('{{ csrf_token }}');
+        });
+    </script>
 {% endblock %}

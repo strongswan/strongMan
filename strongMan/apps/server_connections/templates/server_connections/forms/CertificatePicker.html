@@ -6,7 +6,7 @@
                     name="{{ certificate.name }}"
                     id="id_{{ certificate.name }}" data-show-subtext="True">
                 {% if certificate.value == None or certificate.value == '-1' %}
-                    <option value="-1" selected>Nothing selected</option>
+                    <option value="-1" selected="selected">Nothing selected</option>
                 {% endif %}
                 {% for choise in certificate.field.queryset %}
                     <option value="{{ choise.id }}"
@@ -34,10 +34,10 @@
                     {% if identity.field.choices|length == 0 %}disabled="True"{% endif %}>
                 {% for value, identity_choice in identity.field.choices %}
                     <option value="{{ value }}"
-                            {% if identity.value|slugify == value|slugify %}selected={% endif %}
+                            {% if identity.value|slugify == value|slugify %}selected="selected"{% endif %}
                                     data-subtext="{{ identity_choice.type }}"
                             {% if not identity.value and identity_choice.type == 'distinguishedName' %}
-                            selected
+                            selected="selected"
                             {% endif %}>{{ identity_choice }}
                     </option>
                 {% endfor %}

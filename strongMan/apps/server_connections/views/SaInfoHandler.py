@@ -18,10 +18,16 @@ class SaInfoHandler:
         response = dict(id=self.connection.id, success=False)
         try:
             vici_wrapper = ViciWrapper()
-            sa = vici_wrapper.get_sas_by(self.connection.profile)
-            if sa:
-                child = ChildSA(sa[0], self.connection.profile)
-                response['child'] = child.__dict__
+            sas = vici_wrapper.get_sas_by(self.connection.profile)
+            if sas:
+                ikesas = []
+                for sa in sas:
+                    sa = sa[self.connection.profile]
+                    ikesas.append(IkeSA(sa))
+                sadict = []
+                for ikesa in ikesas:
+                    sadict.append(ikesa.__dict__)
+                response['child'] = sadict
                 response['success'] = True
         except ViciException as e:
             response['message'] = str(e)
@@ -31,11 +37,23 @@ class SaInfoHandler:
             return JsonResponse(response)
 
 
-class ChildSA(object):
-    def __init__(self, sa, connection_name):
-        sa = sa[connection_name]
+class IkeSA(object):
+    def __init__(self, sa):
+        self.uniqueid = sa['uniqueid'].decode('ascii')
+        self.remote_host = sa['remote-host'].decode('ascii')
+        self.remote_id = sa['remote-id'].decode('ascii')
         child_sas = sa['child-sas']
-        child_sa = child_sas[connection_name]
+        children = []
+        for child_sa in child_sas:
+            child_sa = child_sas[child_sa]
+            children.append(ChildSA(child_sa))
+        childrendict = []
+        for child in children:
+            childrendict.append(child.__dict__)
+        self.child_sas = childrendict
+
+class ChildSA(object):
+    def __init__(self, child_sa):
         self.remote_ts = child_sa['remote-ts'][0].decode('ascii')
         self.local_ts = child_sa['local-ts'][0].decode('ascii')
         self.bytes_in = child_sa['bytes-in'].decode('ascii')

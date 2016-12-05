@@ -92,4 +92,15 @@
 #ConnectionForm input, #ConnectionForm .identity_picker, #ConnectionForm .picker, #ConnectionForm .cert_upload {
   margin-bottom: 10px; }
 
+.filter-table .quick {
+  margin-left: 0.5em;
+  font-size: 0.8em;
+  text-decoration: none; }
+.filter-table .quick:hover {
+  text-decoration: underline; }
+
+td.alt {
+  background-color: #ffc;
+  background-color: rgba(255, 255, 0, 0.2); }
+
 /*# sourceMappingURL=connections.css.map */
