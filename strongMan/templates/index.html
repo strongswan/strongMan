@@ -2,23 +2,65 @@
 {% load i18n %}
 {% block content %}
     <div id="main-page">
-        <div class="jumbotron">
-            <h2>Welcome to strongMan!</h2>
+        <div class="client-mode">
+            <div class="jumbotron">
+                <h2>Welcome to strongMan Client Edition!</h2>
+                <p>strongMan is a management interface for the strongSwan VPN solution.
+                    StrongMan provides a user friendly graphical interface to configure and establish IPsec
+                    connections.</p>
+            </div>
+            <div class="alert alert-info one-time-alert" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Notice the button on top right? </strong> Change to server-mode and back.
+            </div>
+            <h3>Getting started</h3>
+            <ul>
+                <li>
+                    Create a new connection with your credentials and establish a IPsec tunnel in the <a
+                        href="{% url "connections:index" %}">connections section</a>.
+                </li>
+                <li>
+                    Upload certificates to establish an IPsec tunnel in the <a
+                        href="{% url "certificates:overview" %}">certificates section</a>.
+                </li>
+            </ul>
+        </div>
+        <div class="server-mode">
+            <div class="jumbotron">
+            <h2>Welcome to strongMan Server Edition!</h2>
             <p>strongMan is a management interface for the strongSwan VPN solution.
                 StrongMan provides a user friendly graphical interface to configure and establish IPsec
                 connections.</p>
         </div>
+        <div class="alert alert-info one-time-alert" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                </button>
+                <strong>Notice the button on top right? </strong> Change to client-mode and back.
+            </div>
         <h3>Getting started</h3>
         <ul>
-            <li>
-                Create a new connection with your credentials and establish a IPsec tunnel in the <a
-                    href="{% url "connections:index" %}">connections section</a>.
-            </li>
             <li>
                 Upload certificates to establish an IPsec tunnel in the <a
                     href="{% url "certificates:overview" %}">certificates section</a>.
             </li>
+            <li>
+                Create a new site-to-site or remote access connection and start or load an IPsec tunnel in the <a
+                    href="{% url "server_connections:index" %}">server-connections section</a>.
+            </li>
+            <li>
+                Create and manage EAP Secrets to let users authenticate at your server in the <a
+                    href="{% url "eap_secrets:overview" %}">EAP secrets section</a>.
+            </li>
+            <li>
+                Create and manage Pools to use them in the connections setup in the <a
+                    href="{% url "pools:index" %}">pools section</a>.
+            </li>
         </ul>
+        </div>
+
         <h3>Links</h3>
         <ul>
             <li>
@@ -33,3 +75,5 @@
         </ul>
     </div>
 {% endblock %}
+
+

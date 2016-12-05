@@ -151,4 +151,7 @@ html {
 .invisible-mode {
   display: none !important; }
 
+.hide-after-switch {
+  display: None; }
+
 /*# sourceMappingURL=main.css.map */
