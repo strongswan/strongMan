@@ -31,10 +31,9 @@ class OverviewHandler:
             radiuspool.clean()
             radiuspool.save()
 
-        queryset = Pool.objects.exclude(poolname__contains='dhcp')
-        q2 = queryset.exclude(poolname__contains='radius')
+        queryset = Pool.objects.exclude(poolname__contains='dhcp').exclude(poolname__contains='radius')
         pools = ViciWrapper().get_pools()
-        table = tables.PoolsTable(q2, request=self.request, pools=pools)
+        table = tables.PoolsTable(queryset, request=self.request, pools=pools)
 
         RequestConfig(self.request, paginate={"per_page": self.ENTRIES_PER_PAGE}).configure(table)
         if len(queryset) == 0:

@@ -41,6 +41,10 @@ class AddHandler:
             return self._render(self.form)
 
         else:
+            # if self.form.my_addresses == "":
+            #     messages.add_message(self.request, messages.ERROR,
+            #                          'Can\'t add pool: Address is mandatory.')
+            #     return self._render(self.form)
             if self.form.my_attribute == 'None':
                 if self.form.my_attributevalues != "":
                     messages.add_message(self.request, messages.ERROR,
