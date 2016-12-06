@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import django
+os.chdir(os.path.dirname(__file__))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "strongMan.settings.production")
 django.setup()
 from collections import OrderedDict
@@ -23,13 +24,16 @@ def load_keys(vici=ViciWrapper()):
 
 def load_certificates(vici=ViciWrapper()):
     for cert in Certificate.objects.all():
-        vici.load_key(OrderedDict(type=cert.get_algorithm_type(), data=cert.der_container))
+        vici.load_certificate(OrderedDict(type=cert.type, flag='None', data=cert.der_container))
 
 
 def load_connections():
     for connection in Connection.objects.all():
         if connection.enabled:
-            connection.start()
+            if connection.is_remote_access():
+                connection.load()
+            else:
+                connection.start()
 
 
 def load_pools(vici=ViciWrapper()):
@@ -45,7 +49,7 @@ def load_credentials(vici=ViciWrapper()):
 
 def main():
     vici = ViciWrapper()
-    load_secrets(vici)
+    load_credentials(vici)
     load_pools(vici)
     load_connections()
 
