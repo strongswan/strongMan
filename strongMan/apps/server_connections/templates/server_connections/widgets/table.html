@@ -15,10 +15,10 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input class="form-control input-sm" type="search" placeholder="Remote host"></td>
-                        <td><input class="form-control input-sm" type="text" placeholder="Remote ID"></td>
-                        <td><input class="form-control input-sm" type="text" placeholder="Remote ts"></td>
-                        <td><input class="form-control input-sm" type="text" placeholder="Local ts"></td>
+                        <td><input id="remoteHostFilter" class="form-control input-sm search" type="text" placeholder="Remote host"></td>
+                        <td><input id="remoteIdFilter" class="form-control input-sm search" type="text" placeholder="Remote ID"></td>
+                        <td><input id="remoteTsFilter" class="form-control input-sm search" type="text" placeholder="Remote ts"></td>
+                        <td><input id="localTsFilter" class="form-control input-sm search" type="text" placeholder="Local ts"></td>
                         <td><button type="button" class="btn btn-default btn-sm">search</button></td>
                     </tr>
                 </tbody>
@@ -144,26 +144,57 @@
     {% endif %}
 </div>
 <script type="text/javascript">
+    var currentSearch;
     $(document).ready(function() {
         function rememberVisible (obj) {
             obj.removeClass('notVisible');
             if(obj.css('display') == 'none') {
-                obj.addClass('notVisible')
+                obj.addClass('notVisible');
             }
-        };
+        }
+
+        $(".search").on("click", function () {
+            currentSearch = $(this);
+        });
 
         $('.connection-info-row').each(function() {
             var that = $(this);
             rememberVisible(that);
             $(document).bind("ajaxComplete", function(){
                 rememberVisible(that);
+                currentSearch.trigger('click');
             });
-        });
 
-        $('#connections-table').filterTable({
-            callback: function(term, table) {
-                table.find('.notVisible').hide();
-            }
+
+            that.find('table').filterTable({
+                inputSelector: $('#remoteHostFilter'),
+                ignoreColumns: [1,2,3,4,5],
+                minRows: 0,
+                callback: function(term, table) {
+                    table.find('.notVisible').hide();
+                }
+            }).filterTable({
+                inputSelector: $('#remoteIdFilter'),
+                ignoreColumns: [0,2,3,4,5],
+                minRows: 0,
+                callback: function(term, table) {
+                    table.find('.notVisible').hide();
+                }
+            }).filterTable({
+                inputSelector: $('#remoteTsFilter'),
+                ignoreColumns: [0,1,3,4,5],
+                minRows: 0,
+                callback: function(term, table) {
+                    table.find('.notVisible').hide();
+                }
+            }).filterTable({
+                inputSelector: $('#localTsFilter'),
+                ignoreColumns: [0,1,2,4,5],
+                minRows: 0,
+                callback: function(term, table) {
+                    table.find('.notVisible').hide();
+                }
+            });
         });
     });
 </script>
