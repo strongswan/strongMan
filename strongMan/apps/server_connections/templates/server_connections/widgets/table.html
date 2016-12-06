@@ -145,6 +145,25 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#connections-table').filterTable();
+        function rememberVisible (obj) {
+            obj.removeClass('notVisible');
+            if(obj.css('display') == 'none') {
+                obj.addClass('notVisible')
+            }
+        };
+
+        $('.connection-info-row').each(function() {
+            var that = $(this);
+            rememberVisible(that);
+            $(document).bind("ajaxComplete", function(){
+                rememberVisible(that);
+            });
+        });
+
+        $('#connections-table').filterTable({
+            callback: function(term, table) {
+                table.find('.notVisible').hide();
+            }
+        });
     });
 </script>
