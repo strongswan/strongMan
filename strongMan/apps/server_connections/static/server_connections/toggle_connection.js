@@ -237,7 +237,7 @@ function generate_entries(conn_id, rows, child) {
             cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 
             var table = document.createElement("table");
-            table.className = "table-hover table-condensed table-responsive";
+            table.className = "table-hover table-condensed table-responsive child-sa-table";
             table.style = "width: 100%;";
 
             var child_sas_header_row = document.createElement("thead");
