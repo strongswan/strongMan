@@ -1,16 +1,16 @@
 <form action="{% url "pools:edit" poolname %}" method="POST" class="inline-form"
       onsubmit="return removeBtnClicked(this)" id="{{ poolname }}">
     {% csrf_token %}
-                    <span title="Remove">
-                        <button type="submit" class="btn btn-default remove-btn"
-                                id="removebtn-{{ poolname }}" name="remove_pool">
-                            <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text"></span>
-                        </button>
-                    </span>
+    <span title="Remove">
+        <button type="submit" class="btn btn-default remove-btn"
+                id="removebtn-{{ poolname }}" name="remove_pool">
+            <span class="glyphicon glyphicon-remove"></span><span class="removebtn-text"></span>
+        </button>
+    </span>
 </form>
 <script>
     function removeBtnClicked(form) {
-        btn = $("#removebtn-" + form.id)
+        btn = $("#removebtn-" + form.id);
         if (btn.hasClass('btn-default')) {
             btn.removeClass('btn-default').addClass('btn-danger');
             btn.children('.removebtn-text').text('Remove');
@@ -18,7 +18,5 @@
         } else {
             return true;
         }
-
     }
-
 </script>

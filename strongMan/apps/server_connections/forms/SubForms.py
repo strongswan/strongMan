@@ -78,8 +78,6 @@ class HeaderForm(forms.Form):
     def _set_addresses(connection, child, local_addrs, remote_addrs, local_ts, remote_ts):
         Address(value=local_addrs, local_addresses=connection).save()
         Address(value=remote_addrs, remote_addresses=connection).save()
-        Address(value='0.0.0.0', vips=connection).save()
-        Address(value='::', vips=connection).save()
         Address(value=local_ts, local_ts=child).save()
         Address(value=remote_ts, remote_ts=child).save()
 

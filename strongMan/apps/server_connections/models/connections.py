@@ -106,7 +106,10 @@ class Connection(models.Model):
         return type(self).__name__
 
     def get_connection_type(self):
-        return self.connection_type
+        if self.is_remote_access():
+            return 'Remote Access'
+        else:
+            return 'Site to Site'
 
     def is_remote_access(self):
         return self.connection_type == 'remote_access'
@@ -211,7 +214,6 @@ class IKEv2EapTls(Connection):
         Proposal.objects.filter(connection=instance).delete()
         Address.objects.filter(local_addresses=instance).delete()
         Address.objects.filter(remote_addresses=instance).delete()
-        Address.objects.filter(vips=instance).delete()
 
         for local in Authentication.objects.filter(local=instance):
             local.delete()

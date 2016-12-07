@@ -66,7 +66,6 @@ class Address(models.Model):
                                          related_name='server_remote_addresses')
     local_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
                                         related_name='server_local_addresses')
-    vips = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None, related_name='server_vips')
 
 
 class Proposal(models.Model):

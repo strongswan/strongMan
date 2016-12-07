@@ -149,17 +149,17 @@ function hideConnectionInfoRow(id) {
     $('#connection-row-' + id).removeClass("success");
 }
 
-function generate_entries(id, rows, child) {
-    sas = document.getElementById("connection-" + id + "-sas");
+function generate_entries(conn_id, rows, child) {
+    var sas = document.getElementById("connection-" + conn_id + "-sas");
 
-    $("#connection-" + id + "-sas tr").remove();
+    $("#connection-" + conn_id + "-sas tr").remove();
 
     for (var i = 0; i < rows; i++) {
-        id = child[i].uniqueid;
+        var id = child[i].uniqueid;
         var row = document.createElement("tr");
 
         var cell_uniqueid = document.createElement("td");
-        var uniqueid = document.createTextNode(id);
+        var uniqueid = document.createTextNode(id);
         cell_uniqueid.appendChild(uniqueid);
         row.appendChild(cell_uniqueid);
 
@@ -173,53 +173,70 @@ function generate_entries(id, rows, child) {
         cell_remote_id.appendChild(remote_id);
         row.appendChild(cell_remote_id);
 
-        var cell_button = document.createElement("td");
+        var cell_button_terminate_sa = document.createElement("td");
 
-        var form = document.createElement("form");
-        form.id = "delete_sa_form_" + id;
-        form.action = "/server_connections/delete_sa/";
+        var form_terminate_sa = document.createElement("form");
+        form_terminate_sa.id = id;
+        form_terminate_sa.method = "POST";
+        form_terminate_sa.action = "/server_connections/terminate_sa/";
+        form_terminate_sa.className = "pull-right inline-class";
+        form_terminate_sa.setAttribute("onSubmit", "return button_terminate_sa_clicked(this)");
 
         var csrf_token = document.createElement("input");
         csrf_token.name = "csrfmiddlewaretoken";
         csrf_token.value = getCookie('csrftoken');
         csrf_token.type = "hidden";
-        form.appendChild(csrf_token);
+        form_terminate_sa.appendChild(csrf_token);
 
         var sa_id = document.createElement("input");
         sa_id.name = "sa_id";
         sa_id.value = id;
         sa_id.type = "hidden";
-        form.appendChild(sa_id);
+        form_terminate_sa.appendChild(sa_id);
 
-        var div = document.createElement("div");
-        div.id = "delete_sa_" + id;
+        var connection_id = document.createElement("input");
+        connection_id.name = "conn_id";
+        connection_id.value = conn_id;
+        connection_id.type = "hidden";
+        form_terminate_sa.appendChild(connection_id);
 
-        var delete_button = document.createElement("button");
-        delete_button.type = 'button';
-        delete_button.className = 'btn btn-danger';
-        delete_button.innerHTML = "delete";
+        var span_terminate_sa = document.createElement("span");
+        span_terminate_sa.title = "Terminate SA";
 
-        div.appendChild(delete_button);
-        form.appendChild(sa_id);
-        form.appendChild(div);
-        cell_button.appendChild(form);
-        row.appendChild(cell_button);
+        var button_terminate_sa = document.createElement("button");
+        button_terminate_sa.type = "submit";
+        button_terminate_sa.className = "btn btn-default";
+        button_terminate_sa.id = "btn_terminate_sa_" + id;
+
+        var glyphicon_remove = document.createElement("span");
+        glyphicon_remove.className = "glyphicon glyphicon-remove";
+        button_terminate_sa.appendChild(glyphicon_remove);
+
+        var button_terminate_sa_text = document.createElement("span");
+        button_terminate_sa_text.id = "btn_terminate_sa_text";
+        button_terminate_sa.appendChild(button_terminate_sa_text);
+
+        span_terminate_sa.appendChild(button_terminate_sa);
+        form_terminate_sa.appendChild(span_terminate_sa);
+        cell_button_terminate_sa.appendChild(form_terminate_sa);
+        row.appendChild(cell_button_terminate_sa);
        
         sas.appendChild(row);
 
         // CHILD SAS
-        child_sas = child[i].child_sas;
-        nr_of_childs = Object.keys(child_sas).length;
+        var child_sas = child[i].child_sas;
+        var nr_of_children = Object.keys(child_sas).length;
 
         var child_sas_row = document.createElement("tr");
-        child_sas_row.id = "child-sas" + id;
+        child_sas_row.id = "child_sas" + id;
 
         var cell_child_sas = document.createElement("td");
-        cell_child_sas.colSpan = "4";
+        cell_child_sas.colSpan = "5";
+        cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 
         var table = document.createElement("table");
         table.className = "table-hover table-condensed table-responsive";
-        table.style = "width: 100%";
+        table.style = "width: 100%;";
 
         var child_sas_header_row = document.createElement("thead");
 
@@ -247,13 +264,19 @@ function generate_entries(id, rows, child) {
         var h_packets_out = document.createTextNode("packets out");
         h_cell_packets_out.appendChild(h_packets_out);
         child_sas_header_row.appendChild(h_cell_packets_out);
-        var h_cell_delete_button = document.createElement("th");
-        child_sas_header_row.appendChild(h_cell_delete_button);
+        var h_cell_install_time = document.createElement("th");
+        var h_install_time = document.createTextNode("install time");
+        h_cell_install_time.appendChild(h_install_time);
+        child_sas_header_row.appendChild(h_cell_install_time);
+        var h_cell_terminate_button = document.createElement("th");
+        child_sas_header_row.appendChild(h_cell_terminate_button);
 
         table.appendChild(child_sas_header_row);
 
-        for (var n = 0; n < nr_of_childs; n++) {
+        for (var n = 0; n < nr_of_children; n++) {
             var child_sa = child_sas[n];
+
+            var child_id = child_sa.uniqueid;
 
             var child_row = document.createElement("tr");
 
@@ -287,37 +310,58 @@ function generate_entries(id, rows, child) {
             cell_packets_out.appendChild(packets_out);
             child_row.appendChild(cell_packets_out);
 
-            var cell_button_child_sa = document.createElement("td");
+            var cell_install_time = document.createElement("td");
+            var install_time = document.createTextNode(child_sa.install_time + " s");
+            cell_install_time.appendChild(install_time);
+            child_row.appendChild(cell_install_time);
 
-            var form_child_sa = document.createElement("form");
-            form_child_sa.id = "delete_sa_form_" + id;
-            form_child_sa.action = "/server_connections/delete_sa/";
+            var cell_button_terminate_child_sa = document.createElement("td");
 
-            var csrf_token_child_sas = document.createElement("input");
-            csrf_token_child_sas.name = "csrfmiddlewaretoken";
-            csrf_token_child_sas.value = getCookie('csrftoken');
-            csrf_token_child_sas.type = "hidden";
-            form_child_sa.appendChild(csrf_token_child_sas);
+            var form_terminate_child_sa = document.createElement("form");
+            form_terminate_child_sa.id = child_id;
+            form_terminate_child_sa.method = "POST";
+            form_terminate_child_sa.action = "/server_connections/terminate_sa/";
+            form_terminate_child_sa.className = "pull-right inline-class";
+            form_terminate_child_sa.setAttribute("onSubmit", "return button_terminate_child_sa_clicked(this)");
+
+            var csrf_token_child_sa = document.createElement("input");
+            csrf_token_child_sa.name = "csrfmiddlewaretoken";
+            csrf_token_child_sa.value = getCookie('csrftoken');
+            csrf_token_child_sa.type = "hidden";
+            form_terminate_child_sa.appendChild(csrf_token_child_sa);
 
             var child_sa_id = document.createElement("input");
-            child_sa_id.name = "sa_id";
-            child_sa_id.value = id;
+            child_sa_id.name = "child_sa_id";
+            child_sa_id.value = child_id;
             child_sa_id.type = "hidden";
-            form_child_sa.appendChild(child_sa_id);
+            form_terminate_child_sa.appendChild(child_sa_id);
 
-            var div_child_sa = document.createElement("div");
-            div_child_sa.id = "delete_child_sa_" + id;
+            var connection_id_child_sa = document.createElement("input");
+            connection_id_child_sa.name = "conn_id";
+            connection_id_child_sa.value = conn_id;
+            connection_id_child_sa.type = "hidden";
+            form_terminate_child_sa.appendChild(connection_id_child_sa);
 
-            var delete_child_sa_button = document.createElement("button");
-            delete_child_sa_button.type = 'button';
-            delete_child_sa_button.className = 'btn btn-danger';
-            delete_child_sa_button.innerHTML = "delete";
+            var span_terminate_child_sa = document.createElement("span");
+            span_terminate_child_sa.title = "Terminate Child SA";
 
-            div_child_sa.appendChild(delete_child_sa_button);
-            form_child_sa.appendChild(child_sa_id);
-            form_child_sa.appendChild(div_child_sa);
-            cell_button_child_sa.appendChild(form_child_sa);
-            child_row.appendChild(cell_button_child_sa);
+            var button_terminate_child_sa = document.createElement("button");
+            button_terminate_child_sa.type = "submit";
+            button_terminate_child_sa.className = "btn btn-default";
+            button_terminate_child_sa.id = "btn_terminate_child_sa_" + child_id;
+
+            var glyphicon_remove_child_sa = document.createElement("span");
+            glyphicon_remove_child_sa.className = "glyphicon glyphicon-remove";
+            button_terminate_child_sa.appendChild(glyphicon_remove_child_sa);
+
+            var button_terminate_child_sa_text = document.createElement("span");
+            button_terminate_child_sa_text.id = "btn_terminate_child_sa_text";
+            button_terminate_child_sa.appendChild(button_terminate_child_sa_text);
+
+            span_terminate_child_sa.appendChild(button_terminate_child_sa);
+            form_terminate_child_sa.appendChild(span_terminate_child_sa);
+            cell_button_terminate_child_sa.appendChild(form_terminate_child_sa);
+            child_row.appendChild(cell_button_terminate_child_sa);
 
             table.appendChild(child_row);
         }
@@ -344,3 +388,25 @@ function getCookie(cname) {
     }
     return "";
 }
+
+button_terminate_sa_clicked = function button_terminate_sa_clicked(form) {
+    var btn = $("#btn_terminate_sa_" + form.id);
+    if (btn.hasClass('btn-default')) {
+        btn.removeClass('btn-default').addClass('btn-danger');
+        btn.children('#btn_terminate_sa_text').text(' terminate');
+        return false;
+    } else {
+        return true;
+    }
+};
+
+button_terminate_child_sa_clicked = function button_terminate_child_sa_clicked(form) {
+    var btn = $("#btn_terminate_child_sa_" + form.id);
+    if (btn.hasClass('btn-default')) {
+        btn.removeClass('btn-default').addClass('btn-danger');
+        btn.children('#btn_terminate_child_sa_text').text(' terminate');
+        return false;
+    } else {
+        return true;
+    }
+};

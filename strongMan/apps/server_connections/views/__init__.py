@@ -12,6 +12,7 @@ from .SaInfoHandler import SaInfoHandler
 from .CertificatePickerHandler import CertificatePickerHandler
 from .CaPickerHandler import CaPickerHandler
 from .PoolPickerHandler import PoolPickerHandler
+from .SaTerminateHandler import SaTerminateHandler
 
 
 @require_http_methods('GET')
@@ -44,6 +45,13 @@ def toggle_connection(request):
 @login_required
 def delete_connection(request, id):
     handler = DeleteHandler(request, id)
+    return handler.handle()
+
+
+@login_required
+@require_http_methods('POST')
+def terminate_sa(request):
+    handler = SaTerminateHandler(request)
     return handler.handle()
 
 

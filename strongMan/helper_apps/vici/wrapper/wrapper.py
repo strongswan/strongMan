@@ -182,6 +182,36 @@ class ViciWrapper:
         except Exception as e:
             raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
 
+    def terminate_ike_sa(self, unique_sa_id):
+        '''
+        :param unique_sa_id:
+        :type unique_sa_id: str
+        '''
+        ike_sa = OrderedDict()
+        ike_sa['ike-id'] = unique_sa_id
+        try:
+            logs = self.session.terminate(ike_sa)
+            for log in logs:
+                message = log['msg'].decode('ascii')
+                yield OrderedDict(message=message)
+        except Exception as e:
+            raise ViciTerminateException("Can't terminate Ike SA!")
+
+    def terminate_child_sa(self, reqid):
+        '''
+        :param reqid:
+        :type reqid: str
+        '''
+        child_sa = OrderedDict()
+        child_sa['child-id'] = reqid
+        try:
+            logs = self.session.terminate(child_sa)
+            for log in logs:
+                message = log['msg'].decode('ascii')
+                yield OrderedDict(message=message)
+        except Exception as e:
+            raise ViciTerminateException("Can't terminate Child SA!")
+
     def get_connection_state(self, connection_name):
         default_state = 'DOWN'
         try:

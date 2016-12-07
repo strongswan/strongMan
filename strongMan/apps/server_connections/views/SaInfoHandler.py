@@ -54,9 +54,12 @@ class IkeSA(object):
 
 class ChildSA(object):
     def __init__(self, child_sa):
+        self.uniqueid = child_sa['uniqueid'].decode('ascii')
         self.remote_ts = child_sa['remote-ts'][0].decode('ascii')
         self.local_ts = child_sa['local-ts'][0].decode('ascii')
         self.bytes_in = child_sa['bytes-in'].decode('ascii')
         self.bytes_out = child_sa['bytes-out'].decode('ascii')
         self.packets_in = child_sa['packets-in'].decode('ascii')
         self.packets_out = child_sa['packets-out'].decode('ascii')
+        self.install_time = child_sa['install-time'].decode('ascii')
+
