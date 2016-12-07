@@ -158,10 +158,10 @@ function generate_entries(conn_id, rows, child) {
         var id = child[i].uniqueid;
         var row = document.createElement("tr");
 
-        var cell_uniqueid = document.createElement("td");
-        var uniqueid = document.createTextNode(id);
-        cell_uniqueid.appendChild(uniqueid);
-        row.appendChild(cell_uniqueid);
+        // var cell_uniqueid = document.createElement("td");
+        // var uniqueid = document.createTextNode(id);
+        // cell_uniqueid.appendChild(uniqueid);
+        // row.appendChild(cell_uniqueid);
 
         var cell_remote_host = document.createElement("td");
         var remote_host = document.createTextNode(child[i].remote_host);
@@ -311,7 +311,11 @@ function generate_entries(conn_id, rows, child) {
             child_row.appendChild(cell_packets_out);
 
             var cell_install_time = document.createElement("td");
-            var install_time = document.createTextNode(child_sa.install_time + " s");
+            var install_time_seconds = child_sa.install_time;
+            var time_stamp = new Date().getTime() - install_time_seconds*1000;
+            var time = new Date(time_stamp);
+
+            var install_time = document.createTextNode(time.toLocaleTimeString());
             cell_install_time.appendChild(install_time);
             child_row.appendChild(cell_install_time);
 
