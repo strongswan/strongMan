@@ -227,154 +227,154 @@ function generate_entries(conn_id, rows, child) {
         var child_sas = child[i].child_sas;
         var nr_of_children = Object.keys(child_sas).length;
 
-        var child_sas_row = document.createElement("tr");
-        child_sas_row.id = "child_sas" + id;
+        if (nr_of_children > 0) {
 
-        var cell_child_sas = document.createElement("td");
-        cell_child_sas.colSpan = "5";
-        cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
+            var child_sas_row = document.createElement("tr");
+            child_sas_row.id = "child_sas" + id;
 
-        var table = document.createElement("table");
-        table.className = "table-hover table-condensed table-responsive";
-        table.style = "width: 100%;";
+            var cell_child_sas = document.createElement("td");
+            cell_child_sas.colSpan = "5";
+            cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 
-        var child_sas_header_row = document.createElement("thead");
+            var table = document.createElement("table");
+            table.className = "table-hover table-condensed table-responsive";
+            table.style = "width: 100%;";
 
-        var h_cell_remote_ts = document.createElement("th");
-        var h_remote_ts = document.createTextNode("remote ts");
-        h_cell_remote_ts.appendChild(h_remote_ts);
-        child_sas_header_row.appendChild(h_cell_remote_ts);
-        var h_cell_local_ts = document.createElement("th");
-        var h_local_ts = document.createTextNode("local ts");
-        h_cell_local_ts.appendChild(h_local_ts);
-        child_sas_header_row.appendChild(h_cell_local_ts);
-        var h_cell_bytes_in = document.createElement("th");
-        var h_bytes_in = document.createTextNode("bytes in");
-        h_cell_bytes_in.appendChild(h_bytes_in);
-        child_sas_header_row.appendChild(h_cell_bytes_in);
-        var h_cell_bytes_out = document.createElement("th");
-        var h_bytes_out = document.createTextNode("bytes out");
-        h_cell_bytes_out.appendChild(h_bytes_out);
-        child_sas_header_row.appendChild(h_cell_bytes_out);
-        var h_cell_packets_in = document.createElement("th");
-        var h_packets_in = document.createTextNode("packets in");
-        h_cell_packets_in.appendChild(h_packets_in);
-        child_sas_header_row.appendChild(h_cell_packets_in);
-        var h_cell_packets_out = document.createElement("th");
-        var h_packets_out = document.createTextNode("packets out");
-        h_cell_packets_out.appendChild(h_packets_out);
-        child_sas_header_row.appendChild(h_cell_packets_out);
-        var h_cell_install_time = document.createElement("th");
-        var h_install_time = document.createTextNode("install time");
-        h_cell_install_time.appendChild(h_install_time);
-        child_sas_header_row.appendChild(h_cell_install_time);
-        var h_cell_terminate_button = document.createElement("th");
-        child_sas_header_row.appendChild(h_cell_terminate_button);
+            var child_sas_header_row = document.createElement("thead");
 
-        table.appendChild(child_sas_header_row);
+            var h_cell_remote_ts = document.createElement("th");
+            var h_remote_ts = document.createTextNode("remote ts");
+            h_cell_remote_ts.appendChild(h_remote_ts);
+            child_sas_header_row.appendChild(h_cell_remote_ts);
+            var h_cell_local_ts = document.createElement("th");
+            var h_local_ts = document.createTextNode("local ts");
+            h_cell_local_ts.appendChild(h_local_ts);
+            child_sas_header_row.appendChild(h_cell_local_ts);
+            var h_cell_bytes_in = document.createElement("th");
+            var h_bytes_in = document.createTextNode("bytes in");
+            h_cell_bytes_in.appendChild(h_bytes_in);
+            child_sas_header_row.appendChild(h_cell_bytes_in);
+            var h_cell_bytes_out = document.createElement("th");
+            var h_bytes_out = document.createTextNode("bytes out");
+            h_cell_bytes_out.appendChild(h_bytes_out);
+            child_sas_header_row.appendChild(h_cell_bytes_out);
+            var h_cell_packets_in = document.createElement("th");
+            var h_packets_in = document.createTextNode("packets in");
+            h_cell_packets_in.appendChild(h_packets_in);
+            child_sas_header_row.appendChild(h_cell_packets_in);
+            var h_cell_packets_out = document.createElement("th");
+            var h_packets_out = document.createTextNode("packets out");
+            h_cell_packets_out.appendChild(h_packets_out);
+            child_sas_header_row.appendChild(h_cell_packets_out);
+            var h_cell_install_time = document.createElement("th");
+            var h_install_time = document.createTextNode("install time");
+            h_cell_install_time.appendChild(h_install_time);
+            child_sas_header_row.appendChild(h_cell_install_time);
+            var h_cell_terminate_button = document.createElement("th");
+            child_sas_header_row.appendChild(h_cell_terminate_button);
 
-        for (var n = 0; n < nr_of_children; n++) {
-            var child_sa = child_sas[n];
+            table.appendChild(child_sas_header_row);
 
-            var child_id = child_sa.uniqueid;
+            for (var n = 0; n < nr_of_children; n++) {
+                var child_sa = child_sas[n];
 
-            var child_row = document.createElement("tr");
+                var child_id = child_sa.uniqueid;
 
-            var cell_remote_ts = document.createElement("td");
-            var remote_ts = document.createTextNode(child_sa.remote_ts);
-            cell_remote_ts.appendChild(remote_ts);
-            child_row.appendChild(cell_remote_ts);
+                var child_row = document.createElement("tr");
 
-            var cell_local_ts = document.createElement("td");
-            var local_ts = document.createTextNode(child_sa.local_ts);
-            cell_local_ts.appendChild(local_ts);
-            child_row.appendChild(cell_local_ts);
+                var cell_remote_ts = document.createElement("td");
+                var remote_ts = document.createTextNode(child_sa.remote_ts);
+                cell_remote_ts.appendChild(remote_ts);
+                child_row.appendChild(cell_remote_ts);
 
-            var cell_bytes_in = document.createElement("td");
-            var bytes_in = document.createTextNode(child_sa.bytes_in);
-            cell_bytes_in.appendChild(bytes_in);
-            child_row.appendChild(cell_bytes_in);
+                var cell_local_ts = document.createElement("td");
+                var local_ts = document.createTextNode(child_sa.local_ts);
+                cell_local_ts.appendChild(local_ts);
+                child_row.appendChild(cell_local_ts);
 
-            var cell_bytes_out = document.createElement("td");
-            var bytes_out = document.createTextNode(child_sa.bytes_out);
-            cell_bytes_out.appendChild(bytes_out);
-            child_row.appendChild(cell_bytes_out);
+                var cell_bytes_in = document.createElement("td");
+                var bytes_in = document.createTextNode(child_sa.bytes_in);
+                cell_bytes_in.appendChild(bytes_in);
+                child_row.appendChild(cell_bytes_in);
 
-            var cell_packets_in = document.createElement("td");
-            var packets_in = document.createTextNode(child_sa.packets_in);
-            cell_packets_in.appendChild(packets_in);
-            child_row.appendChild(cell_packets_in);
+                var cell_bytes_out = document.createElement("td");
+                var bytes_out = document.createTextNode(child_sa.bytes_out);
+                cell_bytes_out.appendChild(bytes_out);
+                child_row.appendChild(cell_bytes_out);
 
-            var cell_packets_out = document.createElement("td");
-            var packets_out = document.createTextNode(child_sa.packets_out);
-            cell_packets_out.appendChild(packets_out);
-            child_row.appendChild(cell_packets_out);
+                var cell_packets_in = document.createElement("td");
+                var packets_in = document.createTextNode(child_sa.packets_in);
+                cell_packets_in.appendChild(packets_in);
+                child_row.appendChild(cell_packets_in);
 
-            var cell_install_time = document.createElement("td");
-            var install_time_seconds = child_sa.install_time;
-            var time_stamp = new Date().getTime() - install_time_seconds*1000;
-            var time = new Date(time_stamp);
+                var cell_packets_out = document.createElement("td");
+                var packets_out = document.createTextNode(child_sa.packets_out);
+                cell_packets_out.appendChild(packets_out);
+                child_row.appendChild(cell_packets_out);
 
-            var install_time = document.createTextNode(time.toLocaleTimeString());
-            cell_install_time.appendChild(install_time);
-            child_row.appendChild(cell_install_time);
+                var cell_install_time = document.createElement("td");
+                var install_time_seconds = child_sa.install_time;
+                var time_stamp = new Date().getTime() - install_time_seconds * 1000;
+                var time = new Date(time_stamp);
 
-            var cell_button_terminate_child_sa = document.createElement("td");
+                var install_time = document.createTextNode(time.toLocaleTimeString());
+                cell_install_time.appendChild(install_time);
+                child_row.appendChild(cell_install_time);
 
-            var form_terminate_child_sa = document.createElement("form");
-            form_terminate_child_sa.id = child_id;
-            form_terminate_child_sa.method = "POST";
-            form_terminate_child_sa.action = "/server_connections/terminate_sa/";
-            form_terminate_child_sa.className = "pull-right inline-class";
-            form_terminate_child_sa.setAttribute("onSubmit", "return button_terminate_child_sa_clicked(this)");
+                var cell_button_terminate_child_sa = document.createElement("td");
 
-            var csrf_token_child_sa = document.createElement("input");
-            csrf_token_child_sa.name = "csrfmiddlewaretoken";
-            csrf_token_child_sa.value = getCookie('csrftoken');
-            csrf_token_child_sa.type = "hidden";
-            form_terminate_child_sa.appendChild(csrf_token_child_sa);
+                var form_terminate_child_sa = document.createElement("form");
+                form_terminate_child_sa.id = child_id;
+                form_terminate_child_sa.method = "POST";
+                form_terminate_child_sa.action = "/server_connections/terminate_sa/";
+                form_terminate_child_sa.className = "pull-right inline-class";
+                form_terminate_child_sa.setAttribute("onSubmit", "return button_terminate_child_sa_clicked(this)");
 
-            var child_sa_id = document.createElement("input");
-            child_sa_id.name = "child_sa_id";
-            child_sa_id.value = child_id;
-            child_sa_id.type = "hidden";
-            form_terminate_child_sa.appendChild(child_sa_id);
+                var csrf_token_child_sa = document.createElement("input");
+                csrf_token_child_sa.name = "csrfmiddlewaretoken";
+                csrf_token_child_sa.value = getCookie('csrftoken');
+                csrf_token_child_sa.type = "hidden";
+                form_terminate_child_sa.appendChild(csrf_token_child_sa);
 
-            var connection_id_child_sa = document.createElement("input");
-            connection_id_child_sa.name = "conn_id";
-            connection_id_child_sa.value = conn_id;
-            connection_id_child_sa.type = "hidden";
-            form_terminate_child_sa.appendChild(connection_id_child_sa);
+                var child_sa_id = document.createElement("input");
+                child_sa_id.name = "child_sa_id";
+                child_sa_id.value = child_id;
+                child_sa_id.type = "hidden";
+                form_terminate_child_sa.appendChild(child_sa_id);
 
-            var span_terminate_child_sa = document.createElement("span");
-            span_terminate_child_sa.title = "Terminate Child SA";
+                var connection_id_child_sa = document.createElement("input");
+                connection_id_child_sa.name = "conn_id";
+                connection_id_child_sa.value = conn_id;
+                connection_id_child_sa.type = "hidden";
+                form_terminate_child_sa.appendChild(connection_id_child_sa);
 
-            var button_terminate_child_sa = document.createElement("button");
-            button_terminate_child_sa.type = "submit";
-            button_terminate_child_sa.className = "btn btn-default";
-            button_terminate_child_sa.id = "btn_terminate_child_sa_" + child_id;
+                var span_terminate_child_sa = document.createElement("span");
+                span_terminate_child_sa.title = "Terminate Child SA";
 
-            var glyphicon_remove_child_sa = document.createElement("span");
-            glyphicon_remove_child_sa.className = "glyphicon glyphicon-remove";
-            button_terminate_child_sa.appendChild(glyphicon_remove_child_sa);
+                var button_terminate_child_sa = document.createElement("button");
+                button_terminate_child_sa.type = "submit";
+                button_terminate_child_sa.className = "btn btn-default";
+                button_terminate_child_sa.id = "btn_terminate_child_sa_" + child_id;
 
-            var button_terminate_child_sa_text = document.createElement("span");
-            button_terminate_child_sa_text.id = "btn_terminate_child_sa_text";
-            button_terminate_child_sa.appendChild(button_terminate_child_sa_text);
+                var glyphicon_remove_child_sa = document.createElement("span");
+                glyphicon_remove_child_sa.className = "glyphicon glyphicon-remove";
+                button_terminate_child_sa.appendChild(glyphicon_remove_child_sa);
 
-            span_terminate_child_sa.appendChild(button_terminate_child_sa);
-            form_terminate_child_sa.appendChild(span_terminate_child_sa);
-            cell_button_terminate_child_sa.appendChild(form_terminate_child_sa);
-            child_row.appendChild(cell_button_terminate_child_sa);
+                var button_terminate_child_sa_text = document.createElement("span");
+                button_terminate_child_sa_text.id = "btn_terminate_child_sa_text";
+                button_terminate_child_sa.appendChild(button_terminate_child_sa_text);
 
-            table.appendChild(child_row);
+                span_terminate_child_sa.appendChild(button_terminate_child_sa);
+                form_terminate_child_sa.appendChild(span_terminate_child_sa);
+                cell_button_terminate_child_sa.appendChild(form_terminate_child_sa);
+                child_row.appendChild(cell_button_terminate_child_sa);
+
+                table.appendChild(child_row);
+            }
+            cell_child_sas.appendChild(table);
+            child_sas_row.appendChild(cell_child_sas);
+            sas.appendChild(child_sas_row);
         }
-
-        cell_child_sas.appendChild(table);
-
-        child_sas_row.appendChild(cell_child_sas);
-
-        sas.appendChild(child_sas_row);
     }
 }
 
