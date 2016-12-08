@@ -251,7 +251,7 @@ class UserCertificateForm(forms.Form):
     Form to choose the Usercertifite. Only shows the certs which contains a private key
     """
     certificate = CertificateChoice(queryset=UserCertificate.objects.none(), label="Server certificate",
-                                    required=True)
+                                    empty_label="Nothing selected", required=True)
     identity = IdentityChoice(choices=(), required=True)
 
     def __init__(self, *args, **kwargs):
