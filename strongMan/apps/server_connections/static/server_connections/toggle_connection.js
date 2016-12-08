@@ -234,6 +234,7 @@ function generate_entries(conn_id, rows, child) {
 
             var cell_child_sas = document.createElement("td");
             cell_child_sas.colSpan = "5";
+            cell_child_sas.className = "child-sa-cell";
             cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 
             var table = document.createElement("table");
@@ -274,6 +275,9 @@ function generate_entries(conn_id, rows, child) {
             child_sas_header_row.appendChild(h_cell_terminate_button);
 
             table.appendChild(child_sas_header_row);
+
+
+            var child_sas_body_row = document.createElement("tbody");
 
             for (var n = 0; n < nr_of_children; n++) {
                 var child_sa = child_sas[n];
@@ -369,7 +373,8 @@ function generate_entries(conn_id, rows, child) {
                 cell_button_terminate_child_sa.appendChild(form_terminate_child_sa);
                 child_row.appendChild(cell_button_terminate_child_sa);
 
-                table.appendChild(child_row);
+                child_sas_body_row.appendChild(child_row);
+                table.appendChild(child_sas_body_row);
             }
             cell_child_sas.appendChild(table);
             child_sas_row.appendChild(cell_child_sas);

@@ -52,6 +52,7 @@ class IkeSA(object):
             childrendict.append(child.__dict__)
         self.child_sas = childrendict
 
+
 class ChildSA(object):
     def __init__(self, child_sa):
         self.uniqueid = child_sa['uniqueid'].decode('ascii')
