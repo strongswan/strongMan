@@ -58,6 +58,7 @@ class ChooseTypeForm(AbstractDynamicForm):
 
 
 class AbstractConnectionForm(AbstractDynamicForm):
+
     def is_valid(self):
         valid = True
         # Call is_valid method for every base class
@@ -73,7 +74,7 @@ class AbstractConnectionForm(AbstractDynamicForm):
     def create_connection(self, connection_type):
         connection = self.model(profile=self.cleaned_data['profile'], version=self.cleaned_data['version'],
                                 pool=self.cleaned_data['pool'], send_certreq=self.cleaned_data["send_certreq"],
-                                connection_type=connection_type)
+                                connection_type=connection_type, initiate=self.cleaned_data["initiate"])
         connection.save()
         # Call create_connection method for every base class
         for base in self.__class__.__bases__:
@@ -116,6 +117,7 @@ class AbstractConnectionForm(AbstractDynamicForm):
 
 class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
                           ServerIdentityForm, PoolForm):
+
     @property
     def model(self):
         return IKEv2Certificate

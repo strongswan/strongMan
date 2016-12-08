@@ -11,8 +11,15 @@
                 <input id="toggle_input{{ record.id }}" type="checkbox" data-toggle="toggle"
                        data-offstyle="default"
                        data-onstyle="success"
-                       {% if record.subclass.is_remote_access %}data-on="Loaded" data-off="Unloaded"{% endif %}
-                       {% if record.subclass.is_site_to_site %}data-on="On" data-off="Off"{% endif %}
+                       {% if record.subclass.is_remote_access %}
+                            data-on="Loaded" data-off="Unloaded"
+                       {% elif record.subclass.is_site_to_site %}
+                            {% if record.subclass.initiate %}
+                                data-on="On" data-off="Off"
+                            {% else %}
+                                data-on="Loaded" data-off="Unloaded"
+                            {% endif %}
+                       {% endif %}
                        {% if record.state == 'ESTABLISHED' or record.state == 'LOADED' %}checked{% endif %}>
             </div>
         </form>

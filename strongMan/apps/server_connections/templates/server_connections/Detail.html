@@ -9,8 +9,13 @@
     <link rel="stylesheet" href="{% static 'server_connections/bootstrap-select.min.css' %}">
 {% endblock html-head %}
 {% block title %}Connection{% endblock title %}
-{% block small-title %}{% if connection %}Edit connection{% else %}Add a new connection
-{% endif %}{% endblock small-title %}
+{% block small-title %}
+    {% if connection %}
+        Edit connection
+    {% else %}
+        Add a new connection
+    {% endif %}
+{% endblock small-title %}
 {% block content %}
     <div id="connection-details">
         <div class="row">

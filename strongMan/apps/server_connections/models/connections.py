@@ -24,11 +24,12 @@ class Connection(models.Model):
     )
 
     profile = models.TextField(unique=True)
-    version = models.CharField(max_length=1, choices=VERSION_CHOICES, default='2')
+    version = models.CharField(max_length=1, choices=VERSION_CHOICES, default=None)
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
     send_certreq = models.NullBooleanField(null=True, blank=True, default=None)
     enabled = models.BooleanField(default=False)
     connection_type = models.TextField()
+    initiate = models.NullBooleanField(null=True, blank=True, default=None)
 
     def dict(self):
         children = OrderedDict()
@@ -36,15 +37,21 @@ class Connection(models.Model):
             children[child.name] = child.dict()
 
         ike_sa = OrderedDict()
-        ike_sa['pools'] = [self.pool.poolname]
-        ike_sa['local_addrs'] = [local_address.value for local_address in self.server_local_addresses.all()]
+        if self.pool is not None:
+            ike_sa['pools'] = [self.pool.poolname]
+        local_address = [local_address.value for local_address in self.server_local_addresses.all()]
+        if local_address[0] is not '':
+            ike_sa['local_addrs'] = local_address
         remote_address = [remote_address.value for remote_address in self.server_remote_addresses.all()]
         if remote_address[0] is not '':
             ike_sa['remote_addrs'] = remote_address
         ike_sa['version'] = self.version
         ike_sa['proposals'] = [proposal.type for proposal in self.server_proposals.all()]
         ike_sa['children'] = children
-        ike_sa['send_certreq'] = self.send_certreq
+        if self.send_certreq == '1':
+            ike_sa['send_certreq'] = 'yes'
+        else:
+            ike_sa['send_certreq'] = 'no'
 
         for local in self.server_local.all():
             local = local.subclass()
@@ -78,11 +85,12 @@ class Connection(models.Model):
 
     def start(self):
         self.load()
-        vici_wrapper = ViciWrapper()
-        for child in self.server_children.all():
-            logs = vici_wrapper.initiate(child.name, self.profile)
-            for log in logs:
-                LogMessage(connection=self, message=log['message']).save()
+        if self.initiate:
+            vici_wrapper = ViciWrapper()
+            for child in self.server_children.all():
+                logs = vici_wrapper.initiate(child.name, self.profile)
+                for log in logs:
+                    LogMessage(connection=self, message=log['message']).save()
 
     def unload(self):
         self.enabled = False
@@ -131,9 +139,9 @@ class Connection(models.Model):
 
     @property
     def state(self):
-        if self.is_remote_access():
+        vici_wrapper = ViciWrapper()
+        if self.is_remote_access() or self.is_site_to_site() and not self.initiate:
             try:
-                vici_wrapper = ViciWrapper()
                 loaded = vici_wrapper.is_connection_loaded(self.profile)
                 if loaded:
                     return State.LOADED.value
@@ -143,7 +151,6 @@ class Connection(models.Model):
                 return State.UNLOADED.value
         else:
             try:
-                vici_wrapper = ViciWrapper()
                 state = vici_wrapper.get_connection_state(self.profile)
                 if state == State.DOWN.value:
                     return State.DOWN.value

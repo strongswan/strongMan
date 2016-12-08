@@ -24,6 +24,7 @@ class UpdateHandler:
         if form is None:
             form = AbstractConnectionForm.subclass(self.connection)
             form.fill(self.connection)
+        form.connection_type = self.connection.connection_type
         return render(self.request, 'server_connections/Detail.html', {"form": form, "connection": self.connection})
 
     def _abstract_form(self):

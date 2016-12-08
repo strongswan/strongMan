@@ -23,10 +23,21 @@
         </div>
     </div>
 
+    <div class="row">
+        <label class="control-label col-sm-3 col-xs-12" for="label_connection_type">Connection Type</label>
+        <div class="col-sm-9 col-xs-12">
+            <p name="connection_type" id="connection_type">
+                {% ifequal form.connection_type 'site_to_site' %}Site to Site{% endifequal %}
+                {% ifequal form.connection_type 'remote_access' %}Remote Access{% endifequal %}
+            </p>
+        </div>
+    </div>
+
     <hr>
 
     <form action="" method="post">
         {% csrf_token %}
+        <input type="hidden" name="connection_type" value="{{ form.connection_type }}"/>
         <input type="hidden" name="current_form" value="{{ form|classname }}"/>
         <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
         <div class="row">
@@ -84,48 +95,6 @@
             </div>
         </div>
 
-{#        <div class="row picker">#}
-{#            <label class="control-label col-sm-3 col-xs-12">{{ form.pool.label }}</label>#}
-{#            <div class="controls col-sm-8 col-xs-10">#}
-{#                <select class="selectpicker" data-live-search="true"#}
-{#                        name="{{ form.pool.name }}"#}
-{#                        id="id_{{ form.pool.name }}" data-show-subtext="True">#}
-{#                    <option value="">{{ form.fields.pool.empty_label }}</option>#}
-{#                    {% for choice in form.pool.field.queryset %}#}
-{#                        <option value="{{ choice.id }}"#}
-{#                                {% if form.pool.value|slugify == choice.id|slugify %}#}
-{#                                selected="selected"{% endif %}>{{ choice }}</option>#}
-{#                    {% endfor %}#}
-{#                </select>#}
-{#                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.pool %}#}
-{#            </div>#}
-{#            <div class="col-sm-1 col-xs-2">#}
-{#                {% include "server_connections/widgets/QuestionPopover.html" with title="Pools help" content="Select a pool." %}#}
-{#            </div>#}
-{#            <div class="col-sm-11 col-xs-10">#}
-{#                <div class="pull-right">#}
-{#                    <a data-toggle="modal" data-target="#AddPoolModal">Upload new Pool</a>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{#        <div class="modal fade" id="AddPoolModal" tabindex="-1" role="dialog">#}
-{#            <div class="modal-dialog" role="document">#}
-{#                <div class="modal-content">#}
-{#                    <div class="modal-header">#}
-{#                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span#}
-{#                                aria-hidden="true">&times;</span></button>#}
-{#                        <h4 class="modal-title" id="myModalLabel">Upload Pool</h4>#}
-{#                    </div>#}
-{#                    <div class="modal-body text-center">#}
-{#                        <iframe src="{% url "pools:add_form" %}" frameborder="0"#}
-{#                                style="width: 100%; height: 600px;"></iframe>#}
-{#                        <button type="button" class="btn btn-primary" data-dismiss="modal">Finish</button>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-
         {% include "server_connections/forms/PoolPicker.html" with pool=form.pool%}
 
         <div class="row">
@@ -160,6 +129,23 @@
                 {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Select Start Action for this connection." %}
             </div>
         </div>
+
+        {% if form.connection_type == 'site_to_site' or connection.connection_type == 'site_to_site' %}
+            <div class="row">
+                <label class="control-label col-sm-3 col-xs-12">Active initiator</label>
+                <div class="controls col-sm-8 col-xs-10">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="initiate" {% if form.initiate.value == True %}
+                                 checked="checked"
+                            {% endif %}>Initiate connection
+                    </label>
+                    {% include "server_connections/forms/../widgets/errormsg.html" with field=form.initiate %}
+                </div>
+                <div class="col-sm-1 col-xs-2">
+                    {% include "server_connections/widgets/QuestionPopover.html" with title="Initiate help" content="Select if connection should be initiated after loading." %}
+                </div>
+            </div>
+        {% endif %}
 
         <hr>
 

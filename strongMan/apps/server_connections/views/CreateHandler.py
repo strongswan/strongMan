@@ -15,6 +15,7 @@ class AddHandler:
     def _render(self, form=ChooseTypeForm()):
         if isinstance(form, ChooseTypeForm):
             form = ChooseTypeForm(None, self.connection_type)
+        form.connection_type = self.connection_type
         return render(self.request, 'server_connections/Detail.html', {"form": form})
 
     def _abstract_form(self):

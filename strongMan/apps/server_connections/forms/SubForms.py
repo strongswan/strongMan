@@ -10,13 +10,14 @@ from strongMan.apps.pools.models import Pool
 class HeaderForm(forms.Form):
     connection_id = forms.IntegerField(required=False)
     profile = forms.CharField(max_length=50, initial="")
-    local_addrs = forms.CharField(max_length=50, initial="")
+    local_addrs = forms.CharField(max_length=50, initial="", required=False)
     remote_addrs = forms.CharField(max_length=50, initial="", required=False)
     version = forms.ChoiceField(widget=forms.RadioSelect(), choices=Connection.VERSION_CHOICES, initial='2')
-    send_certreq = forms.BooleanField(required=False)
-    local_ts = forms.CharField(max_length=50, initial="")
+    send_certreq = forms.BooleanField(initial=True, required=False)
+    local_ts = forms.CharField(max_length=50, initial="", required=False)
     remote_ts = forms.CharField(max_length=50, initial="", required=False)
     start_action = forms.ChoiceField(widget=forms.Select(), choices=Child.START_ACTION_CHOICES, required=False)
+    initiate = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(HeaderForm, self).__init__(*args, **kwargs)
@@ -31,6 +32,13 @@ class HeaderForm(forms.Form):
             raise forms.ValidationError("Connection with same name already exists!")
         return profile
 
+    def clean_remote_addrs(self):
+        remote_addrs = self.cleaned_data['remote_addrs']
+        if remote_addrs is '':
+            if 'initiate' in self.data:
+                raise forms.ValidationError("This field is required.")
+        return remote_addrs
+
     def fill(self, connection):
         self.initial['profile'] = connection.profile
         self.initial['local_addrs'] = connection.server_local_addresses.first().value
@@ -40,6 +48,8 @@ class HeaderForm(forms.Form):
         self.initial['local_ts'] = connection.server_children.first().server_local_ts.first().value
         self.initial['remote_ts'] = connection.server_children.first().server_remote_ts.first().value
         self.initial['start_action'] = connection.server_children.first().start_action
+        if connection.is_site_to_site():
+            self.initial['initiate'] = connection.initiate
 
     def create_connection(self, connection):
         child = Child(name=self.cleaned_data['profile'], connection=connection,
@@ -59,6 +69,7 @@ class HeaderForm(forms.Form):
         connection.profile = self.cleaned_data['profile']
         connection.version = self.cleaned_data['version']
         connection.send_certreq = self.cleaned_data["send_certreq"]
+        connection.initiate = self.cleaned_data['initiate']
         connection.save()
 
     def model(self):

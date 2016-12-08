@@ -143,9 +143,10 @@
   a {
     cursor: pointer;
   }
-  input, .identity_picker, .picker, .cert_upload {
+  .row, input, .identity_picker, .picker, .cert_upload, .certificateselect, .identityselect {
     margin-bottom: 10px;
   }
+
 }
 
 .filter-table {
