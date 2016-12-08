@@ -19,6 +19,6 @@ class PoolRefreshHandler:
             messages.warning(self.request, str(e))
 
     def _render(self):
-        pooldetails = ViciWrapper().get_pools()
+        pooldetails = ViciWrapper().get_pools({'leases': "yes"})
         table = {"pools": pooldetails}
         return render(self.request, 'pools/widgets/detailPoolTable.html', {'table': table, 'is_refresh': True})

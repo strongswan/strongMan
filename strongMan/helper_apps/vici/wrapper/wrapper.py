@@ -225,8 +225,11 @@ class ViciWrapper:
         except Exception as e:
             return default_state
 
-    def get_pools(self):
-        return self.session.get_pools()
+    def get_pools(self, include_leases):
+        try:
+            return self.session.get_pools(include_leases)
+        except:
+            return self.session.get_pools()
 
     def unload_pool(self, pool_name):
         try:
