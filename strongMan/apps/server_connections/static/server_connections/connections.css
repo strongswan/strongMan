@@ -106,4 +106,14 @@ td.alt {
 td.child-alt {
   background-color: #bfe4ff; }
 
+.modal-dialog {
+  width: 800px;
+  margin: 30px auto; }
+
+#read-only-view {
+  hight: 100%; }
+  #read-only-view dl {
+    margin-bottom: 0px;
+    width: 100%; }
+
 /*# sourceMappingURL=connections.css.map */

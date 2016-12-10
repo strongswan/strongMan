@@ -4,124 +4,145 @@
 <html>
 <head>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'server_connections/connections.css' %}">
 </head>
 <body>
-    <dl class="dl-horizontal">
-        <dt>Method</dt><dd>{{ form.model.choice_name }}</dd>
-    </dl>
-    <dl class="dl-horizontal">
-        <dt>Name</dt>
-        <dd>{{ form.profile.value }}</dd>
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>IKE Version</dt>
-        <dd>{{ form.version.value }}</dd>
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Server Address</dt>
-        {% if not form.local_addrs.value %}
-            <dd>-</dd>
-        {% else %}
-            <dd>{{ form.local_addrs.value }}</dd>
-        {% endif %}
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Remote Address</dt>
-        {% if not form.remote_addrs.value %}
-            <dd>-</dd>
-        {% else %}
-            <dd>{{ form.remote_addrs.value }}</dd>
-        {% endif %}
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Pool Name</dt>
-        <dd>{{ form.initial.pool.poolname }}</dd>
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Send Certificate Request</dt>
-        <dd>{{ form.send_certreq.value }}</dd>
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Start Action</dt>
-        {% if not form.start_action.value %}
-            <dd>-</dd>
-        {% else %}
-            <dd>{{ form.start_action.value }}</dd>
-        {% endif %}
-    </dl>
-
-    {% for key, value in form.remote_auth.field.choices %}
-        {% if form.remote_auth.value|slugify == key|slugify %}
-            <dl class="dl-horizontal">
-                <dt>Remote Authentication</dt>
-                <dd>{{ value }}</dd>
-            </dl>
-        {% endif %}
-    {% endfor %}
-
-    {% if form.connection_type == 'site_to_site' or connection.connection_type == 'site_to_site' %}
-        <dl class="dl-horizontal">
-            <dt>Active initiator</dt>
-            <dd>{{ form.initiate.value }}</dd>
+    <div id="read-only-view">
+        <dl class="row">
+            <dt class="col-sm-4">Method</dt>
+            <dd class="col-sm-8">{{ form.model.choice_name }}</dd>
         </dl>
-    {% endif %}
-
-    {% for choise in form.certificate.field.queryset %}
-        {% if form.certificate.value|slugify == choise.id|slugify %}
-            <dl class="dl-horizontal">
-                <dt>Certificate</dt>
-                <dd>{{ choise }}</dd>
-            </dl>
-        {% endif %}
-    {% endfor %}
-
-    {% for value, identity_choice in form.identity.field.choices %}
-        {% if form.identity.value|slugify == value|slugify %}
-            <dl class="dl-horizontal">
-                <dt>Identity</dt>
-                <dd>{{ identity_choice }}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>Identity Type</dt>
-                <dd>{{ identity_choice.type }}</dd>
-            </dl>
-        {% endif %}
-    {% endfor %}
-
-    {% for choise in form.certificate_ca.field.queryset %}
-        {% if form.certificate_ca.value|slugify == choise.id|slugify %}
-            <dl class="dl-horizontal">
-                <dt>CA Certificate</dt>
-                <dd>{{ choise }}</dd>
-            </dl>
-        {% endif %}
-    {% endfor %}
-
-    {% if form.identity_ca.value %}
-        <dl class="dl-horizontal">
-            <dt>CA Identity</dt>
-            <dd>{{ form.identity_ca.value }}</dd>
+        <dl class="row">
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8">{{ form.profile.value }}</dd>
         </dl>
-    {% endif %}
+        <dl class="row">
+            <dt class="col-sm-4">IKE Version</dt>
+            <dd class="col-sm-8">{{ form.version.value }}</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Server Address</dt>
+            {% if not form.local_addrs.value %}
+                <dd class="col-sm-8">-</dd>
+            {% else %}
+                <dd class="col-sm-8">{{ form.local_addrs.value }}</dd>
+            {% endif %}
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Remote Address</dt>
+            {% if not form.remote_addrs.value %}
+                <dd class="col-sm-8">-</dd>
+            {% else %}
+                <dd class="col-sm-8">{{ form.remote_addrs.value }}</dd>
+            {% endif %}
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Pool Name</dt>
+            <dd class="col-sm-8">{{ form.initial.pool.poolname }}</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Send Certificate Request</dt>
+            <dd class="col-sm-8">{{ form.send_certreq.value }}</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Start Action</dt>
+            {% if not form.start_action.value %}
+                <dd class="col-sm-8">-</dd>
+            {% else %}
+                <dd class="col-sm-8">{{ form.start_action.value }}</dd>
+            {% endif %}
+        </dl>
 
-    <dl class="dl-horizontal">
-        <dt>Local traffic selector</dt>
-        <dd>{{ form.local_ts.value }}</dd>
-    </dl>
-
-    <dl class="dl-horizontal">
-        <dt>Remote traffic selector</dt>
-        {% if not form.remote_ts.value %}
-            <dd>-</dd>
-        {% else %}
-            <dd>{{ form.remote_ts.value }}</dd>
+        {% if form.remote_auth.value %}
+            <dl class="row">
+                <dt class="col-sm-4">Remote Authentication</dt>
+                {% for key, value in form.remote_auth.field.choices %}
+                    {% if form.remote_auth.value|slugify == key|slugify %}
+                        <dd class="col-sm-8" class="col-sm-8">{{ value }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
         {% endif %}
-    </dl>
+
+        {% if form.connection_type == 'site_to_site' or connection.connection_type == 'site_to_site' %}
+            <dl class="row">
+                <dt class="col-sm-4">Active initiator</dt>
+                <dd class="col-sm-8" class="col-sm-8">{{ form.initiate.value }}</dd>
+            </dl>
+        {% endif %}
+        {% for choise in form.certificate.field.queryset %}
+            {% if form.certificate.value|slugify == choise.id|slugify %}
+                <dl class="row">
+                    <dt class="col-sm-4">Server Certificate</dt>
+                    <dd class="col-sm-8">{{ choise }}</dd>
+                </dl>
+            {% endif %}
+        {% endfor %}
+        {% if form.certificate and not form.certificate.value %}
+            <dl class="row">
+                <dt class="col-sm-4">Server Certificate</dt>
+                <dd class="col-sm-8">-</dd>
+            </dl>
+        {% endif %}
+        {% for value, identity_choice in form.identity.field.choices %}
+            {% if form.identity.value|slugify == value|slugify %}
+                <dl class="row">
+                    <dt class="col-sm-4">Identity</dt>
+                    <dd class="col-sm-8">{{ identity_choice }}</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Identity Type</dt>
+                    <dd class="col-sm-8">{{ identity_choice.type }}</dd>
+                </dl>
+            {% endif %}
+        {% endfor %}
+        {% if form.identitiy and not form.identitiy.value %}
+            <dl class="row">
+                <dt class="col-sm-4">Identity</dt>
+                <dd class="col-sm-8">-</dd>
+            </dl>
+        {% endif %}
+        {% for choise in form.certificate_ca.field.queryset %}
+            {% if form.certificate_ca.value|slugify == choise.id|slugify %}
+                <dl class="row">
+                    <dt class="col-sm-4">CA/Peer Certificate</dt>
+                    <dd class="col-sm-8">{{ choise }}</dd>
+                </dl>
+            {% endif %}
+        {% endfor %}
+        {% if form.certificate and not form.certificate_ca.value %}
+            <dl class="row">
+                <dt class="col-sm-4">CA/Peer Certificate</dt>
+                <dd class="col-sm-8">-</dd>
+            </dl>
+        {% endif %}
+        {% if form.identity_ca.value %}
+            <dl class="row">
+                <dt class="col-sm-4">CA Identity</dt>
+                <dd class="col-sm-8">{{ form.identity_ca.value }}</dd>
+            </dl>
+        {% elif form.identity and not form.identity_ca.value %}
+            <dl class="row">
+                <dt class="col-sm-4">CA Identity</dt>
+                <dd class="col-sm-8">-</dd>
+            </dl>
+        {% endif %}
+        <dl class="row">
+            <dt class="col-sm-4">Local traffic selector</dt>
+            {% if not form.local_ts.value %}
+                <dd class="col-sm-8">-</dd>
+            {% else %}
+                <dd class="col-sm-8">{{ form.local_ts.value }}</dd>
+            {% endif %}
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-4">Remote traffic selector</dt>
+            {% if not form.remote_ts.value %}
+                <dd class="col-sm-8">-</dd>
+            {% else %}
+                <dd class="col-sm-8">{{ form.remote_ts.value }}</dd>
+            {% endif %}
+        </dl>
+    </div>
 </body>
 </html>

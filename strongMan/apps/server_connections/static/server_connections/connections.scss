@@ -168,5 +168,16 @@ td.child-alt {
   background-color: #bfe4ff;
 }
 
+.modal-dialog {
+  width: 800px;
+  margin: 30px auto;
+}
+#read-only-view {
+  hight: 100%;
+  dl {
+    margin-bottom: 0px;
+    width: 100%;
+  }
+}
 
 
