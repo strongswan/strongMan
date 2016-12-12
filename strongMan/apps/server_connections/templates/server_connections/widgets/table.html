@@ -15,10 +15,13 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input id="remoteHostFilter" class="form-control input-sm" type="text" placeholder="Remote host"></td>
-                        <td><input id="remoteIdFilter" class="form-control input-sm" type="text" placeholder="Remote ID"></td>
-                        <td><input id="remoteTsFilter" class="form-control input-sm" type="text" placeholder="Remote ts"></td>
-                        <td><input id="localTsFilter" class="form-control input-sm" type="text" placeholder="Local ts"></td>
+                        <td><input id="remoteHostFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote host"></td>
+                        <td><input id="remoteIdFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote ID"></td>
+                        <td><input id="remoteTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Remote ts"></td>
+                        <td><input id="localTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Local ts"></td>
+                        <td><div class="col-sm-1 col-xs-2">
+                            {% include "server_connections/widgets/QuestionPopover.html" with title="Filter help" content="Filterterm = 'Remote Host' OR 'Remote ID' AND ('Remote TS' OR 'Local TS'). If you set Remote Host and Remote ID, the last focused value is taken for filtering." %}
+                        </div></td>
                     </tr>
                 </tbody>
             </table>
@@ -143,6 +146,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
         function rememberVisible (obj) {
             obj.removeClass('notVisible');
             if(obj.css('display') == 'none') {
@@ -235,4 +239,11 @@
             });
         });
     });
+    $(function () {
+        $(document).popover({
+            selector: '[data-toggle=popover]',
+            trigger: 'focus',
+            container: 'body'
+        });
+      });
 </script>
