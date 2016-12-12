@@ -9,10 +9,10 @@
                     <div class="controls col-sm-8 col-xs-10">
                         <input required type="text" class="form-control" name="poolname" value="{{ form.poolname.value }}"
                                placeholder="Pool name"/>
-                        {% include "connections/forms/../widgets/errormsg.html" with field=poolname %}
+                        {% include "pools/widgets/errormsg.html" with field=poolname %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "connections/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. 'dhcp' and 'radius' are reserved keywords. These can be used from the server connections wizard directly. There's no need to create such a pool." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. 'dhcp' and 'radius' are reserved keywords. These can be used from the server connections wizard directly. There's no need to create such a pool." %}
                     </div>
                 </div>
 
@@ -21,10 +21,10 @@
                     <div class="controls col-sm-8 col-xs-10">
                         <input required type="text" class="form-control" name="addresses" value="{{ form.addresses.value }}"
                                placeholder="Address list"/>
-                        {% include "connections/forms/../widgets/errormsg.html" with field=addresses %}
+                        {% include "pools/widgets/errormsg.html" with field=addresses %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "connections/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the corresponding addresses comma separated." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the corresponding addresses comma separated." %}
                     </div>
                 </div>
 
@@ -41,10 +41,10 @@
                                 </option>
                             {% endfor %}
                         </select>
-                        {% include "server_connections/forms/../widgets/errormsg.html" with field=form.attribute %}
+                        {% include "pools/widgets/errormsg.html" with field=form.attribute %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "server_connections/widgets/QuestionPopover.html" with title="Attributes" content="Select attribute type." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attributes" content="Select attribute type." %}
                     </div>
                 </div>
 
@@ -53,10 +53,10 @@
                     <div class="controls col-sm-8 col-xs-10">
                         <input type="text" class="form-control" name="attributevalues" value="{{ form.attributevalues.value }}"
                                placeholder="Attribute values"/>
-                        {% include "connections/forms/../widgets/errormsg.html" with field=attributevalues %}
+                        {% include "pools/widgets/errormsg.html" with field=attributevalues %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "connections/widgets/QuestionPopover.html" with title="Attribute help" content="Enter the corresponding values comma separated." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attribute help" content="Enter the corresponding values comma separated." %}
                     </div>
                 </div>
 
