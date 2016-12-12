@@ -128,4 +128,9 @@ td.child-alt {
     margin-bottom: 0px;
     width: 100%; }
 
+#grow span {
+  font-family: 'Glyphicons Halflings';
+  float: left;
+  color: grey; }
+
 /*# sourceMappingURL=connections.css.map */

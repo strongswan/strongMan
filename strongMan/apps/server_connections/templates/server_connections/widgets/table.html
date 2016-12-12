@@ -53,16 +53,15 @@
                                         {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
                             {% endfor %}
                         </tr>
-                        <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row {{ cyclename }}"
+                        <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row {{ cyclename }} collapsed"
                             style="display: none;">
-                            <td colspan="6" class="connection-info-span">
+                            <td colspan="7" class="connection-info-span">
                                 <div class="sa-scroll">
-                                <div class="panel panel-default connection-info">
-                                    <div class="panel-body">
+                                    <div class="panel panel-default connection-info">
+                                        <div class="panel-body">
                                             <table class="table-hover table-condensed table-responsive sa-table" style="width: 100%">
                                                 <thead>
                                                     <tr>
-                                                        <!--<th>Ike SA id {#% csrf_token %#}</th>-->
                                                         <th>Remote host</th>
                                                         <th>Remote ID</th>
                                                         <th class="col-xs-1">Terminate</th>
@@ -70,8 +69,8 @@
                                                 </thead>
                                                 <tbody id="connection-{{ row.record.id }}-sas"></tbody>
                                             </table>
+                                        </div>
                                     </div>
-                                </div>
                                 </div>
                             </td>
                         </tr>
