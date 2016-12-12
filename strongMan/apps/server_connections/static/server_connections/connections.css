@@ -111,11 +111,11 @@
 .filter-table .quick:hover {
   text-decoration: underline; }
 
-td.alt {
+td.alt1, td.alt2 {
   background-color: #ffc;
   background-color: rgba(255, 255, 0, 0.2); }
 
-td.child-alt {
+td.child-alt1, td.child-alt2 {
   background-color: #bfe4ff; }
 
 .modal-dialog {

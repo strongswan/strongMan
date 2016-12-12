@@ -15,10 +15,10 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input id="remoteHostFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote host"></td>
-                        <td><input id="remoteIdFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote ID"></td>
-                        <td><input id="remoteTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Remote ts"></td>
-                        <td><input id="localTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Local ts"></td>
+                        <td><input id="remoteHostFilter" class="form-control input-sm" type="text" placeholder="Remote host"></td>
+                        <td><input id="remoteIdFilter" class="form-control input-sm" type="text" placeholder="Remote ID"></td>
+                        <td><input id="remoteTsFilter" class="form-control input-sm" type="text" placeholder="Remote ts"></td>
+                        <td><input id="localTsFilter" class="form-control input-sm" type="text" placeholder="Local ts"></td>
                     </tr>
                 </tbody>
             </table>
@@ -142,8 +142,6 @@
     {% endif %}
 </div>
 <script type="text/javascript">
-    var currentSaSearch = $('#remoteHostFilter');
-    var currentChildSaSearch = $('#remoteTsFilter');
     $(document).ready(function() {
         function rememberVisible (obj) {
             obj.removeClass('notVisible');
@@ -151,64 +149,88 @@
                 obj.addClass('notVisible');
             }
         }
+        $(document).bind("ajaxComplete", function(){
+            $('#remoteTsFilter, #localTsFilter').unbind();
+            $("#remoteTsFilter, #localTsFilter").on("keyup", function () {
+                $('#remoteHostFilter').trigger('click');
+                $('#remoteIdFilter').trigger('click');
+                $('#remoteTsFilter').trigger('click');
+                $('#localTsFilter').trigger('click');
+                console.log('child-sa');
+            });
+
+            $('.child-sa-table').filterTable({
+                inputSelector: $('#remoteTsFilter'),
+                ignoreColumns: [1,2,3,4,5,6],
+                minRows: 0,
+                highlightClass: 'child-alt1',
+                callback: function(term, table) {
+{#                    table.parents('tr').show().prev().show();#}
+                    if (term) {
+                        table.find('tr').not('.visible').parent().closest('tr').hide().prev().hide();
+{#                        table.closest('tr').not('.visible').hide().prev().hide();#}
+                    }
+                }
+            }).filterTable({
+                inputSelector: $('#localTsFilter'),
+                ignoreColumns: [0,2,3,4,5,6],
+                minRows: 0,
+                highlightClass: 'child-alt2',
+                callback: function(term, table) {
+{#                    table.parents('tr').show().prev().show();#}
+                    if (term) {
+                        table.find('tr').not('.visible').parent().closest('tr').hide().prev().hide();
+{#                        table.closest('tr').not('.visible').hide().prev().hide();#}
+                    }
+                }
+            });
+            $('#remoteHostFilter').trigger('click');
+            $('#remoteIdFilter').trigger('click');
+            $('#remoteTsFilter').trigger('click');
+            $('#localTsFilter').trigger('click');
+        });
 
         $('.connection-info-row').each(function() {
             var that = $(this);
-            var outerTable = that.find('table');
             rememberVisible(that);
             $(document).bind("ajaxComplete", function(){
                 rememberVisible(that);
-
-                $('#remoteTsFilter').unbind();
-                $('#localTsFilter').unbind();
-                $(".search-child-sa").on("click keyup", function () {
-                    currentChildSaSearch = $(this);
-                });
-
-                $('.child-sa-table').filterTable({
-                    inputSelector: $('#remoteTsFilter'),
-                    ignoreColumns: [1,2,3,4,5,6],
-                    minRows: 0,
-                    highlightClass: 'child-alt',
-                    callback: function(term, table) {
-                        table.find('.notVisible').hide();
-                    }
-                });
-                $('.child-sa-table').filterTable({
-                    inputSelector: $('#localTsFilter'),
-                    ignoreColumns: [0,2,3,4,5,6],
-                    minRows: 0,
-                    highlightClass: 'child-alt',
-                    callback: function(term, table) {
-                        table.find('.notVisible').hide();
-                    }
-                });
-
-                currentSaSearch.trigger('click');
-                currentChildSaSearch.trigger('click');
             });
 
-            $(".search-sa").on("click keyup", function () {
-                currentSaSearch = $(this);
+            $('#remoteHostFilter, #remoteIdFilter').on("keyup", function () {
+                console.log('sa');
+                $('#remoteHostFilter').trigger('click');
+                $('#remoteIdFilter').trigger('click');
+                $('#remoteTsFilter').trigger('click');
+                $('#localTsFilter').trigger('click');
             });
 
-            outerTable.filterTable({
+            that.find('table').filterTable({
                 inputSelector: $('#remoteHostFilter'),
                 ignoreColumns: [1,2],
                 ignoreClass: 'child-sa-cell',
+                highlightClass: 'alt1',
                 minRows: 0,
                 callback: function(term, table) {
                     table.find('.notVisible').hide();
-                    table.find('.visible').next().show().find('tr').show().find('td').removeClass('alt');
+                    table.find('.alt1').closest('tr').show();
+                    table.find('.visible').next().show().find('tr').show().find('td').removeClass('alt1');
+                    $('#remoteTsFilter').trigger('click');
+                    $('#localTsFilter').trigger('click');
+
                 }
             }).filterTable({
                 inputSelector: $('#remoteIdFilter'),
                 ignoreColumns: [0,2],
                 ignoreClass: 'child-sa-cell',
+                highlightClass: 'alt2',
                 minRows: 0,
                 callback: function(term, table) {
                     table.find('.notVisible').hide();
-                    table.find('.visible').next().show().find('tr').show().find('td').removeClass('alt');
+                    table.find('.alt2').closest('tr').show();
+                    table.find('.visible').next().show().find('tr').show();
+                    $('#remoteTsFilter').trigger('click');
+                    $('#localTsFilter').trigger('click');
                 }
             });
         });
