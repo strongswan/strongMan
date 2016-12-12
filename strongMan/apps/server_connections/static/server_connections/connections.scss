@@ -109,8 +109,17 @@
     }
     .connection-info-span {
       padding-top: 0px;
-
+      td {
+        padding: 2px;
+      }
     }
+
+    .child-sa-table {
+      tr {
+        border-top: solid 1px grey;
+      }
+    }
+
     .connection-info {
       width: 100%;
       border-top: None;
@@ -146,7 +155,15 @@
   .row, input, .identity_picker, .picker, .cert_upload, .certificateselect, .identityselect {
     margin-bottom: 10px;
   }
+}
+.sa-scroll {
+  max-height: 400px !important;
+  width: 100% !important;
+  overflow-y: scroll;
+}
 
+#connection-overview .table-container .connection-info {
+  margin-bottom: 0;
 }
 
 .filter-table {

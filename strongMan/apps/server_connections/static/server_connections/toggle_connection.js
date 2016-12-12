@@ -39,26 +39,29 @@ function stateDown(connectionId) {
 }
 
 function stateConnecting(connectionId) {
-    $('#toggle_input' + connectionId).prop('checked', true).change();
+
     $('#button_div' + connectionId).find('.toggle-on').text("");
     $('#button_div' + connectionId).find('.toggle-on').append("<i class='glyphicon glyphicon-refresh spinning'></i>");
     $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-warning toggle-on");
     $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-warning');
+    $('#toggle_input' + connectionId).prop('checked', true).change();
     lock(connectionId);
 }
 
 function stateLoaded(connectionId) {
-    $('#toggle_input' + connectionId).prop('checked', true).change();
+
     $('#button_div' + connectionId).find('.toggle-on').text("Loaded");
     $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-success toggle-on");
     $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-success');
+    $('#toggle_input' + connectionId).prop('checked', true).change();
 }
 
 function stateUnloaded(connectionId) {
-    $('#toggle_input' + connectionId).prop('checked', false).change();
+
     $('#button_div' + connectionId).find('.toggle-off').text("Unloaded");
     $('#toggle_connection' + connectionId).prop('checked', false).change();
     $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-default off');
+    $('#toggle_input' + connectionId).prop('checked', false).change();
 }
 
 function lock(connectionId) {
@@ -156,6 +159,10 @@ function generate_entries(conn_id, rows, child) {
 
     for (var i = 0; i < rows; i++) {
         var id = child[i].uniqueid;
+
+        //var sa_scroll = document.createElement(div);
+        //sa_scroll.className = "sa-scroll";
+
         var row = document.createElement("tr");
 
         // var cell_uniqueid = document.createElement("td");
@@ -221,6 +228,8 @@ function generate_entries(conn_id, rows, child) {
         cell_button_terminate_sa.appendChild(form_terminate_sa);
         row.appendChild(cell_button_terminate_sa);
        
+
+        //sa_scroll.appendChild(row);
         sas.appendChild(row);
 
         // CHILD SAS
@@ -233,7 +242,7 @@ function generate_entries(conn_id, rows, child) {
             child_sas_row.id = "child_sas" + id;
 
             var cell_child_sas = document.createElement("td");
-            cell_child_sas.colSpan = "5";
+            cell_child_sas.colSpan = "3";
             cell_child_sas.className = "child-sa-cell";
             cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 

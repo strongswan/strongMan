@@ -55,25 +55,25 @@
                         </tr>
                         <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row {{ cyclename }}"
                             style="display: none;">
-
-                            <td colspan="5" class="connection-info-span">
+                            <td colspan="6" class="connection-info-span">
+                                <div class="sa-scroll">
                                 <div class="panel panel-default connection-info">
                                     <div class="panel-body">
-                                        <table class="table-hover table-condensed table-responsive sa-table" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <!--<th>Ike SA id {#% csrf_token %#}</th>-->
-                                                    <th>Remote host</th>
-                                                    <th>Remote ID</th>
-                                                    <th class="col-xs-1">Terminate</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="connection-{{ row.record.id }}-sas"></tbody>
-                                        </table>
+                                            <table class="table-hover table-condensed table-responsive sa-table" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <!--<th>Ike SA id {#% csrf_token %#}</th>-->
+                                                        <th>Remote host</th>
+                                                        <th>Remote ID</th>
+                                                        <th class="col-xs-1">Terminate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="connection-{{ row.record.id }}-sas"></tbody>
+                                            </table>
                                     </div>
                                 </div>
+                                </div>
                             </td>
-
                         </tr>
                     {% endblock table.tbody.row %}
                     {% empty %}

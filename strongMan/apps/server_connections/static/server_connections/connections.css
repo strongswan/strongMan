@@ -67,6 +67,10 @@
   min-width: 100px; }
 #connection-overview .table-container .connection-info-span {
   padding-top: 0px; }
+  #connection-overview .table-container .connection-info-span td {
+    padding: 2px; }
+#connection-overview .table-container .child-sa-table tr {
+  border-top: solid 1px grey; }
 #connection-overview .table-container .connection-info {
   width: 100%;
   border-top: None;
@@ -91,6 +95,14 @@
   cursor: pointer; }
 #ConnectionForm .row, #ConnectionForm input, #ConnectionForm .identity_picker, #ConnectionForm .picker, #ConnectionForm .cert_upload, #ConnectionForm .certificateselect, #ConnectionForm .identityselect {
   margin-bottom: 10px; }
+
+.sa-scroll {
+  max-height: 400px !important;
+  width: 100% !important;
+  overflow-y: scroll; }
+
+#connection-overview .table-container .connection-info {
+  margin-bottom: 0; }
 
 .filter-table .quick {
   margin-left: 0.5em;
