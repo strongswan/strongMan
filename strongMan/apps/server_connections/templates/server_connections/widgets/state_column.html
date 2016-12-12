@@ -1,8 +1,11 @@
 <span title="Turn connection on / off" xmlns="http://www.w3.org/1999/html">
-    <div id="alert_style">
-        <div id="alert_{{ record.id }}" style='float: left; text-align: left;'></div>
+    <!--<div id="alert_style">
+        <div id="alert_{{ record.id }}" style='text-align: left;'></div>
     </div>
-    <div class="btn-toolbar" style="white-space: nowrap; margin-right: 20px;">
+    <a id="alert_{{ record.id }}" title="Exception" data-toggle="popover" data-trigger="focus" data-placement="right"
+       class="pull-right"></a>-->
+    <div id="alert_{{ record.id }}" class="pull-right"></div>
+    <div class="" style="white-space: nowrap; margin-right: 20px;">
         <form id="toggle_connection{{ record.id }}" action="{% url 'server_connections:toggle' %}">
             {% csrf_token %}
             <input type="hidden" name="id" value="{{ record.id }}">

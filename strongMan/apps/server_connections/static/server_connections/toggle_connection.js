@@ -26,38 +26,43 @@ function handler(event) {
 
 function stateEstablished(connectionId) {
     $('#toggle_input' + connectionId).prop('checked', true).change();
-    $('#button_div' + connectionId).find('.toggle-on').text("On");
-    $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-success toggle-on");
-    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-success');
+    var button = $('#button_div' + connectionId);
+    button.find('.toggle-on').text("On");
+    button.find('.toggle-on').attr("class", "btn btn-success toggle-on");
+    button.find('.toggle').attr("class", 'toggle btn btn-success');
 }
 
 function stateDown(connectionId) {
     $('#toggle_input' + connectionId).prop('checked', false).change();
-    $('#button_div' + connectionId).find('.toggle-off').text("Off");
+    var button = $('#button_div' + connectionId);
+    button.find('.toggle-off').text("Off");
     $('#toggle_connection' + connectionId).prop('checked', false).change();
-    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-default off');
+    button.find('.toggle').attr("class", 'toggle btn btn-default off');
 }
 
 function stateConnecting(connectionId) {
-    $('#button_div' + connectionId).find('.toggle-on').text("");
-    $('#button_div' + connectionId).find('.toggle-on').append("<i class='glyphicon glyphicon-refresh spinning'></i>");
-    $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-warning toggle-on");
-    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-warning');
+    var button = $('#button_div' + connectionId);
+    button.find('.toggle-on').text("");
+    button.find('.toggle-on').append("<i class='glyphicon glyphicon-refresh spinning'></i>");
+    button.find('.toggle-on').attr("class", "btn btn-warning toggle-on");
+    button.find('.toggle').attr("class", 'toggle btn btn-warning');
     $('#toggle_input' + connectionId).prop('checked', true).change();
     lock(connectionId);
 }
 
 function stateLoaded(connectionId) {
-    $('#button_div' + connectionId).find('.toggle-on').text("Loaded");
-    $('#button_div' + connectionId).find('.toggle-on').attr("class", "btn btn-success toggle-on");
-    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-success');
+    var button = $('#button_div' + connectionId);
+    button.find('.toggle-on').text("Loaded");
+    button.find('.toggle-on').attr("class", "btn btn-success toggle-on");
+    button.find('.toggle').attr("class", 'toggle btn btn-success');
     $('#toggle_input' + connectionId).prop('checked', true).change();
 }
 
 function stateUnloaded(connectionId) {
-    $('#button_div' + connectionId).find('.toggle-off').text("Unloaded");
+    var button = $('#button_div' + connectionId);
+    button.find('.toggle-off').text("Unloaded");
     $('#toggle_connection' + connectionId).prop('checked', false).change();
-    $('#button_div' + connectionId).find('.toggle').attr("class", 'toggle btn btn-default off');
+    button.find('.toggle').attr("class", 'toggle btn btn-default off');
     $('#toggle_input' + connectionId).prop('checked', false).change();
 }
 
@@ -113,9 +118,9 @@ function getState(connectionId, csrf) {
 }
 
 function setAlert(response) {
-    $('#alert_' + response.id).html('<div class="my_alert" role="alert" disabled="true">' +
-        '<a class="close" data-dismiss="alert">&nbsp;×</a>' +
-        '<strong>' + response.message + '</strong></div>');
+    var alert = $('#alert_' + response.id);
+    alert.popover({title: "Exception", content: response.message, placement: "right"});
+    alert.popover('show');
 }
 
 function setConnectionInfo(connectionId, csrf) {
@@ -227,7 +232,7 @@ function fillInfos(conn_id, rows, child) {
 
         var button_terminate_sa = document.createElement("button");
         button_terminate_sa.type = "submit";
-        button_terminate_sa.className = "btn btn-default";
+        button_terminate_sa.className = "btn btn-default btn-sm";
         button_terminate_sa.id = "btn_terminate_sa_" + id;
 
         var glyphicon_remove = document.createElement("span");
@@ -381,7 +386,7 @@ function fillInfos(conn_id, rows, child) {
 
                 var button_terminate_child_sa = document.createElement("button");
                 button_terminate_child_sa.type = "submit";
-                button_terminate_child_sa.className = "btn btn-default";
+                button_terminate_child_sa.className = "btn btn-default btn-sm";
                 button_terminate_child_sa.id = "btn_terminate_child_sa_" + child_id;
 
                 var glyphicon_remove_child_sa = document.createElement("span");

@@ -131,6 +131,7 @@ td.child-alt1, td.child-alt2 {
 #grow span {
   font-family: 'Glyphicons Halflings';
   float: left;
-  color: grey; }
+  color: grey;
+  padding-left: 8px; }
 
 /*# sourceMappingURL=connections.css.map */
