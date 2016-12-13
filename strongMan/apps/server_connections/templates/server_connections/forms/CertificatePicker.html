@@ -16,7 +16,7 @@
             {% include "server_connections/forms/../widgets/errormsg.html" with field=certificate %}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="User certificate help" content="Select a certificate which authenticates the client. Only certificate with a private key are shown." %}
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Server certificate help" content="Select a certificate which authenticates the server. Only certificate with a private key are shown." %}
         </div>
         <div class="col-sm-11 col-xs-10">
             <div class="pull-right cert_upload">
@@ -43,7 +43,7 @@
             {% include "server_connections/forms/../widgets/errormsg.html" with field=identity %}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="Identity help" content="Select one of the available identities. Use the distinguished name in doubt. This field will be enabled as soon as the certificate is selected." %}
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Server identity help" content="Select one of the available identities for the server. Use the distinguished name in doubt. This field will be enabled as soon as the certificate is selected." %}
         </div>
     </div>
 

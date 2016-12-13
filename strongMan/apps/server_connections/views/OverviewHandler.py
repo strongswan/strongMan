@@ -10,7 +10,7 @@ from ..tables import ConnectionTable
 class OverviewHandler:
     def __init__(self, request):
         self.request = request
-        self.ENTRIES_PER_PAGE = 10
+        self.ENTRIES_PER_PAGE = 20
 
     def handle(self):
         try:

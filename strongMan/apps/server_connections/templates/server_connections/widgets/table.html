@@ -103,16 +103,13 @@
                 {% block pagination %}
                     <div class="text-center">
                         {% if table.page.has_previous %}
-                            <div class="text-center">
                                 {% block pagination.previous %}
                                     <a class="btn btn-default" name="next"
                                        href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">
                                         <span class="glyphicon glyphicon-chevron-left"></span> Previous
                                     </a>
                                 {% endblock pagination.previous %}
-                            </div>
                         {% endif %}
-
                         {% if table.page.has_previous or table.page.has_next %}
                             {% block pagination.current %}
                                 <span class="current">
@@ -122,7 +119,6 @@
                                 </span>
                             {% endblock pagination.current %}
                         {% endif %}
-
                         {% if table.page.has_next %}
                             {% block pagination.next %}
                                 <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"

@@ -24,7 +24,7 @@
                         {% include "pools/widgets/errormsg.html" with field=addresses %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "pools/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the corresponding addresses comma separated." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the (IPv4 or IPv6) addresses or address ranges of the pool comma separated. Examples: 192.168.1.0/24, 192.168.2.10-192.168.2.15" %}
                     </div>
                 </div>
 
@@ -44,7 +44,7 @@
                         {% include "pools/widgets/errormsg.html" with field=form.attribute %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "pools/widgets/QuestionPopover.html" with title="Attributes" content="Select attribute type." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attributes" content="Select an additional attribute. (optional)" %}
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@
                         {% include "pools/widgets/errormsg.html" with field=attributevalues %}
                     </div>
                     <div class="col-sm-1 col-xs-2">
-                        {% include "pools/widgets/QuestionPopover.html" with title="Attribute help" content="Enter the corresponding values comma separated." %}
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attribute help" content="Enter the address of the additional attribute. This field is required if attribute is set." %}
                     </div>
                 </div>
 

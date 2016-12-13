@@ -67,7 +67,7 @@
                 {% endfor %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="IKE Version." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="Choose the IKE Version which should be allowd by the server." %}
             </div>
         </div>
 
@@ -126,7 +126,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.start_action %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Select Start Action for this connection." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Select a Start Action for this connection." %}
             </div>
         </div>
 
@@ -142,7 +142,7 @@
                     {% include "server_connections/forms/../widgets/errormsg.html" with field=form.initiate %}
                 </div>
                 <div class="col-sm-1 col-xs-2">
-                    {% include "server_connections/widgets/QuestionPopover.html" with title="Initiate help" content="Select if connection should be initiated after loading." %}
+                    {% include "server_connections/widgets/QuestionPopover.html" with title="Initiate help" content="Select if connection should be initiated after loading into strongSwan." %}
                 </div>
             </div>
         {% endif %}

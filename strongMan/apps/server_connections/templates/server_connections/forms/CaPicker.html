@@ -29,7 +29,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=certificate %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="CA certificate help" content="Select a CA certificate which authenticates the remote peer. If no ca certificate is available 'Choose automatically' will be disabled." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="CA/Peer certificate help" content="Select a CA or peer certificate which authenticates the remote peer. If no ca certificate is available 'Choose automatically' will be disabled." %}
             </div>
             <div class="col-sm-11 col-xs-10">
                 <div class="pull-right cert_upload">
@@ -57,7 +57,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=identity %}
             </div>
             <div class="col-sm-1 col-xs-2" id="{{ identity.name }}_questionpopover">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote identity help" content="Enter the server identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. The CA identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote identity help" content="Enter the peer identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. The CA identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
             </div>
         </div>
 

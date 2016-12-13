@@ -5,6 +5,7 @@
             <select class="selectpicker" data-live-search="true"
                     name="{{ pool.name }}"
                     id="id_{{ pool.name }}" data-show-subtext="True">
+
                 <option value="">{{ fields.pool.empty_label }}</option>
                 {% for choice in pool.field.queryset %}
                     <option value="{{ choice.id }}"
@@ -15,11 +16,11 @@
             {% include "server_connections/forms/../widgets/errormsg.html" with field=pool %}
         </div>
         <div class="col-sm-1 col-xs-2">
-            {% include "server_connections/widgets/QuestionPopover.html" with title="Pools help" content="Select a pool." %}
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Pools help" content="Select an IP pool to allocate virtual IP addresses and other configuration attributes." %}
         </div>
         <div class="col-sm-11 col-xs-10">
             <div class="pull-right">
-                <a data-toggle="modal" data-target="#AddPoolModal">Upload new Pool</a>
+                <a data-toggle="modal" data-target="#AddPoolModal">Create new Pool</a>
             </div>
         </div>
     </div>
@@ -30,7 +31,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Upload Pool</h4>
+                    <h4 class="modal-title" id="myModalLabel">Create Pool</h4>
                 </div>
                 <div class="modal-body text-center">
                     <iframe src="{% url "pools:add_form" %}" frameborder="0"

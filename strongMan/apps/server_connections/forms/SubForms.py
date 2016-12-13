@@ -2,7 +2,7 @@ from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.server_connections.models import Connection, Child, Address, Proposal, AutoCaAuthentication, \
     CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, EapCertificateAuthentication, \
-    EapTlsAuthentication, IKEv2Certificate, IKEv2EapTls
+    EapTlsAuthentication, IKEv2Certificate, IKEv2EapTls, IKEv2CertificateEAP, IKEv2EAP
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
 
@@ -105,6 +105,7 @@ class PoolForm(forms.Form):
 
     def update_connection(self, connection):
         connection.pool = self.cleaned_data['pool']
+        connection.save()
 
 
 class CaCertificateForm(forms.Form):
@@ -155,20 +156,21 @@ class CaCertificateForm(forms.Form):
                 if sub.ca_cert is not None:
                     self.chosen_certificate = sub.ca_cert.pk
                 self.is_auto_choose = False
+                self.initial['remote_auth'] = sub.auth
                 break
 
     def create_connection(self, connection):
-        if isinstance(connection, IKEv2Certificate):
+        if isinstance(connection, IKEv2Certificate) or isinstance(connection, IKEv2CertificateEAP):
             auth = 'pubkey'
         else:
             auth = self.cleaned_data['remote_auth']
         if self.is_auto_choose:
-            AutoCaAuthentication(name='remote-cert', auth=auth, remote=connection).save()
+            AutoCaAuthentication(name='remote', auth=auth, remote=connection).save()
         else:
             if self.chosen_certificate is None:
-                CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection).save()
+                CaCertificateAuthentication(name='remote', auth=auth, remote=connection).save()
             else:
-                CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
+                CaCertificateAuthentication(name='remote', auth=auth, remote=connection,
                                             ca_cert=self.chosen_certificate).save()
 
     def update_connection(self, connection):
@@ -178,15 +180,53 @@ class CaCertificateForm(forms.Form):
                 sub.delete()
             if isinstance(sub, AutoCaAuthentication):
                 sub.delete()
-        if isinstance(connection, IKEv2EapTls):
-            auth = self.cleaned_data['remote_auth']
-        else:
+        if isinstance(connection, IKEv2Certificate) or isinstance(connection, IKEv2CertificateEAP):
             auth = 'pubkey'
-        if self.is_auto_choose:
-            AutoCaAuthentication(name='remote-cert', auth=auth, remote=connection).save()
         else:
-            CaCertificateAuthentication(name='remote-cert', auth=auth, remote=connection,
+            auth = self.cleaned_data['remote_auth']
+        if self.is_auto_choose:
+            AutoCaAuthentication(name='remote', auth=auth, remote=connection).save()
+        else:
+            CaCertificateAuthentication(name='remote', auth=auth, remote=connection,
                                         ca_cert=self.chosen_certificate).save()
+
+
+class EapCertificateForm(forms.Form):
+    """
+    Form to choose the eap secret for 2 round authentication.
+    """
+    remote_auth = forms.ChoiceField(widget=forms.Select(), choices=EapCertificateAuthentication.AUTH_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super(EapCertificateForm, self).__init__(*args, **kwargs)
+
+    def fill(self, connection):
+        remote_auth = None
+        for remote in connection.server_remote.all():
+            subclass = remote.subclass()
+            if isinstance(subclass, EapCertificateAuthentication):
+                remote_auth = subclass
+                break
+        if remote_auth is None:
+            assert False
+        self.initial['remote_auth'] = remote_auth.auth
+
+    def create_connection(self, connection):
+        max_round = 0
+        for remote in connection.server_remote.all():
+            if remote.round > max_round:
+                max_round = remote.round
+
+        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection,
+                                            round=max_round + 1)
+        auth.save()
+
+    def update_connection(self, connection):
+        for remote in connection.server_remote.all():
+            sub = remote.subclass()
+            if isinstance(sub, EapCertificateAuthentication):
+                sub.auth = self.cleaned_data['remote_auth']
+                sub.save()
 
 
 class ServerIdentityForm(forms.Form):
@@ -316,9 +356,11 @@ class EapTlsForm(UserCertificateForm):
             assert False
         self.my_certificate = local_auth.identity.certificate.pk
         self.my_identity = local_auth.identity.pk
+        self.initial['remote_auth'] = local_auth.auth
 
     def create_connection(self, connection):
-        EapTlsAuthentication(name='local-eap-tls', auth=self.cleaned_data['remote_auth'], local=connection,
+        auth = self.cleaned_data['remote_auth']
+        EapTlsAuthentication(name='local', auth=auth, local=connection,
                              identity=self.my_identity).save()
 
     def update_connection(self, connection):
@@ -355,7 +397,7 @@ class EapForm(forms.Form):
             if local.round > max_round:
                 max_round = local.round
 
-        auth = EapAuthentication(name='local-eap', auth='pubkey', local=connection,
+        auth = EapAuthentication(name='local', auth='pubkey', local=connection,
                                  round=max_round + 1)
         auth.save()
 
@@ -363,40 +405,4 @@ class EapForm(forms.Form):
         for local in connection.server_remote.all():
             sub = local.subclass()
             if isinstance(sub, EapAuthentication):
-                sub.save()
-
-
-class EapCertificateForm(forms.Form):
-    """
-    Form to choose the eap secret for 2 round authentication.
-    """
-    remote_auth = forms.ChoiceField(widget=forms.Select(), choices=EapCertificateAuthentication.AUTH_CHOICES)
-
-    def __init__(self, *args, **kwargs):
-        super(EapCertificateForm, self).__init__(*args, **kwargs)
-
-    def fill(self, connection):
-        local_auth = None
-        for local in connection.server_local.all():
-            subclass = local.subclass()
-            if isinstance(subclass, EapCertificateAuthentication):
-                local_auth = subclass
-                break
-        if local_auth is None:
-            assert False
-
-    def create_connection(self, connection):
-        max_round = 0
-        for local in connection.server_local.all():
-            if local.round > max_round:
-                max_round = local.round
-
-        auth = EapCertificateAuthentication(name='local-eap', auth='pubkey', local=connection,
-                                            round=max_round + 1)
-        auth.save()
-
-    def update_connection(self, connection):
-        for local in connection.server_local.all():
-            sub = local.subclass()
-            if isinstance(sub, EapCertificateAuthentication):
                 sub.save()
