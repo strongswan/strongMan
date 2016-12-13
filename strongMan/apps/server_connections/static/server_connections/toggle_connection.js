@@ -262,8 +262,8 @@ function fillInfos(conn_id, rows, child) {
             child_sas_row.id = "child_sas" + id;
 
             var cell_child_sas = document.createElement("td");
-            cell_child_sas.colSpan = "3";
             cell_child_sas.className = "child-sa-cell";
+            cell_child_sas.colSpan = "3";
             cell_child_sas.style = "padding-left: 34px; background-color: #dadfe8;";
 
             var table = document.createElement("table");
@@ -316,36 +316,43 @@ function fillInfos(conn_id, rows, child) {
                 var child_row = document.createElement("tr");
 
                 var cell_remote_ts = document.createElement("td");
+                cell_remote_ts.className = "child-sa-cell";
                 var remote_ts = document.createTextNode(child_sa.remote_ts);
                 cell_remote_ts.appendChild(remote_ts);
                 child_row.appendChild(cell_remote_ts);
 
                 var cell_local_ts = document.createElement("td");
+                cell_local_ts.className = "child-sa-cell";
                 var local_ts = document.createTextNode(child_sa.local_ts);
                 cell_local_ts.appendChild(local_ts);
                 child_row.appendChild(cell_local_ts);
 
                 var cell_bytes_in = document.createElement("td");
+                cell_bytes_in.className = "child-sa-cell";
                 var bytes_in = document.createTextNode(child_sa.bytes_in);
                 cell_bytes_in.appendChild(bytes_in);
                 child_row.appendChild(cell_bytes_in);
 
                 var cell_bytes_out = document.createElement("td");
+                cell_bytes_out.className = "child-sa-cell";
                 var bytes_out = document.createTextNode(child_sa.bytes_out);
                 cell_bytes_out.appendChild(bytes_out);
                 child_row.appendChild(cell_bytes_out);
 
                 var cell_packets_in = document.createElement("td");
+                cell_packets_in.className = "child-sa-cell";
                 var packets_in = document.createTextNode(child_sa.packets_in);
                 cell_packets_in.appendChild(packets_in);
                 child_row.appendChild(cell_packets_in);
 
                 var cell_packets_out = document.createElement("td");
+                cell_packets_out.className = "child-sa-cell";
                 var packets_out = document.createTextNode(child_sa.packets_out);
                 cell_packets_out.appendChild(packets_out);
                 child_row.appendChild(cell_packets_out);
 
                 var cell_install_time = document.createElement("td");
+                cell_install_time.className = "child-sa-cell";
                 var install_time_seconds = child_sa.install_time;
                 var time_stamp = new Date().getTime() - install_time_seconds * 1000;
                 var time = new Date(time_stamp);
@@ -355,6 +362,7 @@ function fillInfos(conn_id, rows, child) {
                 child_row.appendChild(cell_install_time);
 
                 var cell_button_terminate_child_sa = document.createElement("td");
+                cell_button_terminate_child_sa.className = "child-sa-cell";
 
                 var form_terminate_child_sa = document.createElement("form");
                 form_terminate_child_sa.id = child_id;

@@ -15,12 +15,13 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input id="remoteHostFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote host"></td>
-                        <td><input id="remoteIdFilter" class="form-control input-sm search-sa" type="text" placeholder="Remote ID"></td>
-                        <td><input id="remoteTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Remote ts"></td>
-                        <td><input id="localTsFilter" class="form-control input-sm search-child-sa" type="text" placeholder="Local ts"></td>
+                        <td><input id="remoteHostFilter" class="form-control input-sm" type="text" placeholder="Remote host"></td>
+                        <td><input id="remoteIdFilter" class="form-control input-sm" type="text" placeholder="Remote ID"></td>
+                        <td><input id="remoteTsFilter" class="form-control input-sm" type="text" placeholder="Remote ts"></td>
+                        <td><input id="localTsFilter" class="form-control input-sm" type="text" placeholder="Local ts"></td>
+                        <td><button type="button" class="btn btn-default" id="filter-clear">Clear</button></td>
                         <td><div class="col-sm-1 col-xs-2">
-                            {% include "server_connections/widgets/QuestionPopover.html" with title="Filter help" content="Filterterm = 'Remote Host' OR 'Remote ID' AND ('Remote TS' OR 'Local TS'). If you set Remote Host and Remote ID, the last focused value is taken for filtering." %}
+                            {% include "server_connections/widgets/QuestionPopover.html" with title="Filter help" content="Filterterm = 'Remote Host' AND 'Remote ID' AND 'Remote TS' AND 'Local TS'." %}
                         </div></td>
                     </tr>
                 </tbody>
@@ -153,46 +154,13 @@
                 obj.addClass('notVisible');
             }
         }
-        $(document).bind("ajaxComplete", function(){
-            $('#remoteTsFilter, #localTsFilter').unbind();
-            $("#remoteTsFilter, #localTsFilter").on("keyup", function () {
-                $('#remoteHostFilter').trigger('click');
-                $('#remoteIdFilter').trigger('click');
-                $('#remoteTsFilter').trigger('click');
-                $('#localTsFilter').trigger('click');
-                console.log('child-sa');
-            });
 
-            $('.child-sa-table').filterTable({
-                inputSelector: $('#remoteTsFilter'),
-                ignoreColumns: [1,2,3,4,5,6],
-                minRows: 0,
-                highlightClass: 'child-alt1',
-                callback: function(term, table) {
-{#                    table.parents('tr').show().prev().show();#}
-                    if (term) {
-                        table.find('tr').not('.visible').parent().closest('tr').hide().prev().hide();
-{#                        table.closest('tr').not('.visible').hide().prev().hide();#}
-                    }
-                }
-            }).filterTable({
-                inputSelector: $('#localTsFilter'),
-                ignoreColumns: [0,2,3,4,5,6],
-                minRows: 0,
-                highlightClass: 'child-alt2',
-                callback: function(term, table) {
-{#                    table.parents('tr').show().prev().show();#}
-                    if (term) {
-                        table.find('tr').not('.visible').parent().closest('tr').hide().prev().hide();
-{#                        table.closest('tr').not('.visible').hide().prev().hide();#}
-                    }
-                }
-            });
-            $('#remoteHostFilter').trigger('click');
-            $('#remoteIdFilter').trigger('click');
+        function triggerAllFilter () {
             $('#remoteTsFilter').trigger('click');
             $('#localTsFilter').trigger('click');
-        });
+            $('#remoteHostFilter').trigger('click');
+            $('#remoteIdFilter').trigger('click');
+        }
 
         $('.connection-info-row').each(function() {
             var that = $(this);
@@ -200,43 +168,83 @@
             $(document).bind("ajaxComplete", function(){
                 rememberVisible(that);
             });
+        });
 
-            $('#remoteHostFilter, #remoteIdFilter').on("keyup", function () {
-                console.log('sa');
-                $('#remoteHostFilter').trigger('click');
-                $('#remoteIdFilter').trigger('click');
-                $('#remoteTsFilter').trigger('click');
-                $('#localTsFilter').trigger('click');
+        $('#filter-clear').on("click", function(){
+            $('#remoteHostFilter, #remoteIdFilter, #remoteTsFilter, #localTsFilter').val('');
+            triggerAllFilter();
+        });
+
+        $(document).bind("ajaxComplete", function(){
+            $('#remoteHostFilter, #remoteIdFilter, #remoteTsFilter, #localTsFilter').unbind();
+            $('.child-sa-table').filterTable({
+                inputSelector: $('#remoteTsFilter'),
+                ignoreColumns: [1,2,3,4,5,6],
+                minRows: 0,
+                highlightClass: 'child-alt1',
+                visibleClass: 'visible1',
+                callback: function(term, table) {
+
+                    if (term.length>0) {
+                        table.find('tr').not('.visible1').parent().closest('tr').hide().prev().hide();
+                        table.find('.visible1.visible2').parent().closest('tr .visible3.visible4').show().prev().show();
+                    } else {
+                        table.find('.visible2').parent().closest('tr .visible3.visible4').show().prev().show();
+                    }
+                }
+            }).filterTable({
+                inputSelector: $('#localTsFilter'),
+                ignoreColumns: [0,2,3,4,5,6],
+                minRows: 0,
+                highlightClass: 'child-alt2',
+                visibleClass: 'visible2',
+                callback: function(term, table) {
+                    if (term.length>0) {
+                        table.find('tr').not('.visible2').parent().closest('tr').hide().prev().hide();
+                        table.find('.visible2.visible1').parent().closest('tr .visible3.visible4').show().prev().show();
+                    } else {
+                        table.find('.visible1').parent().closest('tr .visible3.visible4').show().prev().show();
+                    }
+                }
             });
-
-            that.find('table').filterTable({
+            $('.sa-table').filterTable({
                 inputSelector: $('#remoteHostFilter'),
                 ignoreColumns: [1,2],
                 ignoreClass: 'child-sa-cell',
                 highlightClass: 'alt1',
+                visibleClass: 'visible3',
                 minRows: 0,
                 callback: function(term, table) {
                     table.find('.notVisible').hide();
-                    table.find('.alt1').closest('tr').show();
-                    table.find('.visible').next().show().find('tr').show().find('td').removeClass('alt1');
-                    $('#remoteTsFilter').trigger('click');
-                    $('#localTsFilter').trigger('click');
-
+                    table.children('tbody').children().not('.visible3.visible4').hide();
+                    table.find('tbody').children('.visible3.visible4').next().show().find('tr').show();
+                    if ( $('#remoteTsFilter').val().length>0 ) {
+                        table.find('.child-sa-table').find("tr:not(.visible1)").parent().closest('tr').hide().prev().hide();
+                    }
+                    if ( $('#localTsFilter').val().length>0 ) {
+                        table.find('.child-sa-table').find("tr:not(.visible2)").parent().closest('tr').hide().prev().hide();
+                    }
                 }
             }).filterTable({
                 inputSelector: $('#remoteIdFilter'),
                 ignoreColumns: [0,2],
                 ignoreClass: 'child-sa-cell',
                 highlightClass: 'alt2',
+                visibleClass: 'visible4',
                 minRows: 0,
                 callback: function(term, table) {
                     table.find('.notVisible').hide();
-                    table.find('.alt2').closest('tr').show();
-                    table.find('.visible').next().show().find('tr').show();
-                    $('#remoteTsFilter').trigger('click');
-                    $('#localTsFilter').trigger('click');
+                    table.children('tbody').children().not('.visible3.visible4').hide();
+                    table.find('tbody').children('.visible3.visible4').next().show().find('tr').show();
+                    if ( $('#remoteTsFilter').val().length>0 ) {
+                        table.find('.child-sa-table').find("tr:not(.visible1)").parent().closest('tr').hide().prev().hide();
+                    }
+                    if ( $('#localTsFilter').val().length>0 ) {
+                        table.find('.child-sa-table').find("tr:not(.visible2)").parent().closest('tr').hide().prev().hide();
+                    }
                 }
             });
+            triggerAllFilter();
         });
     });
     $(function () {
