@@ -38,8 +38,28 @@
         </dl>
         <dl class="row">
             <dt class="col-sm-4">Pool Name</dt>
-            <dd class="col-sm-8">{{ form.initial.pool.poolname }}</dd>
+            {% if form.initial.pool.poolname %}
+                <dd class="col-sm-8">{{ form.initial.pool.poolname }}</dd>
+            {% else %}
+                <dd class="col-sm-8">-</dd>
+            {% endif %}
         </dl>
+        {% if form.initial.pool.addresses %}
+            <dl class="row">
+                <dt class="col-sm-4">Pool Addresses</dt>
+                <dd class="col-sm-8">{{ form.initial.pool.addresses }}</dd>
+            </dl>
+        {% endif %}
+        {% if form.initial.pool.attributevalues %}
+            <dl class="row">
+                <dt class="col-sm-4">Pool Attribute</dt>
+                <dd class="col-sm-8">{{ form.initial.pool.attribute }}</dd>
+            </dl>
+            <dl class="row">
+                <dt class="col-sm-4">Pool Attribute values</dt>
+                <dd class="col-sm-8">{{ form.initial.pool.attributevalues }}</dd>
+            </dl>
+        {% endif %}
         <dl class="row">
             <dt class="col-sm-4">Send Certificate Request</dt>
             <dd class="col-sm-8">{{ form.send_certreq.value }}</dd>
@@ -52,7 +72,6 @@
                 <dd class="col-sm-8">{{ form.start_action.value }}</dd>
             {% endif %}
         </dl>
-
         {% if form.remote_auth.value %}
             <dl class="row">
                 <dt class="col-sm-4">Remote Authentication</dt>
