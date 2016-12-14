@@ -3,6 +3,7 @@ from strongMan.apps.server_connections.forms.ConnectionForms import AbstractDyna
 from ..forms import ChooseTypeForm
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from .. import forms
 
@@ -45,4 +46,5 @@ class AddHandler:
 
             if isinstance(form, HeaderForm):
                 form.create_connection(self.connection_type)
+                messages.success(self.request, "Connection " + form.cleaned_data['profile'] + " has been updated.")
                 return redirect(reverse("server_connections:index"))

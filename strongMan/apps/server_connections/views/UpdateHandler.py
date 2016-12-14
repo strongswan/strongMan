@@ -1,7 +1,8 @@
 from ..forms.ConnectionForms import AbstractConnectionForm
 from strongMan.apps.server_connections.forms.ConnectionForms import AbstractDynamicForm
 from strongMan.apps.server_connections.models.connections import Connection
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 
@@ -59,5 +60,5 @@ class UpdateHandler:
                     return self._render(form)
 
                 form.update_connection(self.id)
-                messages.success(self.request, "Connection has been updated.")
-                return self._render(form)
+                messages.success(self.request, "Connection " + self.connection.profile + " has been updated.")
+                return redirect(reverse("server_connections:index"))
