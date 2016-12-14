@@ -5,7 +5,9 @@ from django.shortcuts import render
 from django.db.models import ProtectedError
 
 from ..forms import AddOrEditForm
+from ..models import Secret
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
+from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from configloader import load_credentials
 
 
@@ -19,12 +21,18 @@ class EditHandler:
 
     def delete_secret(self):
         try:
+            store_secret = self.secret
             self.secret.delete()
+            vici = ViciWrapper()
+            vici.clear_creds()
+            load_credentials(vici)
+            messages.add_message(self.request, messages.SUCCESS, 'Successfully deleted EAP Secret')
         except ProtectedError as e:
             messages.add_message(self.request, messages.ERROR,
                                  'Secret not deleted! Secret is referenced by a Connection')
-            return redirect(reverse("eap_secrets:overview"))
-        messages.add_message(self.request, messages.SUCCESS, 'Successfully deleted EAP Secret')
+        except ViciException as e:
+            store_secret.save()
+            messages.add_message(self.request, messages.ERROR, str(e))
         return redirect(reverse("eap_secrets:overview"))
 
     def update_secret(self):
@@ -32,12 +40,19 @@ class EditHandler:
         if not form.is_valid():
             return self._render_edit(form)
         else:
-            self.secret.password = form.my_password
-            self.secret.save()
-            vici = ViciWrapper()
-            vici.clear_creds()
-            load_credentials(vici)
-            messages.add_message(self.request, messages.SUCCESS, 'Successfully updated EAP Secret')
+            try:
+                store_password = self.secret.password
+                self.secret.password = form.my_password
+                self.secret.save()
+                vici = ViciWrapper()
+                vici.clear_creds()
+                load_credentials(vici)
+                messages.add_message(self.request, messages.SUCCESS, 'Successfully updated EAP Secret')
+            except ViciException as e:
+                self.secret.password = store_password
+                self.secret.save()
+                messages.add_message(self.request, messages.ERROR, str(e))
+                return render(self.request, 'eap_secrets/edit.html', {"form": form})
             return redirect(reverse("eap_secrets:overview"))
 
     def handle(self):
