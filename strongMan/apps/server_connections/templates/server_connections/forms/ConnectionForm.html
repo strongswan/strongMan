@@ -67,7 +67,7 @@
                 {% endfor %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="Choose the IKE Version which should be allowd by the server." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="Choose the IKE Version which should be used by the server." %}
             </div>
         </div>
 
@@ -79,7 +79,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_addrs %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Server address help" content="The local server endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Server address help" content="Local address to use for IKE communication. Takes single IPv4/IPv6 addresses, DNS names, CIDR subnets or IP address ranges. Use keyword %any or leave field empty for any ethernet interface." %}
             </div>
         </div>
 
@@ -91,11 +91,13 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_addrs %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote address help" content="The remote endpoint of the vpn connection. Enter either a domain name like 'vpn.myenterprise.com' or a IP like '86.12.24.212'." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote address help" content="Remote address to use for IKE communication. Takes single IPv4/IPv6 addresses, DNS names, CIDR subnets or IP address ranges. Use keyword %any or leave field empty for any ethernet interface." %}
             </div>
         </div>
 
-        {% include "server_connections/forms/PoolPicker.html" with pool=form.pool%}
+        {% if form.connection_type == 'remote_access' or connection.connection_type == 'remote_access' %}
+            {% include "server_connections/forms/PoolPicker.html" with pool=form.pool%}
+        {% endif %}
 
         <div class="row">
             <label class="control-label col-sm-3 col-xs-12">Send Certificate Request</label>
@@ -108,7 +110,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_certreq %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Certificate request help" content="Select if certificate request is enabled." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Certificate request help" content="Send certificate request payloads to offer trusted root CA certificates to the peer. Disabling certificate requests can be useful if too many trusted root CA certificates are installed, as each certificate request increases the size of the initial IKE packets." %}
             </div>
         </div>
 
@@ -126,7 +128,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.start_action %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Select a Start Action for this connection." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Action to perform after loading the configuration. The default of none loads the connection only, which then can be manually initiated or used as a responder configuration. The value trap installs a trap policy, which triggers the tunnel as soon as matching traffic has been detected. The value start initiates the connection actively." %}
             </div>
         </div>
 
@@ -160,7 +162,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_ts %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="Local traffic selectors to include in CHILD_SA. Each selector is a CIDR subnet definition, followed by an optional proto/port selector. The special value dynamic may be used instead of a subnet definition, which gets replaced by the tunnel outer address or the virtual IP, if negotiated. This is the default." %}
             </div>
         </div>
 
@@ -172,7 +174,7 @@
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_ts %}
             </div>
             <div class="col-sm-1 col-xs-2">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="" %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="Remote traffic selectors to include in CHILD_SA. Each selector is a CIDR subnet definition, followed by an optional proto/port selector. The special value dynamic may be used instead of a subnet definition, which gets replaced by the tunnel outer address or the virtual IP, if negotiated. This is the default." %}
             </div>
         </div>
 
@@ -200,6 +202,14 @@
         </div>
     </form>
     <script>
+        $(function () {
+            $(document).popover({
+                selector: '[data-toggle=popover]',
+                trigger: 'focus',
+                container: 'body'
+            });
+        });
+
         $(".remove-btn").click(function () {
             btn = $(this);
             if (btn.hasClass('btn-default')) {

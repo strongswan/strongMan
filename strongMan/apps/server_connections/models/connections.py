@@ -9,11 +9,11 @@ from django.dispatch import receiver
 
 from strongMan.apps.server_connections.models.common import State
 from strongMan.apps.pools.models import Pool
-from strongMan.apps.certificates.models import Certificate
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 from .specific import Child, Address, Proposal, LogMessage
 from .authentication import Authentication, AutoCaAuthentication
+from strongMan.apps.certificates.models.certificates import Certificate
 
 
 class Connection(models.Model):
@@ -82,6 +82,9 @@ class Connection(models.Model):
             remote = remote.subclass()
             if remote.has_private_key():
                 vici_wrapper.load_key(remote.get_key_dict())
+
+        for cert in Certificate.objects.all():
+            vici_wrapper.load_certificate(OrderedDict(type=cert.type, flag='None', data=cert.der_container))
 
     def start(self):
         self.load()

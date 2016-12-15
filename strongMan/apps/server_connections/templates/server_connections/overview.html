@@ -68,5 +68,26 @@
         $(function () {
             logger('{{ csrf_token }}');
         });
+
+        $(function () {
+            $(document).popover({
+                selector: '[data-toggle=popover]',
+                trigger: 'focus',
+                container: 'body'
+            });
+        });
+
+        function edit_conn(connectionId) {
+            if ($('#toggle_input' + connectionId).prop('checked')) {
+                    var alert_edit = $('#alert_edit_' + connectionId);
+                    alert_edit.popover({title: "Unload connection first.", content: "You can't edit a loaded connection.", placement: "right"});
+                    alert_edit.popover('show');
+                    setTimeout(function () {
+                        alert_edit.popover('hide');
+                    }, 5000);
+                return false;
+            }
+            return true;
+        }
     </script>
 {% endblock %}

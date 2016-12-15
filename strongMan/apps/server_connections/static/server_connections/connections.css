@@ -7,14 +7,14 @@
     max-width: 300px; }
 
 #connection-overview #log_panel {
-  margin-top: 100px; }
+  margin-top: 60px; }
   #connection-overview #log_panel .panel-body {
     padding: 0px;
     padding-left: 5px; }
 #connection-overview #log #log-content {
   overflow: scroll;
   overflow: auto;
-  height: 150px; }
+  height: 200px; }
   #connection-overview #log #log-content .child td {
     padding: 4px;
     font-size: 10px; }
@@ -120,7 +120,7 @@ td.child-alt1, td.child-alt2 {
 
 .modal-dialog {
   width: 800px;
-  margin: 30px auto; }
+  margin: 30px aulo; }
 
 #read-only-view {
   hight: 100%; }

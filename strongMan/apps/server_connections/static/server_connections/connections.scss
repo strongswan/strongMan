@@ -14,7 +14,7 @@
 
 #connection-overview {
   #log_panel {
-    margin-top: 100px;
+    margin-top: 60px;
     .panel-body {
       padding: 0px;
       padding-left: 5px
@@ -25,7 +25,7 @@
     #log-content {
       overflow: scroll;
       overflow: auto;
-      height: 150px;
+      height: 200px;
       .child {
         td {
           padding: 4px;
@@ -187,7 +187,7 @@ td.child-alt1, td.child-alt2 {
 
 .modal-dialog {
   width: 800px;
-  margin: 30px auto;
+  margin: 30px aulo;
 }
 #read-only-view {
   hight: 100%;
