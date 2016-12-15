@@ -84,6 +84,12 @@ class Migrator(BaseInstaller):
         self._run_bash(
             self.env + "/bin/python " + self.django_dir + "/manage.py makemigrations connections --settings=strongMan.settings.local")
         self._run_bash(
+            self.env + "/bin/python " + self.django_dir + "/manage.py makemigrations eap_secrets --settings=strongMan.settings.local")
+        self._run_bash(
+            self.env + "/bin/python " + self.django_dir + "/manage.py makemigrations pools --settings=strongMan.settings.local")
+        self._run_bash(
+            self.env + "/bin/python " + self.django_dir + "/manage.py makemigrations server_connections --settings=strongMan.settings.local")
+        self._run_bash(
             self.env + "/bin/python " + self.django_dir + "/manage.py migrate --settings=strongMan.settings.local")
 
     def load_fixtures(self):
