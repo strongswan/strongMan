@@ -9,26 +9,13 @@ from strongMan.apps.server_connections.forms.ConnectionForms import ChooseTypeFo
 from strongMan.apps.server_connections.forms.SubForms import CaCertificateForm, ServerIdentityForm, HeaderForm, \
     UserCertificateForm
 from strongMan.apps.server_connections.models import IKEv2Certificate, Child, Proposal, Address, EapAuthentication, \
-    CertificateAuthentication, CaCertificateAuthentication
+    CertificateAuthentication, CaCertificateAuthentication, Connection
 
 
 class ConnectionFormsTest(TestCase):
     fixtures = ['initial_data.json']
 
     def setUp(self):
-        bytes = Paths.X509_googlecom.read()
-        manager = UserCertificateManager()
-        manager.add_keycontainer(bytes)
-        manager.add_keycontainer(Paths.X509_rsa_ca.read())
-        manager.add_keycontainer(Paths.PKCS1_rsa_ca.read())
-
-        self.certificate = Certificate.objects.first().subclass()
-        self.usercert = Certificate.objects.get(pk=2)
-
-        self.identity = self.certificate.identities.first()
-
-    @staticmethod
-    def create_connection():
         connection = IKEv2Certificate(profile='rw', version='1', send_certreq=False, enabled=True)
         connection.save()
 
@@ -40,22 +27,63 @@ class ConnectionFormsTest(TestCase):
         Proposal(type='aes128gcm128-ntru128', connection=connection).save()
         Proposal(type='aes128gcm128-ecp256', connection=connection).save()
 
-        Address(value='127.0.0.1', local_ts=child1, remote_ts=child2, local_addresses=connection).save()
-        Address(value='127.0.0.2', local_ts=child1, remote_ts=child2, remote_addresses=connection).save()
+        Address(value='127.0.0.1', local_ts=child1, remote_ts=child1, local_addresses=connection).save()
+        Address(value='127.0.0.2', local_ts=child2, remote_ts=child2, remote_addresses=connection).save()
 
         bytes = Paths.X509_googlecom.read()
         manager = UserCertificateManager()
         manager.add_keycontainer(bytes)
+        manager.add_keycontainer(Paths.X509_rsa_ca.read())
+        manager.add_keycontainer(Paths.PKCS1_rsa_ca.read())
 
-        certificate = Certificate.objects.first().subclass()
+        self.certificate = Certificate.objects.first().subclass()
+        self.usercert = Certificate.objects.get(pk=2)
+
+        self.identity = self.certificate.identities.first()
+
         auth = EapAuthentication(name='local-eap', auth='eap-ttls', local=connection, round=2)
         auth.save()
         CaCertificateAuthentication(name='remote-1', auth='pubkey',
-                                    ca_cert=certificate, ca_identity="adsfasdf", remote=connection).save()
-        CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey',
+                                    ca_cert=self.certificate, ca_identity="adsfasdf", remote=connection).save()
+        CertificateAuthentication(name='local-1', identity=self.certificate.identities.first(), auth='pubkey', remote=connection,
                                   local=connection).save()
         connection.refresh_from_db()
-        return connection
+        self.connection = IKEv2Certificate.objects.first()
+
+
+
+
+    # @staticmethod
+    # def create_connection():
+    #     connection = IKEv2Certificate(profile='rw', version='1', send_certreq=False, enabled=True)
+    #     connection.save()
+    #
+    #     child1 = Child(name='all', mode='TUNNEL', connection=connection)
+    #     child1.save()
+    #     child2 = Child(name='child_2', mode='TUNNEL', connection=connection)
+    #     child2.save()
+    #
+    #     Proposal(type='aes128gcm128-ntru128', connection=connection).save()
+    #     Proposal(type='aes128gcm128-ecp256', connection=connection).save()
+    #
+    #     Address(value='127.0.0.1', local_ts=child1, remote_ts=child2, local_addresses=connection).save()
+    #     Address(value='127.0.0.2', local_ts=child1, remote_ts=child2, remote_addresses=connection).save()
+    #
+    #     bytes = Paths.X509_googlecom.read()
+    #     manager = UserCertificateManager()
+    #     manager.add_keycontainer(bytes)
+    #
+    #     certificate = Certificate.objects.first().subclass()
+    #     auth = EapAuthentication(name='local-eap', auth='eap-ttls', local=connection, round=2)
+    #     auth.save()
+    #     CaCertificateAuthentication(name='remote-1', auth='pubkey',
+    #                                 ca_cert=certificate, ca_identity="adsfasdf", remote=connection).save()
+    #     CertificateAuthentication(name='local-1', identity=certificate.identities.first(), auth='pubkey', remote=connection,
+    #                               local=connection).save()
+    #     connection.refresh_from_db()
+    #     connection2 = Connection.objects.first()
+    #     x = connection2.server_children.first().server_remote_ts.first().value
+    #     return connection2
 
     def test_ChooseTypeForm(self):
         form_data = {'current_form': "ChooseTypeForm", 'form_name': "Ike2CertificateForm"}
@@ -68,17 +96,19 @@ class ConnectionFormsTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_ConnectionForm_server_as_caidentity(self):
-        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile',
+        form_data = {'current_form': Ike2CertificateForm, 'profile': 'profile',
                      'identity': self.usercert.identities.first().pk,
-                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'is_server_identity': True}
+                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'is_server_identity': True,
+                     "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
         form = Ike2CertificateForm(data=form_data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
 
     def test_ConnectionForm_server_as_caidentity_unchecked(self):
-        form_data = {'current_form': Ike2CertificateForm, 'gateway': "gateway", 'profile': 'profile',
+        form_data = {'current_form': Ike2CertificateForm, 'profile': 'profile',
                      'identity': self.usercert.identities.first().pk,
-                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'identity_ca': "gateway"}
+                     'certificate': self.usercert.pk, 'certificate_ca': self.certificate.pk, 'identity_ca': "gateway",
+                     "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
         form = Ike2CertificateForm(data=form_data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
@@ -111,9 +141,10 @@ class ConnectionFormsTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_Ike2EapForm(self):
-        form_data = {'current_form': "Ike2EapForm", 'gateway': "gateway", 'username': "username",
-                     'password': 'password',
-                     'profile': 'profile', 'certificate_ca': self.certificate.pk, 'identity_ca': "yolo"}
+        form_data = {'current_form': "Ike2EapForm",
+                     'profile': 'profile', 'certificate_ca': self.certificate.pk, 'identity_ca': "yolo",
+                     "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2',
+                     "remote_auth": 'eap-radius'}
         form = Ike2EapForm(data=form_data)
         form.update_certs()
         valid = form.is_valid()
@@ -145,9 +176,8 @@ class ConnectionFormsTest(TestCase):
         self.assertIsNotNone(form.chosen_certificate)
 
     def test_CaCertificateForm_fill(self):
-        connection = self.create_connection()
         form = CaCertificateForm()
-        form.fill(connection)
+        form.fill(self.connection)
         self.assertEqual(form.initial, {"certificate_ca": 1, "certificate_ca_auto": False, 'remote_auth': 'pubkey'})
 
     def test_CaCertificateForm_create(self):
@@ -165,10 +195,9 @@ class ConnectionFormsTest(TestCase):
         data = {"certificate_ca_auto": True}
         form = CaCertificateForm(data=data)
         self.assertTrue(form.is_valid())
-        connection = self.create_connection()
-        form.update_connection(connection)
+        form.update_connection(self.connection)
         newform = CaCertificateForm()
-        newform.fill(connection)
+        newform.fill(self.connection)
         self.assertEqual(newform.initial, data)
 
     def test_ServerIdentityForm_is_valid1(self):
@@ -181,12 +210,13 @@ class ConnectionFormsTest(TestCase):
             pass
 
         data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
-                "gateway": "LetsCallTheServerHansUeli", "is_server_identity": True}
+                "is_server_identity": True,
+                "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
         form = ServerIdentForm(data=data)
         valid = form.is_valid()
         self.assertTrue(valid)
         self.assertTrue(form.is_server_identity_checked)
-        self.assertEqual(form.ca_identity, "LetsCallTheServerHansUeli")
+        self.assertEqual(form.ca_identity, '127.0.0.2')
 
     def test_ServerIdentityForm_is_valid2(self):
         """
@@ -198,7 +228,8 @@ class ConnectionFormsTest(TestCase):
             pass
 
         data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
-                "gateway": "LetsCallTheServerHansUeli", "identity_ca": "myidentity"}
+                "identity_ca": "myidentity",
+                "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
         form = ServerIdentForm(data=data)
         valid = form.is_valid()
         self.assertTrue(valid)
@@ -206,10 +237,9 @@ class ConnectionFormsTest(TestCase):
         self.assertEqual(form.ca_identity, "myidentity")
 
     def test_ServerIdentityForm_fill(self):
-        connection = self.create_connection()
         form = ServerIdentityForm()
-        form.fill(connection)
-        self.assertEqual(form.initial, {'is_server_identity': False, 'identity_ca': 'asdfasdfff'})
+        form.fill(self.connection)
+        self.assertEqual(form.initial, {'is_server_identity': False, 'identity_ca': 'adsfasdf'})
 
     def test_UserCertificateForm_is_valid(self):
         data = {'certificate': self.usercert.pk, "identity": self.usercert.subclass().identities.first().pk}
@@ -221,9 +251,8 @@ class ConnectionFormsTest(TestCase):
         self.assertEqual(form.my_identity, self.usercert.identities.first())
 
     def test_UserCertificateForm_fill(self):
-        connection = self.create_connection()
         form = UserCertificateForm()
-        form.fill(connection)
+        form.fill(self.connection)
         self.assertEqual(form.initial, {'certificate': 1, 'identity': 1})
 
     def test_UserCertificateForm_create(self):
@@ -231,7 +260,9 @@ class ConnectionFormsTest(TestCase):
         form = UserCertificateForm(data=data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
-        connection = IKEv2Certificate(profile='rw', auth='pubkey', version=1)
+        pool = Pool(poolname='pool2', addresses='127.0.0.1')
+        pool.save()
+        connection = IKEv2Certificate(profile='rw2', version='2', pool=pool, send_certreq=False, enabled=True)
         connection.save()
         form.create_connection(connection)
         newform = UserCertificateForm()
@@ -243,34 +274,32 @@ class ConnectionFormsTest(TestCase):
         form = UserCertificateForm(data=data)
         form.update_certificates()
         self.assertTrue(form.is_valid())
-        connection = self.create_connection()
-        form.update_connection(connection)
+        form.update_connection(self.connection)
         newform = UserCertificateForm()
-        newform.fill(connection)
+        newform.fill(self.connection)
         self.assertEqual(newform.initial, data)
 
     def test_Ike2CertificateForm_is_valid(self):
         data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
-                "gateway": "LetsCallTheServerHansUeli", "identity_ca": "myidentity",
+                "identity_ca": "myidentity",
                 'certificate': self.usercert.pk, "identity": self.usercert.subclass().identities.first().pk,
-                "certificate_ca": self.usercert.pk}
+                "certificate_ca": self.usercert.pk,
+                "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
         form = Ike2CertificateForm(data=data)
         form.update_certificates()
         valid = form.is_valid()
         self.assertTrue(valid)
 
     def test_Ike2CertificateForm_fill(self):
-        connection = self.create_connection()
         form = Ike2CertificateForm()
-        form.fill(connection)
-        self.assertEqual(len(form.initial), 8)
+        form.fill(self.connection)
+        self.assertEqual(len(form.initial), 16)
 
     def test_ConnectionForm_create_connection(self):
-        pool = Pool(poolname='pool', addresses='192.168.0.5').save()
         data = {"current_form": "ServerIdentForm", "profile": "myNewProfileName",
-                "gateway": "LetsCallTheServerHansUeli", "identity_ca": "myidentity",
+                "identity_ca": "myidentity",
                 'certificate': self.usercert.pk, "identity": self.usercert.subclass().identities.first().pk,
-                "certificate_ca": self.usercert.pk, "pool": pool}
+                "version": "2", "local_addrs": '127.0.0.1', "remote_addrs": '127.0.0.2'}
 
         form = Ike2CertificateForm(data)
         form.update_certificates()
@@ -278,7 +307,7 @@ class ConnectionFormsTest(TestCase):
         connection = form.create_connection('remote_access')
         self.assertIsNotNone(connection)
         self.assertEqual(connection.profile, "myNewProfileName")
-        self.assertEqual(connection.remote_addresses.first().value, "LetsCallTheServerHansUeli")
+        self.assertEqual(connection.server_remote_addresses.first().value, '127.0.0.2')
 
 
 class TestCert:
