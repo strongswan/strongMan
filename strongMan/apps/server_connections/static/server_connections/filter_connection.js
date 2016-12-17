@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    $('[data-toggle="popover"]').popover();
 
     function rememberVisible (obj) {
         obj.removeClass('notVisible');
@@ -13,11 +12,6 @@ $(document).ready(function() {
         $('#localTsFilter').trigger('click');
         $('#remoteHostFilter').trigger('click');
         $('#remoteIdFilter').trigger('click');
-        // $('#remoteTsFilter, #localTsFilter, #remoteHostFilter, #remoteIdFilter').each(function(){
-        //    if ($(this).val().length>0) {
-        //        $(this).trigger('click');
-        //    }
-        // });
     }
 
     function initAllFilter (){

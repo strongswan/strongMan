@@ -119,11 +119,8 @@ function getState(connectionId, csrf) {
 
 function setAlert(response) {
     var alert = $('#alert_' + response.id);
-    alert.popover({title: "Warning!", content: response.message, placement: "left"});
+    alert.popover({title: "Warning!", content: response.message, placement: "left", trigger: 'focus', container: 'body'});
     alert.popover('show');
-    setTimeout(function () {
-        alert.popover('hide');
-    }, 5000);
 }
 
 function setConnectionInfo(connectionId, csrf) {
