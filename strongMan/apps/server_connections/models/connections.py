@@ -4,6 +4,7 @@ from collections import Iterable
 from collections import OrderedDict
 
 from django.db import models
+from django.db.models import PROTECT
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
@@ -25,7 +26,7 @@ class Connection(models.Model):
 
     profile = models.TextField(unique=True)
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default=None)
-    pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool')
+    pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool', on_delete=PROTECT)
     send_certreq = models.NullBooleanField(null=True, blank=True, default=None)
     enabled = models.BooleanField(default=False)
     connection_type = models.TextField()
