@@ -30,8 +30,6 @@ class AddHandler:
     def handle(self):
         self.form = AddOrEditForm(self.request.POST)
         if not self.form.is_valid():
-            messages.add_message(self.request, messages.ERROR,
-                                 'Form was not valid')
             return self._render(self.form)
 
         if self.form.my_poolname.lower() == 'dhcp' or self.form.my_poolname.lower() == 'radius':

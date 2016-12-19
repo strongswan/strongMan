@@ -6,7 +6,7 @@ class EapSecretSearchForm(forms.Form):
 
 
 class AddOrEditForm(forms.Form):
-    username = forms.RegexField(max_length=50, initial="", regex=r'^[0-9a-zA-Z]+$')
+    username = forms.RegexField(max_length=50, initial="", regex=r'^[0-9a-zA-Z_\-]+$')
     password = forms.CharField(max_length=50, widget=forms.PasswordInput, initial="")
 
     def is_valid(self):

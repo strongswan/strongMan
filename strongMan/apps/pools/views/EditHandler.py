@@ -36,8 +36,6 @@ class EditHandler:
 
     def update_pool(self, vici):
         if not self.form.is_valid():
-            messages.add_message(self.request, messages.ERROR,
-                                 'Form was not valid')
             return render(self.request, 'pools/edit.html', {"form": self.form})
         else:
             if self.form.my_attribute == 'None':
