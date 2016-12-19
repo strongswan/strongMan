@@ -9,9 +9,11 @@ class Secret(models.Model):
     username = models.TextField(unique=True)
     type = models.TextField()
     password = fields.EncryptedCharField(max_length=50)
+    salt = models.TextField()
 
     def dict(self):
-        secrets = OrderedDict(type=self.type, data=self.password, owners=[self.username])
+        password = self.password[32:]
+        secrets = OrderedDict(type=self.type, data=password, owners=[self.username])
         return secrets
 
     def __str__(self):
