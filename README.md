@@ -25,6 +25,34 @@ sudo ./setup.py install
 ```
 We have installed strongMan with all it's requirements in a virtual environment and loaded a default user into the database.
 
+### Configuration Loader
+To guarantee data consistency between strongMan and strongSwan, configure a script in the strongSwan configuration, which will be executed on the startup of strongSwan.
+
+##### Option 1
+If you aren’t planning on setting up a systemd service, do the following: Put these lines into
+in "/etc/strongswan.d/strongMan.conf". Replace ’pathTostrongMan’ with the path, where you
+installed strongMan.
+```bash
+charon {
+  start -scripts {
+    strongman = python3 /pathTostrongMan/configloader.py
+  }
+}
+```
+##### Option 2
+If you will configure strongMan with a systemd service, follow these instructions to get the
+Configuration Loader running.
+Put these lines into "/pathTostrongSwan/init/systemd-swanctl/strongswan-swanctl.service.in". Replace "pathTostrongMan" with the path, where you installed strongMan.
+```bash
+charon {
+  start-scripts {
+    strongman = python3 /pathTostrongMan/configloader.py
+  }
+}
+```
+
+### Run 
+
 Now we can start the strongMan server.
 ```bash
 sudo ./run.py
