@@ -1,8 +1,8 @@
 import sys
 
 from django import forms
-from strongMan.apps.server_connections.forms.SubForms import HeaderForm, CaCertificateForm, \
-    ServerIdentityForm, UserCertificateForm, EapForm, EapCertificateForm, EapTlsForm, PoolForm
+from strongMan.apps.server_connections.forms.SubForms import HeaderForm, RemoteCertificateForm, \
+    RemoteIdentityForm, ServerCertificateForm, EapForm, EapCertificateForm, EapTlsForm, PoolForm
 from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
     IKEv2EapTls
 
@@ -115,8 +115,8 @@ class AbstractConnectionForm(AbstractDynamicForm):
         return self
 
 
-class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
-                          ServerIdentityForm, PoolForm):
+class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, ServerCertificateForm, RemoteCertificateForm,
+                          RemoteIdentityForm, PoolForm):
 
     @property
     def model(self):
@@ -130,7 +130,7 @@ class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateFor
         self.update_certificates()
 
 
-class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapForm, PoolForm):
+class Ike2EapForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm, EapForm, PoolForm):
     @property
     def model(self):
         return IKEv2EAP
@@ -143,8 +143,8 @@ class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerI
         self.update_certificates()
 
 
-class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
-                             ServerIdentityForm, EapCertificateForm, PoolForm):
+class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, ServerCertificateForm, RemoteCertificateForm,
+                             RemoteIdentityForm, EapCertificateForm, PoolForm):
     @property
     def model(self):
         return IKEv2CertificateEAP
@@ -157,7 +157,7 @@ class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificate
         self.update_certificates()
 
 
-class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerIdentityForm, EapTlsForm, PoolForm):
+class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm, EapTlsForm, PoolForm):
     @property
     def model(self):
         return IKEv2EapTls
