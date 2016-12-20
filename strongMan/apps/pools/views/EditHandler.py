@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
-from django.db import IntegrityError
 from ..forms import AddOrEditForm
 from strongMan.apps.pools.models import Pool
 from strongMan.helper_apps.vici.wrapper.exception import ViciException

@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.db.models import ProtectedError
 
 from ..forms import AddOrEditForm
-from ..models import Secret
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from configloader import load_credentials
