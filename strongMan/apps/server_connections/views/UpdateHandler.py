@@ -4,6 +4,7 @@ from strongMan.apps.server_connections.models.connections import Connection
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from .ToggleHandler import ToggleHandler
 
 
 class UpdateHandler:
@@ -50,6 +51,21 @@ class UpdateHandler:
         elif self.request.method == "POST":
             if 'readonly' in self.request.POST:
                 return self._render_readonly()
+            elif 'save_and_reload' in self.request.POST:
+                abstract_form = self._abstract_form()
+                form_class = abstract_form.current_form_class
+
+                form = form_class(self.parameter_dict)
+                form.update_certs()
+                if not form.is_valid():
+                    return self._render(form)
+
+                handler = ToggleHandler(self.request)
+                handler.unload(self.id)
+                form.update_connection(self.id)
+                handler.load(self.id)
+                messages.success(self.request, "Connection " + self.connection.profile + " has been updated and reloaded.")
+                return redirect(reverse("server_connections:index"))
             else:
                 abstract_form = self._abstract_form()
                 form_class = abstract_form.current_form_class
@@ -60,5 +76,6 @@ class UpdateHandler:
                     return self._render(form)
 
                 form.update_connection(self.id)
+
                 messages.success(self.request, "Connection " + self.connection.profile + " has been updated.")
                 return redirect(reverse("server_connections:index"))

@@ -194,11 +194,17 @@
 
             {% if connection and connection.state == 'DOWN' or connection and connection.state == 'UNLOADED' or not connection %}
                 <button type="submit" name="save" id="configuration"
-                        class="btn btn-primary"><span
-                        class="glyphicon glyphicon-floppy-disk"></span> Save
+                        class="btn btn-primary">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> Save
                 </button>
             {% endif %}
 
+            {% if connection and connection.state == 'UP' or connection and connection.state == 'LOADED' or not connection %}
+                <button type="submit" name="save_and_reload" id="configuration_reload"
+                        class="btn btn-primary">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> Save and update
+                </button>
+            {% endif %}
         </div>
     </form>
     <script>
