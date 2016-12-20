@@ -139,6 +139,9 @@ class Ike2EapForm(AbstractConnectionForm, HeaderForm, CaCertificateForm, ServerI
     def template(self):
         return "server_connections/forms/Ike2EAP.html"
 
+    def update_certs(self):
+        self.update_certificates()
+
 
 class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, UserCertificateForm, CaCertificateForm,
                              ServerIdentityForm, EapCertificateForm, PoolForm):

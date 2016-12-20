@@ -85,16 +85,5 @@
 
             });
         });
-
-        function edit_conn(connectionId) {
-            if ($('#toggle_input' + connectionId).prop('checked')) {
-                    var alert_edit = $('#alert_edit_' + connectionId);
-                    alert_edit.popover({title: "Unload connection first.", content: "You can't edit a loaded connection.",
-                        placement: "right", trigger: 'focus', container: 'body'});
-                    alert_edit.popover('show');
-                return false;
-            }
-            return true;
-        }
     </script>
 {% endblock %}

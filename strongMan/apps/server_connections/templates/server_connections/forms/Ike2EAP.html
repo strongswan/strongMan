@@ -1,6 +1,16 @@
 {% extends "server_connections/forms/ConnectionForm.html" %}
 {% load connections_extras %}
 {% block form_content %}
+    <div class="row">
+        <p class="col-xs-12">Local certificates</p>
+        <div class="col-xs-12">
+            <p>Choose the certificate which authenticates the server. Only certificates with private key's are shown.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
+
+    <hr>
+
     <div class="row picker">
         <p class="col-xs-12">Remote settings</p>
         <label class="control-label col-sm-3 col-xs-12">Remote authentication</label>

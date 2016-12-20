@@ -89,10 +89,24 @@ class EapAuthentication(Authentication):
         ('eap-peap', "eap-peap"),
     )
     Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
+                                 related_name='server_eap_identity')
 
     def dict(self):
         auth = super(EapAuthentication, self).dict()
+        values = auth[self.name]
+        values['certs'] = [self.identity.subclass().certificate.der_container]
+        ident = self.identity.subclass()
+        if not isinstance(ident, DnIdentity):
+            values['id'] = ident.value()
         return auth
+
+    def has_private_key(self):
+        return self.identity.subclass().certificate.subclass().has_private_key
+
+    def get_key_dict(self):
+        key = self.identity.subclass().certificate.subclass().private_key
+        return OrderedDict(type=key.get_algorithm_type(), data=key.der_container)
 
 
 class EapCertificateAuthentication(Authentication):

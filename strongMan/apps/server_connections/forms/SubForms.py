@@ -372,7 +372,7 @@ class EapTlsForm(UserCertificateForm):
                 sub.save()
 
 
-class EapForm(forms.Form):
+class EapForm(UserCertificateForm):
     """
     Form to choose the eap secret.
     """
@@ -390,6 +390,8 @@ class EapForm(forms.Form):
                 break
         if local_auth is None:
             assert False
+        self.my_certificate = local_auth.identity.certificate.pk
+        self.my_identity = local_auth.identity.pk
 
     def create_connection(self, connection):
         max_round = 0
@@ -398,11 +400,12 @@ class EapForm(forms.Form):
                 max_round = local.round
 
         auth = EapAuthentication(name='local', auth='pubkey', local=connection,
-                                 round=max_round + 1)
+                                 round=max_round + 1, identity=self.my_identity)
         auth.save()
 
     def update_connection(self, connection):
         for local in connection.server_remote.all():
             sub = local.subclass()
             if isinstance(sub, EapAuthentication):
+                sub.identity = self.my_identity
                 sub.save()
