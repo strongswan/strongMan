@@ -1,9 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
-import django
-os.chdir(os.path.dirname(__file__))
+
+path = os.path.dirname(os.path.realpath(__file__))
+activate = os.path.join(path, 'env/bin/activate_this.py')
+if os.path.exists(activate):
+    with open(activate) as f:
+        exec(f.read(), {'__file__': activate})
+
+os.chdir(path)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "strongMan.settings.production")
+import django
 django.setup()
+
 from collections import OrderedDict
 from strongMan.apps.server_connections.models import Connection
 from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate
