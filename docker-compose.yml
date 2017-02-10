@@ -1,17 +1,22 @@
-roadwarrior:
-  build: ./docker/roadwarrior/
-  links:
-   - "gateway:gateway"
-  privileged: true
-  ports:
-   - "500:500"
-   - "4500:4500"
+version: '2.1'
 
-gateway:
-  command: "ipsec start --nofork"
-  build: ./docker/gateway/
-  privileged: true
-  ports:
-   - "500:500"
-   - "4500:4500"
+services:
+  gateway:
+    command: "ipsec start --nofork"
+    build:
+      context: ./docker/gateway/
+      args:
+        BRANCH: ${TRAVIS_BRANCH:-master}
+        COMMIT: ${TRAVIS_COMMIT:-HEAD}
+        REPO_SLUG: ${TRAVIS_REPO_SLUG:-strongswan/strongMan}
+    privileged: true
+    ports:
+     - "500:500"
+     - "4500:4500"
 
+  roadwarrior:
+    extends: gateway
+    build:
+      context: ./docker/roadwarrior/
+    links:
+     - "gateway"

@@ -9,7 +9,7 @@ python:
   - "3.5"
 
 env:
-  DOCKER_COMPOSE_VERSION: 1.4.0
+  DOCKER_COMPOSE_VERSION: 1.11.1
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
@@ -18,10 +18,9 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
   - docker-compose build
 
+install: true
+
 script:
   - docker-compose up -d gateway
   - sleep 10
-  - docker-compose run roadwarrior /bin/sh -c "cd /strongMan/; ipsec start; git checkout ${TRAVIS_BRANCH}; python manage.py test strongMan.tests.tests --settings=strongMan.settings.local; python manage.py test strongMan.tests.integration_tests --settings=strongMan.settings.local;"
-
-
-
+  - docker-compose run roadwarrior /bin/sh -c "cd /strongMan; ipsec start; ./runtests.py && python manage.py test strongMan.tests.integration_tests --settings=strongMan.settings.local;"
