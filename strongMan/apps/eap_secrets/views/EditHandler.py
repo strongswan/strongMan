@@ -5,9 +5,9 @@ from django.shortcuts import render
 from django.db.models import ProtectedError
 
 from ..forms import AddOrEditForm
+from ..models import Secret
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
-from configloader import load_credentials
 
 
 class EditHandler:
@@ -22,9 +22,7 @@ class EditHandler:
         try:
             store_secret = self.secret
             self.secret.delete()
-            vici = ViciWrapper()
-            vici.clear_creds()
-            load_credentials(vici)
+            self.reload_secrets()
             messages.add_message(self.request, messages.SUCCESS, 'Successfully deleted EAP Secret')
         except ProtectedError as e:
             messages.add_message(self.request, messages.ERROR,
@@ -44,15 +42,19 @@ class EditHandler:
                 self.secret.password = form.my_salted_password
                 self.secret.salt = form.my_salt
                 self.secret.save()
-                vici = ViciWrapper()
-                vici.clear_creds()
-                load_credentials(vici)
+                self.reload_secrets()
                 messages.add_message(self.request, messages.SUCCESS, 'Successfully updated EAP Secret')
             except ViciException as e:
                 store_secret.save()
                 messages.add_message(self.request, messages.ERROR, str(e))
                 return render(self.request, 'eap_secrets/edit.html', {"form": form})
             return redirect(reverse("eap_secrets:overview"))
+
+    def reload_secrets(self):
+        vici = ViciWrapper()
+        vici.clear_creds()
+        for secret in Secret.objects.all():
+            vici.load_secret(secret.dict())
 
     def handle(self):
         if self.request.method == "GET":
