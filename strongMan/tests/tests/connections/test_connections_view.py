@@ -1,11 +1,14 @@
 import os
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+
 from strongMan.apps.certificates.models.certificates import Certificate
 from strongMan.apps.certificates.services import UserCertificateManager
 from strongMan.apps.connections.models.connections import Connection, IKEv2Certificate
+
+from strongMan.tests.tests.certificates.certificates import TestCertificates
 
 
 class ConnectionViewTest(TestCase):
@@ -18,7 +21,7 @@ class ConnectionViewTest(TestCase):
         self.user.save()
         self.client.login(username='testuser', password='12345')
         manager = UserCertificateManager()
-        manager.add_keycontainer(Paths.PKCS12_rsa.read())
+        manager.add_keycontainer(TestCertificates.PKCS12_rsa.read())
 
         certificate = Certificate.objects.first()
         self.certificate = certificate.subclass()
@@ -134,44 +137,3 @@ class ConnectionViewTest(TestCase):
         url = reverse("connections:capicker")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
-
-
-class TestCert:
-    def __init__(self, path):
-        self.path = path
-        self.parent_dir = os.path.join(os.path.dirname(__file__), os.pardir)
-
-    def read(self):
-        absolute_path = self.parent_dir + "/certificates/certs/" + self.path
-        with open(absolute_path, 'rb') as f:
-            return f.read()
-
-    def read_x509(self, password=None):
-        bytes = self.read()
-        reader = X509Reader.by_bytes(bytes, password)
-        reader.parse()
-        return reader
-
-    def read_pkcs1(self, password=None):
-        bytes = self.read()
-        reader = PKCS1Reader.by_bytes(bytes, password)
-        reader.parse()
-        return reader
-
-
-class Paths:
-    X509_rsa_ca = TestCert("ca.crt")
-    X509_rsa_ca_samepublickey_differentserialnumber = TestCert("hsrca_doppelt_gleicher_publickey.crt")
-    X509_rsa_ca_samepublickey_differentserialnumber_san = TestCert("cacert_gleicher_public_anderer_serial.der")
-    PKCS1_rsa_ca = TestCert("ca2.key")
-    PKCS1_rsa_ca_encrypted = TestCert("ca.key")
-    PKCS8_rsa_ca = TestCert("ca2.pkcs8")
-    PKCS8_ec = TestCert("ec.pkcs8")
-    PKCS8_rsa_ca_encrypted = TestCert("ca_enrypted.pkcs8")
-    X509_rsa_ca_der = TestCert("cacert.der")
-    X509_ec = TestCert("ec.crt")
-    PKCS1_ec = TestCert("ec2.key")
-    X509_rsa = TestCert("warrior.crt")
-    PKCS12_rsa = TestCert("warrior.pkcs12")
-    PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
-    X509_googlecom = TestCert("google.com_der.crt")

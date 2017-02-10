@@ -9,6 +9,8 @@ from strongMan.apps.certificates.models.certificates import PrivateKey, Distingu
 from strongMan.apps.certificates.models.identities import AbstractIdentity, TextIdentity, DnIdentity
 from strongMan.apps.certificates.views import AddHandler
 
+from .certificates import TestCertificates
+
 
 class CreateRequest:
     '''
@@ -42,42 +44,11 @@ class CreateRequest:
         self.file.close()
 
 
-class TestCert:
-    def __init__(self, path):
-        self.path = path
-        self.current_dir = os.path.dirname(os.path.realpath(__file__))
-
-    def open(self):
-        absolute_path = self.current_dir + "/certs/" + self.path
-        return open(absolute_path, 'rb')
-
-    def add_to_db(self):
-        with CreateRequest("/certificates/add", self) as request:
-            handler = AddHandler.by_request(request)
-            (req, page, context) = handler.handle()
-            assert "certificates/added.html" == page
-
-    def read(self):
-        absolute_path = self.current_dir + "/certs/" + self.path
-        with open(absolute_path, 'rb') as f:
-            return f.read()
-
-
-class Paths:
-    X509_rsa_ca = TestCert("ca.crt")
-    X509_rsa_ca_samepublickey_differentserialnumber = TestCert("hsrca_doppelt_gleicher_publickey.crt")
-    PKCS1_rsa_ca = TestCert("ca2.key")
-    PKCS1_rsa_ca_encrypted = TestCert("ca.key")
-    PKCS8_rsa_ca = TestCert("ca2.pkcs8")
-    PKCS8_ec = TestCert("ec.pkcs8")
-    PKCS8_rsa_ca_encrypted = TestCert("ca_enrypted.pkcs8")
-    X509_rsa_ca_der = TestCert("cacert.der")
-    X509_ec = TestCert("ec.crt")
-    PKCS1_ec = TestCert("ec2.key")
-    X509_rsa = TestCert("warrior.crt")
-    PKCS12_rsa = TestCert("warrior.pkcs12")
-    PKCS12_rsa_encrypted = TestCert("warrior_encrypted.pkcs12")
-    X509_googlecom = TestCert("google.com_der.crt")
+def add_to_db(certificate):
+    with CreateRequest("/certificates/add", certificate) as request:
+        handler = AddHandler.by_request(request)
+        (req, page, context) = handler.handle()
+        assert "certificates/added.html" == page
 
 
 def count(model):
@@ -86,15 +57,15 @@ def count(model):
 
 class UserCertificateTest(TestCase):
     def test_add_identites(self):
-        Paths.X509_googlecom.add_to_db()
-        Paths.X509_rsa.add_to_db()
+        add_to_db(TestCertificates.X509_googlecom)
+        add_to_db(TestCertificates.X509_rsa)
         cert = UserCertificate.objects.first()
         self.assertEqual(len(cert.identities.all()), 505)
         self.assertEqual(count(TextIdentity), 504)
         self.assertEqual(count(DnIdentity), 2)
 
     def test_abstractIdentity_subclass(self):
-        Paths.X509_googlecom.add_to_db()
+        add_to_db(TestCertificates.X509_googlecom)
         cert = UserCertificate.objects.first()
         for ident in cert.identities.all():
             ident = ident.subclass()
@@ -102,21 +73,21 @@ class UserCertificateTest(TestCase):
             self.assertTrue(isinstance(ident, tuple(subclasses)))
 
     def test_add_to_db(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         self.assertEquals(count(Certificate), 2)
         self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
         self.assertEquals(count(PrivateKey), 1)
 
     def test_encrypted_der_container(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         cert = UserCertificate.objects.first()
         reader = X509Reader.by_bytes(cert.der_container)
         reader.parse()
         self.assertEqual(reader.der_dump(), cert.der_container)
 
     def test_delete_privatekey(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         self.assertEquals(count(PrivateKey), 1)
         PrivateKey.objects.all().delete()
         self.assertEquals(count(PrivateKey), 0)
@@ -128,7 +99,7 @@ class UserCertificateTest(TestCase):
             self.assertIsNone(certificate.private_key, "Private keys should be none")
 
     def test_delete_domain(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         self.assertEquals(count(Certificate), 2)
         self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
@@ -140,7 +111,7 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_subjectinfo(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         self.assertEquals(count(Certificate), 2)
         self.assertEqual(count(AbstractIdentity), 2)
         self.assertEquals(count(DistinguishedName), 4)
@@ -152,7 +123,7 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_without_privatekey(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         ca_list = Certificate.objects.filter(is_CA=True)
         self.assertEquals(ca_list.__len__(), 1)
         ca_list[0].delete()
@@ -162,7 +133,7 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(PrivateKey), 1)
 
     def test_delete_certificate_with_privatekey(self):
-        Paths.PKCS12_rsa.add_to_db()
+        add_to_db(TestCertificates.PKCS12_rsa)
         ca_list = Certificate.objects.filter(is_CA=False)
         self.assertEquals(ca_list.__len__(), 1)
         ca_list[0].delete()
@@ -172,7 +143,7 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(PrivateKey), 0)
 
     def test_CertificateFactory(self):
-        x509 = X509Reader.by_bytes(Paths.X509_rsa_ca.read())
+        x509 = X509Reader.by_bytes(TestCertificates.X509_rsa_ca.read())
         x509.parse()
         certificate = CertificateFactory.user_certificate_by_x509reader(x509)
 
@@ -183,9 +154,9 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(Certificate), 1)
 
     def test_privkey_two_certs_delete_cert(self):
-        Paths.X509_rsa_ca.add_to_db()
-        Paths.X509_rsa_ca_samepublickey_differentserialnumber.add_to_db()
-        Paths.PKCS1_rsa_ca.add_to_db()
+        add_to_db(TestCertificates.X509_rsa_ca)
+        add_to_db(TestCertificates.X509_rsa_ca_samepk_differentsn)
+        add_to_db(TestCertificates.PKCS1_rsa_ca)
         self.assertEquals(count(Certificate), 2)
         self.assertEquals(count(PrivateKey), 1)
         cert = UserCertificate.objects.get(id=1)
@@ -196,9 +167,9 @@ class UserCertificateTest(TestCase):
         self.assertIsNotNone(other_ert.private_key)
 
     def test_privkey_two_certs_delete_both(self):
-        Paths.X509_rsa_ca.add_to_db()
-        Paths.X509_rsa_ca_samepublickey_differentserialnumber.add_to_db()
-        Paths.PKCS1_rsa_ca.add_to_db()
+        add_to_db(TestCertificates.X509_rsa_ca)
+        add_to_db(TestCertificates.X509_rsa_ca_samepk_differentsn)
+        add_to_db(TestCertificates.PKCS1_rsa_ca)
         self.assertEquals(count(Certificate), 2)
         self.assertEquals(count(PrivateKey), 1)
         UserCertificate.objects.all().delete()
@@ -206,9 +177,9 @@ class UserCertificateTest(TestCase):
         self.assertEquals(count(PrivateKey), 0)
 
     def test_privkey_two_certs_delete_key_once(self):
-        Paths.X509_rsa_ca.add_to_db()
-        Paths.X509_rsa_ca_samepublickey_differentserialnumber.add_to_db()
-        Paths.PKCS1_rsa_ca.add_to_db()
+        add_to_db(TestCertificates.X509_rsa_ca)
+        add_to_db(TestCertificates.X509_rsa_ca_samepk_differentsn)
+        add_to_db(TestCertificates.PKCS1_rsa_ca)
         self.assertEquals(count(Certificate), 2)
         self.assertEquals(count(PrivateKey), 1)
         cert = UserCertificate.objects.get(id=1)
@@ -218,7 +189,7 @@ class UserCertificateTest(TestCase):
         self.assertIsNotNone(cert2.private_key)
 
     def test_certificate_identities(self):
-        Paths.X509_googlecom.add_to_db()
+        add_to_db(TestCertificates.X509_googlecom)
         classes = [Certificate, UserCertificate]
         for clas in classes:
             cert = clas.objects.first()
@@ -257,7 +228,7 @@ class ViciCertificateTest(TestCase):
 
 class AbstractDjangoClassTest(TestCase):
     def test_abstractidentity_to_subclasses(self):
-        Paths.X509_googlecom.add_to_db()
+        add_to_db(TestCertificates.X509_googlecom)
         abstract_ident = AbstractIdentity.objects.all()
         real_ident = AbstractIdentity.subclasses(abstract_ident)
         for ident in real_ident:

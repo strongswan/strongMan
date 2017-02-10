@@ -10,6 +10,16 @@ from strongMan.apps.connections.models.connections import Connection
 from strongMan.apps.connections.models.specific import Child
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
+from strongMan.tests.utils.certificates import CertificateLoader
+
+
+class TestCertificates:
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "certs")
+    loader = CertificateLoader(path)
+    carol_cert = loader.create("carolCert.pem")
+    carol_key = loader.create("carolKey.pem")
+    strongSwan_cert = loader.create("strongswanCert.pem")
+
 
 class IntegrationTest(TestCase):
     def setUp(self):
@@ -18,9 +28,9 @@ class IntegrationTest(TestCase):
         self.user.set_password('12345')
         self.user.save()
         self.client.login(username='testuser', password='12345')
-        ca_cert = Paths.strongSwan_cert.read()
-        cert = Paths.carol_cert.read()
-        key = Paths.carol_key.read()
+        ca_cert = TestCertificates.strongSwan_cert.read()
+        cert = TestCertificates.carol_cert.read()
+        key = TestCertificates.carol_key.read()
         manager = UserCertificateManager()
         manager.add_keycontainer(cert)
         manager.add_keycontainer(key)
@@ -187,32 +197,3 @@ class IntegrationTest(TestCase):
         connection = Connection.objects.first().subclass()
         toggle_url = '/connections/toggle/'
         self.client.post(toggle_url, {'id': connection.id})
-
-
-class TestCert:
-    def __init__(self, path):
-        self.path = path
-        self.dir = os.path.dirname(os.path.realpath(__file__))
-
-    def read(self):
-        absolute_path = self.dir + "/certs/" + self.path
-        with open(absolute_path, 'rb') as f:
-            return f.read()
-
-    def read_x509(self, password=None):
-        bytes = self.read()
-        reader = X509Reader.by_bytes(bytes, password)
-        reader.parse()
-        return reader
-
-    def read_pkcs1(self, password=None):
-        bytes = self.read()
-        reader = PKCS1Reader.by_bytes(bytes, password)
-        reader.parse()
-        return reader
-
-
-class Paths:
-    carol_cert = TestCert("carolCert.pem")
-    carol_key = TestCert("carolKey.pem")
-    strongSwan_cert = TestCert("strongswanCert.pem")
