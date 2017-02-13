@@ -3,8 +3,8 @@ import sys
 from django import forms
 from strongMan.apps.server_connections.forms.SubForms import HeaderForm, RemoteCertificateForm, \
     RemoteIdentityForm, ServerCertificateForm, EapForm, EapCertificateForm, EapTlsForm, PoolForm
-from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, IKEv2CertificateEAP, \
-    IKEv2EapTls
+from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, \
+    IKEv2CertificateEAP, IKEv2EapTls
 
 
 class AbstractDynamicForm(forms.Form):
@@ -46,8 +46,8 @@ class ChooseTypeForm(AbstractDynamicForm):
     @classmethod
     def get_choices_remote_access(cls):
         return tuple(
-            tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
-            AbstractConnectionForm.__subclasses__())
+                tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
+                AbstractConnectionForm.__subclasses__())
 
     @classmethod
     def get_choices_site_to_site(cls):
@@ -73,8 +73,9 @@ class AbstractConnectionForm(AbstractDynamicForm):
 
     def create_connection(self, connection_type):
         connection = self.model(profile=self.cleaned_data['profile'], version=self.cleaned_data['version'],
-                                pool=self.cleaned_data['pool'], send_certreq=self.cleaned_data["send_certreq"],
-                                connection_type=connection_type, initiate=self.cleaned_data["initiate"])
+                                pool=self.cleaned_data['pool'], connection_type=connection_type,
+                                send_certreq=self.cleaned_data["send_certreq"],
+                                initiate=self.cleaned_data["initiate"])
         connection.save()
         # Call create_connection method for every base class
         for base in self.__class__.__bases__:
@@ -103,7 +104,8 @@ class AbstractConnectionForm(AbstractDynamicForm):
 
     @classmethod
     def get_models(cls):
-        return tuple(tuple((subclass().model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
+        return tuple(
+                tuple((subclass().model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
 
     @classmethod
     def subclass(self, connection):
@@ -130,7 +132,8 @@ class Ike2CertificateForm(AbstractConnectionForm, HeaderForm, ServerCertificateF
         self.update_certificates()
 
 
-class Ike2EapForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm, EapForm, PoolForm):
+class Ike2EapForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm, EapForm,
+                  PoolForm):
     @property
     def model(self):
         return IKEv2EAP
@@ -143,8 +146,8 @@ class Ike2EapForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, Rem
         self.update_certificates()
 
 
-class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, ServerCertificateForm, RemoteCertificateForm,
-                             RemoteIdentityForm, EapCertificateForm, PoolForm):
+class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, ServerCertificateForm,
+                             RemoteCertificateForm, RemoteIdentityForm, EapCertificateForm, PoolForm):
     @property
     def model(self):
         return IKEv2CertificateEAP
@@ -157,7 +160,8 @@ class Ike2EapCertificateForm(AbstractConnectionForm, HeaderForm, ServerCertifica
         self.update_certificates()
 
 
-class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm, EapTlsForm, PoolForm):
+class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm,
+                     EapTlsForm, PoolForm):
     @property
     def model(self):
         return IKEv2EapTls

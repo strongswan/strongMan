@@ -86,7 +86,8 @@ class AbstractContainerReader:
 
     def public_key_hash(self):
         '''
-        Return a public key like identifier. The identifier can be compare with other to find the private key / certificate pair
+        Return a public key identifier. The identifier can be compared with others to find the
+        private key/certificate pair
         :return: Identifier
         '''
         raise NotImplementedError()
@@ -136,9 +137,10 @@ class AbstractContainerReader:
 class PKCS1Reader(AbstractContainerReader):
     @classmethod
     def is_type(cls, container_bytes, password=None):
-        if PKCS8Reader.is_type(bytes, password=password): return False
+        if PKCS8Reader.is_type(bytes, password=password):
+            return False
         try:
-            if password == None:
+            if password is None:
                 cert = k.parse_private(container_bytes)
             else:
                 cert = k.parse_private(container_bytes, password=password)
@@ -150,7 +152,7 @@ class PKCS1Reader(AbstractContainerReader):
 
     def parse(self):
         assert self.type == ContainerTypes.PKCS1
-        if self.password == None:
+        if self.password is None:
             self.asn1 = k.parse_private(self.bytes)
         else:
             self.asn1 = k.parse_private(self.bytes, password=self.password)
@@ -185,7 +187,7 @@ class PKCS8Reader(AbstractContainerReader):
     def is_type(cls, container_bytes, password=None):
         cert = None
         try:
-            if password == None:
+            if password is None:
                 cert = k.parse_private(container_bytes)
             else:
                 cert = k.parse_private(container_bytes, password=password)
@@ -210,7 +212,7 @@ class PKCS8Reader(AbstractContainerReader):
 
     def parse(self):
         assert self.type == ContainerTypes.PKCS8
-        if self.password == None:
+        if self.password is None:
             self.asn1 = k.parse_private(self.bytes)
         else:
             self.asn1 = k.parse_private(self.bytes, password=self.password)
@@ -237,7 +239,7 @@ class PKCS12Reader(AbstractContainerReader):
     @classmethod
     def is_type(cls, container_bytes, password=None):
         try:
-            if password == None:
+            if password is None:
                 k.parse_pkcs12(container_bytes)
             else:
                 k.parse_pkcs12(container_bytes, password=password)
@@ -247,7 +249,7 @@ class PKCS12Reader(AbstractContainerReader):
 
     def parse(self):
         assert self.type == ContainerTypes.PKCS12
-        if self.password == None:
+        if self.password is None:
             (self.privatekey, self.cert, self.certs) = k.parse_pkcs12(self.bytes)
         else:
             (self.privatekey, self.cert, self.certs) = k.parse_pkcs12(self.bytes, password=self.password)
@@ -302,7 +304,7 @@ class X509Reader(AbstractContainerReader):
     @classmethod
     def is_type(cls, container_bytes, password=None):
         try:
-            if password == None:
+            if password is None:
                 cert = k.parse_certificate(container_bytes)
             else:
                 cert = k.parse_certificate(container_bytes, password=password)

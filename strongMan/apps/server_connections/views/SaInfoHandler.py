@@ -63,4 +63,3 @@ class ChildSA(object):
         self.packets_in = child_sa['packets-in'].decode('ascii')
         self.packets_out = child_sa['packets-out'].decode('ascii')
         self.install_time = child_sa['install-time'].decode('ascii')
-

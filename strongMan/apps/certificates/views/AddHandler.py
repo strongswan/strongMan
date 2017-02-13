@@ -43,7 +43,8 @@ class AddHandler:
             return self._render_upload_page(form=self.form)
 
         try:
-            result = UserCertificateManager.add_keycontainer(self.form._cert_bytes(), self.form._read_password())
+            result = UserCertificateManager.add_keycontainer(self.form._cert_bytes(),
+                                                             self.form._read_password())
             for e in result.exceptions:
                 messages.add_message(self.request, messages.WARNING, str(e))
             if not result.success:

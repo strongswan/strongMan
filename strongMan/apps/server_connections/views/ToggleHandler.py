@@ -68,4 +68,3 @@ class ToggleHandler:
             print(e)
         finally:
             return JsonResponse(response)
-

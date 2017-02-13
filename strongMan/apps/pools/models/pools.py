@@ -21,7 +21,8 @@ class Pool(models.Model):
 
     @classmethod
     def create(cls, poolname, addresses, attribute, attributevalues):
-        pool = cls(poolname=poolname, addresses=addresses, attribute=attribute, attributevalues=attributevalues)
+        pool = cls(poolname=poolname, addresses=addresses, attribute=attribute,
+                   attributevalues=attributevalues)
         return pool
 
     def dict(self):
@@ -38,13 +39,3 @@ class Pool(models.Model):
 
     def __repr__(self):
         return str(self.poolname)
-
-    # def dict(self):
-    #     attributevalues_list = OrderedDict()
-    #     attributevalues_list = 'd'
-    #     pools = OrderedDict(poolname=self.poolname,
-        # addresses=self.addresses, attribute=self.attribute, self.attributevalues)
-    #     return pools
-
-    # on delete: pool.related_name.all...
-

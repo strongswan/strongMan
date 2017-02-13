@@ -43,8 +43,8 @@ class ChooseTypeForm(AbstractDynamicForm):
     @classmethod
     def get_choices(cls):
         return tuple(
-            tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
-            AbstractConnectionForm.__subclasses__())
+                tuple((type(subclass()).__name__, subclass().model.choice_name)) for subclass in
+                AbstractConnectionForm.__subclasses__())
 
 
 class AbstractConnectionForm(AbstractDynamicForm):
@@ -90,7 +90,8 @@ class AbstractConnectionForm(AbstractDynamicForm):
 
     @classmethod
     def get_models(cls):
-        return tuple(tuple((subclass().model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
+        return tuple(
+                tuple((subclass().model(), type(subclass()).__name__)) for subclass in cls.__subclasses__())
 
     @classmethod
     def subclass(self, connection):

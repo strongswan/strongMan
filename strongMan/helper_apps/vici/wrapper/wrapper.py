@@ -1,9 +1,10 @@
-import os, stat
+import os
 import socket
+import stat
 import vici
 from collections import OrderedDict
-from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, ViciInitiateException, \
-    ViciPathNotASocketException
+from .exception import ViciSocketException, ViciTerminateException, ViciLoadException, \
+    ViciInitiateException, ViciPathNotASocketException
 
 
 class ViciWrapper:

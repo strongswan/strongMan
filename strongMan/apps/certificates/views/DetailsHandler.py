@@ -14,14 +14,17 @@ class DetailsHandler:
         self._vicicert = self._certificate_subclass(classe=ViciCertificate)
 
     def _render_vici_details(self):
-        return render(self.request, 'certificates/details.html', {"certificate": self._vicicert, "readonly": True})
+        return render(self.request, 'certificates/details.html',
+                      {"certificate": self._vicicert, "readonly": True})
 
     def _render_user_details(self):
         if self._usercert.private_key is None:
-            return render(self.request, 'certificates/details.html', {"certificate": self._usercert, "readonly": False})
+            return render(self.request, 'certificates/details.html',
+                          {"certificate": self._usercert, "readonly": False})
         else:
             return render(self.request, 'certificates/details.html',
-                          {"certificate": self._usercert, 'private': self._usercert.private_key, "readonly": False})
+                          {"certificate": self._usercert, 'private': self._usercert.private_key,
+                           "readonly": False})
 
     def handle(self):
         if self._is_vicicert():
@@ -51,16 +54,17 @@ class DetailsHandler:
             return None
 
     def _is_vicicert(self):
-        return not self._vicicert is None
+        return self._vicicert is not None
 
     def _is_usercert(self):
-        return not self._usercert is None
+        return self._usercert is not None
 
     def _delete_cert(self):
         cname = self.certificate.subject.cname
         try:
             self.certificate.delete()
-            messages.add_message(self.request, messages.INFO, "Certificate '" + cname + "' has been removed.")
+            messages.add_message(self.request, messages.INFO, "Certificate '" + cname + "' has been "
+                                 "removed.")
             return HttpResponseRedirect(reverse('certificates:overview'))
         except CertificateDoNotDelete as e:
             messages.add_message(self.request, messages.ERROR, "Can't delete certificate. " + str(e))

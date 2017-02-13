@@ -7,8 +7,10 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 
 
 class Authentication(models.Model):
-    local = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='local')
-    remote = models.ForeignKey("connections.Connection", null=True, blank=True, default=None, related_name='remote')
+    local = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                              related_name='local')
+    remote = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                               related_name='remote')
     name = models.TextField()  # starts with remote-* or local-*
     auth = models.TextField()
     round = models.IntegerField(default=1)
@@ -94,7 +96,8 @@ class EapAuthentication(Authentication):
 
 
 class CertificateAuthentication(Authentication):
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='cert_identity')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
+                                 related_name='cert_identity')
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
@@ -115,7 +118,8 @@ class CertificateAuthentication(Authentication):
 
 class EapTlsAuthentication(Authentication):
     eap_id = models.TextField()
-    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None, related_name='tls_identity')
+    identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
+                                 related_name='tls_identity')
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()

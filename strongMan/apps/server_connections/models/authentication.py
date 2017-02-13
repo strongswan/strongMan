@@ -7,8 +7,10 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 
 
 class Authentication(models.Model):
-    local = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None, related_name='server_local')
-    remote = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None, related_name='server_remote')
+    local = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
+                              related_name='server_local')
+    remote = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
+                               related_name='server_remote')
     name = models.TextField()  # starts with remote-* or local-*
     auth = models.CharField(max_length=56)
     round = models.IntegerField(default=1)

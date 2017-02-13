@@ -46,5 +46,6 @@ class AddHandler:
 
             if isinstance(form, HeaderForm):
                 form.create_connection(self.connection_type)
-                messages.success(self.request, "Connection " + form.cleaned_data['profile'] + " has been updated.")
+                messages.success(self.request, "Connection " + form.cleaned_data['profile'] +
+                                 " has been updated.")
                 return redirect(reverse("server_connections:index"))

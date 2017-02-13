@@ -52,7 +52,7 @@ class IdentityChoice(forms.ChoiceField):
             data_source = form.initial
         else:
             return
-        if not certificate_field_name in data_source:
+        if certificate_field_name not in data_source:
             return
         cert_id = data_source[certificate_field_name]
         if cert_id is not "":

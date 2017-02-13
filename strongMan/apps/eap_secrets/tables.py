@@ -12,7 +12,8 @@ class EapSecretsTable(tables.Table):
         super(EapSecretsTable, self).__init__(*args, **kwargs)
 
     def render_name(self, record):
-        return render_to_string('eap_secrets/widgets/name_column.html', {'name': record.username}, request=self.request)
+        return render_to_string('eap_secrets/widgets/name_column.html', {'name': record.username},
+                                request=self.request)
 
     def render_removebtn(self, record):
         return render_to_string('eap_secrets/widgets/remove_column.html', {'name': record.username},

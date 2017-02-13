@@ -14,7 +14,8 @@ class AddForm(forms.Form):
 
     def is_valid(self):
         valid = super(AddForm, self).is_valid()
-        if not valid: return False
+        if not valid:
+            return False
         type = self.container_type()
         return not type == ContainerTypes.Undefined
 
@@ -29,13 +30,14 @@ class AddForm(forms.Form):
         return detected_type
 
     def _cert_bytes(self):
-        if self.cert_bytes == None:
+        if self.cert_bytes is None:
             self.cert_bytes = self.cleaned_data['cert'].read()
         return self.cert_bytes
 
     def _read_password(self):
         password = self.cleaned_data["password"]
-        if password == "": return None
+        if password == "":
+            return None
         password_bytes = str.encode(password)
         return password_bytes
 

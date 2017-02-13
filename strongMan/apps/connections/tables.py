@@ -14,10 +14,12 @@ class ConnectionTable(tables.Table):
         super(ConnectionTable, self).__init__(*args, **kwargs)
 
     def render_name(self, record):
-        return render_to_string('connections/widgets/name_column.html', {'record': record}, request=self.request)
+        return render_to_string('connections/widgets/name_column.html', {'record': record},
+                                request=self.request)
 
     def render_state(self, record):
-        return render_to_string('connections/widgets/state_column.html', {'record': record}, request=self.request)
+        return render_to_string('connections/widgets/state_column.html', {'record': record},
+                                request=self.request)
 
     class Meta:
         attrs = {"class": "table"}

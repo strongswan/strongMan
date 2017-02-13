@@ -30,11 +30,12 @@ class AddHandler:
                 return render(self.request, 'eap_secrets/add.html', {"form": self.form})
             else:
                 try:
-                    secret = Secret(username=self.form.my_username, type='EAP', password=self.form.my_salted_password, salt=self.form.my_salt)
+                    secret = Secret(username=self.form.my_username, type='EAP',
+                                    password=self.form.my_salted_password, salt=self.form.my_salt)
                     secret.save()
                 except IntegrityError:
                     messages.add_message(self.request, messages.ERROR,
-                                    'An EAP Secret with this Username does already exist')
+                                         'An EAP Secret with this Username does already exist')
                     return render(self.request, 'eap_secrets/add.html', {"form": self.form})
                 ViciWrapper().load_secret(secret.dict())
                 messages.add_message(self.request, messages.SUCCESS, 'Successfully created EAP Secret')

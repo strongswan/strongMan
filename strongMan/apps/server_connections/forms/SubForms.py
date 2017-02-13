@@ -1,8 +1,9 @@
 from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
-from strongMan.apps.server_connections.models import Connection, Child, Address, Proposal, AutoCaAuthentication, \
-    CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, EapCertificateAuthentication, \
-    EapTlsAuthentication, IKEv2Certificate, IKEv2EapTls, IKEv2CertificateEAP, IKEv2EAP
+from strongMan.apps.server_connections.models import Connection, Child, Address, Proposal, \
+    AutoCaAuthentication, CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, \
+    EapCertificateAuthentication, EapTlsAuthentication, IKEv2Certificate, IKEv2EapTls, IKEv2CertificateEAP, \
+    IKEv2EAP
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
 
@@ -16,7 +17,8 @@ class HeaderForm(forms.Form):
     send_certreq = forms.BooleanField(initial=True, required=False)
     local_ts = forms.CharField(max_length=50, initial="", required=False)
     remote_ts = forms.CharField(max_length=50, initial="", required=False)
-    start_action = forms.ChoiceField(widget=forms.Select(), choices=Child.START_ACTION_CHOICES, required=False)
+    start_action = forms.ChoiceField(widget=forms.Select(), choices=Child.START_ACTION_CHOICES,
+                                     required=False)
     initiate = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
@@ -56,16 +58,19 @@ class HeaderForm(forms.Form):
                       start_action=self.cleaned_data['start_action'])
         child.save()
         self._set_proposals(connection, child)
-        self._set_addresses(connection, child, self.cleaned_data['local_addrs'], self.cleaned_data['remote_addrs'],
-                            self.cleaned_data['local_ts'], self.cleaned_data['remote_ts'])
+        self._set_addresses(connection, child, self.cleaned_data['local_addrs'],
+                            self.cleaned_data['remote_addrs'], self.cleaned_data['local_ts'],
+                            self.cleaned_data['remote_ts'])
 
     def update_connection(self, connection):
         Child.objects.filter(connection=connection).update(name=self.cleaned_data['profile'],
                                                            start_action=self.cleaned_data['start_action'])
         Address.objects.filter(local_addresses=connection).update(value=self.cleaned_data['local_addrs'])
         Address.objects.filter(remote_addresses=connection).update(value=self.cleaned_data['remote_addrs'])
-        Address.objects.filter(local_ts=connection.server_children.first()).update(value=self.cleaned_data['local_ts'])
-        Address.objects.filter(remote_ts=connection.server_children.first()).update(value=self.cleaned_data['remote_ts'])
+        Address.objects.filter(local_ts=connection.server_children.first()).update(
+                                                                    value=self.cleaned_data['local_ts'])
+        Address.objects.filter(remote_ts=connection.server_children.first()).update(
+                                                                    value=self.cleaned_data['remote_ts'])
         connection.profile = self.cleaned_data['profile']
         connection.version = self.cleaned_data['version']
         connection.send_certreq = self.cleaned_data["send_certreq"]
@@ -80,10 +85,8 @@ class HeaderForm(forms.Form):
 
     @staticmethod
     def _set_proposals(connection, child):
-        #Proposal(type="aes128-sha256-modp2048", connection=connection).save()
         Proposal(type="aes128-sha256-modp2048", connection=connection).save()
         Proposal(type="aes128gcm128-modp2048", child=child).save()
-        #Proposal(type="default", child=child).save()
 
     @staticmethod
     def _set_addresses(connection, child, local_addrs, remote_addrs, local_ts, remote_ts):
@@ -94,7 +97,8 @@ class HeaderForm(forms.Form):
 
 
 class PoolForm(forms.Form):
-    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected", required=False)
+    pool = PoolChoice(queryset=Pool.objects.none(), label="Pools", empty_label="Nothing selected",
+                      required=False)
 
     def __init__(self, *args, **kwargs):
         super(PoolForm, self).__init__(*args, **kwargs)
@@ -111,7 +115,8 @@ class PoolForm(forms.Form):
 class RemoteCertificateForm(forms.Form):
     """
     Manages the remote certificate field.
-    Contains a checkbox for 'auto choosing' the ca certificate and a select field for selecting the certificate manually.
+    Contains a checkbox for 'auto choosing' the ca certificate and a select field for selecting the
+    certificate manually.
     Either the checkbox is checked or the certificate is selected.
     """
     certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA/Peer certificate",
@@ -217,8 +222,8 @@ class EapCertificateForm(forms.Form):
             if remote.round > max_round:
                 max_round = remote.round
 
-        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'], remote=connection,
-                                            round=max_round + 1)
+        auth = EapCertificateAuthentication(name='remote-eap', auth=self.cleaned_data['remote_auth'],
+                                            remote=connection, round=max_round + 1)
         auth.save()
 
     def update_connection(self, connection):
@@ -275,8 +280,8 @@ class RemoteIdentityForm(forms.Form):
                 sub.ca_identity = self.ca_identity
                 sub.save()
                 return
-        raise Exception(
-            "No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
+        raise Exception("No AutoCaAuthentication or CaCertificateAuthentication found that can be used to "
+                        "insert identity.")
 
     def update_connection(self, connection):
         for remote in connection.server_remote.all():

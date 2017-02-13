@@ -39,4 +39,3 @@ class OverviewHandler:
         if len(queryset) == 0:
             table = None
         return render(self.request, 'pools/overview.html', {'table': table})
-

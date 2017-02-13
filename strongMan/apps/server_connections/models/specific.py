@@ -42,7 +42,8 @@ class Child(models.Model):
 
     name = models.TextField()
     mode = models.TextField()
-    start_action = models.CharField(max_length=5, choices=START_ACTION_CHOICES, null=True, blank=True, default=None)
+    start_action = models.CharField(max_length=5, choices=START_ACTION_CHOICES, null=True, blank=True,
+                                    default=None)
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
                                    related_name='server_children')
 
@@ -62,17 +63,20 @@ class Child(models.Model):
 
 class Address(models.Model):
     value = models.TextField()
-    local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='server_local_ts')
-    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='server_remote_ts')
-    remote_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                                         related_name='server_remote_addresses')
-    local_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                                        related_name='server_local_addresses')
+    local_ts = models.ForeignKey(Child, null=True, blank=True, default=None,
+                                 related_name='server_local_ts')
+    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None,
+                                  related_name='server_remote_ts')
+    remote_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True,
+                                         default=None, related_name='server_remote_addresses')
+    local_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True,
+                                        default=None, related_name='server_local_addresses')
 
 
 class Proposal(models.Model):
     type = models.TextField()
-    child = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='server_esp_proposals')
+    child = models.ForeignKey(Child, null=True, blank=True, default=None,
+                              related_name='server_esp_proposals')
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
                                    related_name='server_proposals')
 

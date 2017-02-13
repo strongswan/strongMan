@@ -44,10 +44,8 @@ class HeaderForm(forms.Form):
 
     @staticmethod
     def _set_proposals(connection, child):
-        #Proposal(type="aes128-sha256-modp2048", connection=connection).save()
         Proposal(type="default", connection=connection).save()
         Proposal(type="aes128gcm128-modp2048", child=child).save()
-        #Proposal(type="default", child=child).save()
 
     @staticmethod
     def _set_addresses(connection, child, gateway):
@@ -62,10 +60,12 @@ class HeaderForm(forms.Form):
 class CaCertificateForm(forms.Form):
     """
     Manages the ca certificate field.
-    Contains a checkbox for 'auto choosing' the ca certificate and a select field for selecting the certificate manually.
+    Contains a checkbox for 'auto choosing' the ca certificate and a select field for selecting the
+    certificate manually.
     Either the checkbox is checked or the certificate is selected.
     """
-    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate", required=False)
+    certificate_ca = CertificateChoice(queryset=UserCertificate.objects.none(), label="CA certificate",
+                                       required=False)
     certificate_ca_auto = forms.BooleanField(initial=True, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -75,7 +75,7 @@ class CaCertificateForm(forms.Form):
     def clean_certificate_ca(self):
         if "certificate_ca_auto" in self.data:
             return ""
-        if not "certificate_ca" in self.data:
+        if "certificate_ca" not in self.data:
             raise forms.ValidationError("This field is required!")
         identity_ca = self.data["certificate_ca"]
         if identity_ca == "":
@@ -151,7 +151,7 @@ class ServerIdentityForm(forms.Form):
     def clean_identity_ca(self):
         if "is_server_identity" in self.data:
             return ""
-        if not "identity_ca" in self.data:
+        if "identity_ca" not in self.data:
             raise forms.ValidationError("This field is required!", code='invalid')
         ident = self.data["identity_ca"]
         if ident == "":
@@ -195,8 +195,8 @@ class ServerIdentityForm(forms.Form):
                 sub.ca_identity = self.ca_identity
                 sub.save()
                 return
-        raise Exception(
-            "No AutoCaAuthentication or CaCertificateAuthentication found that can be used to insert identity.")
+        raise Exception("No AutoCaAuthentication or CaCertificateAuthentication found that can be used to "
+                        "insert identity.")
 
     def update_connection(self, connection):
         for remote in connection.remote.all():
@@ -251,7 +251,8 @@ class UserCertificateForm(forms.Form):
         self.my_identity = local_auth.identity.pk
 
     def create_connection(self, connection):
-        CertificateAuthentication(name='local', auth='pubkey', local=connection, identity=self.my_identity).save()
+        CertificateAuthentication(name='local', auth='pubkey', local=connection,
+                                  identity=self.my_identity).save()
 
     def update_connection(self, connection):
         for local in connection.local.all():
@@ -275,7 +276,8 @@ class EapTlsForm(UserCertificateForm):
         self.my_identity = local_auth.identity.pk
 
     def create_connection(self, connection):
-        EapTlsAuthentication(name='local-eap-tls', auth='eap-tls', local=connection, identity=self.my_identity).save()
+        EapTlsAuthentication(name='local-eap-tls', auth='eap-tls', local=connection,
+                             identity=self.my_identity).save()
 
     def update_connection(self, connection):
         for local in connection.local.all():
@@ -321,7 +323,8 @@ class EapForm(forms.Form):
             if local.round > max_round:
                 max_round = local.round
 
-        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username, round=max_round + 1)
+        auth = EapAuthentication(name='local-eap', auth='eap', local=connection, eap_id=self.my_username,
+                                 round=max_round + 1)
         auth.save()
         Secret(type='EAP', data=self.my_password, authentication=auth).save()
 

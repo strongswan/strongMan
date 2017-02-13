@@ -94,10 +94,10 @@ class Certificate(KeyContainer, DjangoAbstractBase):
     is_CA = models.BooleanField()
     valid_not_after = models.DateTimeField()
     valid_not_before = models.DateTimeField()
-    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_issuer",
-                                  null=True)
-    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL, related_name="certificate_subject",
-                                   null=True)
+    issuer = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL,
+                                  related_name="certificate_issuer", null=True)
+    subject = models.OneToOneField(DistinguishedName, on_delete=models.SET_NULL,
+                                   related_name="certificate_subject", null=True)
 
     @property
     def identities(self):
@@ -122,7 +122,8 @@ def certificate_clean_submodels(sender, **kwargs):
 
 
 class UserCertificate(Certificate):
-    private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL, related_name="certificates")
+    private_key = models.ForeignKey(PrivateKey, null=True, on_delete=models.SET_NULL,
+                                    related_name="certificates")
     _nickname = models.TextField()
 
     should_prevent_delete_signal = Signal(providing_args=["usercertificate", "private_key"])
@@ -137,12 +138,14 @@ class UserCertificate(Certificate):
             self.private_key = keys[0]
 
     def already_exists(self):
-        keys = UserCertificate.objects.filter(public_key_hash=self.public_key_hash, serial_number=self.serial_number)
+        keys = UserCertificate.objects.filter(public_key_hash=self.public_key_hash,
+                                              serial_number=self.serial_number)
         count = len(keys)
         return count > 0
 
     def remove_privatekey(self):
-        PrivateKey.should_prevent_delete_signal.send(PrivateKey, usercertificate=self, private_key=self.private_key)
+        PrivateKey.should_prevent_delete_signal.send(PrivateKey, usercertificate=self,
+                                                     private_key=self.private_key)
         privatekey = self.private_key
         self.private_key = None
         self.save()
@@ -154,7 +157,7 @@ class UserCertificate(Certificate):
 
     @property
     def has_private_key(self):
-        return not self.private_key is None
+        return self.private_key is not None
 
     @property
     def nickname(self):
@@ -222,7 +225,7 @@ class CertificateFactory:
             public.hash_algorithm = reader.asn1.hash_algo
             public.public_key_hash = reader.public_key_hash()
             public.serial_number = reader.asn1.serial_number
-            if reader.asn1.ca == None or reader.asn1.ca == False:
+            if reader.asn1.ca is None or reader.asn1.ca is False:
                 public.is_CA = False
             else:
                 public.is_CA = True
@@ -247,9 +250,9 @@ class CertificateFactory:
             public.save()
             return public
         except Exception as e:
-            if not public.issuer == None:
+            if public.issuer is not None:
                 public.issuer.delete()
-            if not public.subject == None:
+            if public.subject is not None:
                 public.subject.delete()
             public.identities.delete()
             public.delete()
