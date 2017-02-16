@@ -10,9 +10,6 @@ services:
         COMMIT: ${TRAVIS_COMMIT:-HEAD}
         REPO_SLUG: ${TRAVIS_REPO_SLUG:-strongswan/strongMan}
     privileged: true
-    ports:
-     - "500:500"
-     - "4500:4500"
 
   roadwarrior:
     extends: gateway

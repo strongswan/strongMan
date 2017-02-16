@@ -1,4 +1,5 @@
 [run]
+branch = True
 source =
     strongMan/apps
     strongMan/helper_apps
