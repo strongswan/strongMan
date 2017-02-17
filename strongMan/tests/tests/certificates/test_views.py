@@ -57,6 +57,15 @@ class AddHandlerTest(TestCase):
             self.assertEqual(1, self.certificates_count())
             self.assertEqual(0, self.privatekeys_count())
 
+    def test_x509_with_pw(self):
+        with CreateRequest("/certificates/add", TestCertificates.X509_rsa_ca, password="asdfasdf") as request:
+            handler = AddHandler.by_request(request)
+            (req, page, context) = handler.handle()
+            self.assertEqual("certificates/added.html", page)
+            self.assertTrue(context['public'].is_CA)
+            self.assertEqual(1, self.certificates_count())
+            self.assertEqual(0, self.privatekeys_count())
+
     def add_rw_certificate(self):
         with CreateRequest("/certificates/add", TestCertificates.X509_rsa) as request:
             handler = AddHandler.by_request(request)
@@ -75,14 +84,6 @@ class AddHandlerTest(TestCase):
         self.assertEqual(0, self.privatekeys_count())
         domains_count = context['public'].identities.all().__len__()
         self.assertEqual(505, domains_count)
-
-    def test_x509_with_pw(self):
-        with CreateRequest("/certificates/add", TestCertificates.X509_rsa_ca, password="asdfasdf") as request:
-            handler = AddHandler.by_request(request)
-            (req, page, context) = handler.handle()
-        self.assertEqual("certificates/add.html", page)
-        self.assertEqual(0, self.certificates_count())
-        self.assertEqual(0, self.privatekeys_count())
 
     def test_pkcs1_without_certificate(self):
         with CreateRequest("/certificates/add", TestCertificates.PKCS1_ec) as request:

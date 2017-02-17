@@ -304,11 +304,7 @@ class X509Reader(AbstractContainerReader):
     @classmethod
     def is_type(cls, container_bytes, password=None):
         try:
-            if password is None:
-                cert = k.parse_certificate(container_bytes)
-            else:
-                cert = k.parse_certificate(container_bytes, password=password)
-
+            cert = k.parse_certificate(container_bytes)
             cert.native
             return True
         except Exception as e:
