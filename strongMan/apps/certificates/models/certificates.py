@@ -205,7 +205,7 @@ class CertificateFactory:
         return subject
 
     @classmethod
-    def _try_to_get_value(cls, dict, key_path=[], default=None):
+    def _try_to_get_value(cls, dict, key_path, default=None):
         try:
             temp_dict = dict
             for key in key_path:

@@ -146,12 +146,13 @@ class CertificateManagerException(Exception):
 
 
 class AddKeyContainerResult:
-    def __init__(self, success, certificate=None, privatekey=None, further_certificates=[], exceptions=[]):
+    def __init__(self, success, certificate=None, privatekey=None, further_certificates=None,
+                 exceptions=None):
         self.success = success
         self.certificate = certificate
         self.privatekey = privatekey
-        self.further_certificates = further_certificates
-        self.exceptions = exceptions
+        self.further_certificates = further_certificates or []
+        self.exceptions = exceptions or []
 
     def __add__(self, other):
         if self.certificate is not None and other.certificate is not None:

@@ -341,16 +341,6 @@ class X509Reader(AbstractContainerReader):
         myident = self.public_key_hash()
         return ident == myident
 
-    def _try_to_get_value(self, dict, key_path=[], default=None):
-        try:
-            temp_dict = dict
-            for key in key_path:
-                temp_dict = temp_dict[key]
-
-            return temp_dict
-        except:
-            return default
-
     def serial_number(self):
         return self.asn1.serial_number
 
