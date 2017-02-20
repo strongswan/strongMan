@@ -1,0 +1,24 @@
+<form action="{% url "server_connections:update" record.id %}" method="post" data-toggle="modal" target="readonlyFrame{{ record.id }}" data-target="#readonlyModal{{ record.id }}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-default">
+        <span class="glyphicon glyphicon-eye-open"></span>
+    </button>
+    <input type="hidden" name="readonly">
+</form>
+
+<div class="modal fade" id="readonlyModal{{ record.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Connection Settings: {{ record.profile }}</h4>
+            </div>
+            <div class="modal-body text-center">
+                <iframe name="readonlyFrame{{ record.id }}" src="" frameborder="0"
+                        style="width: 100%; height: 600px;"></iframe>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Finish</button>
+            </div>
+        </div>
+    </div>
+</div>

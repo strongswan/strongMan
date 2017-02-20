@@ -1,14 +1,14 @@
 import os
 
-from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.test import TestCase, Client
 
-from strongMan.apps.connections.models.specific import Child
-from strongMan.apps.connections.models.connections import Connection
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
-from strongMan.apps.certificates.services import UserCertificateManager
 from strongMan.apps.certificates.models.certificates import Certificate
+from strongMan.apps.certificates.services import UserCertificateManager
+from strongMan.apps.connections.models.connections import Connection
+from strongMan.apps.connections.models.specific import Child
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class IntegrationTest(TestCase):

@@ -1,0 +1,82 @@
+<div class="container" id="pools-add">
+    <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
+        <div class="panel-body" id="upload-area">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    <label class="control-label col-sm-3 col-xs-12">Pool name*</label>
+                    <div class="controls col-sm-8 col-xs-10">
+                        <input type="text" class="form-control" name="poolname" value="{{ form.poolname.value }}"
+                               placeholder="Pool name"/>
+                        {% include "pools/widgets/errormsg.html" with field=form.poolname %}
+                    </div>
+                    <div class="col-sm-1 col-xs-2">
+                        {% include "pools/widgets/QuestionPopover.html" with title="Pool name help" content="Choose a name for your pool. 'dhcp' and 'radius' are reserved keywords. These can be used from the server connections wizard directly. There's no need to create such a pool." %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="control-label col-sm-3 col-xs-12">Addresses*</label>
+                    <div class="controls col-sm-8 col-xs-10">
+                        <input type="text" class="form-control" name="addresses" value="{{ form.addresses.value }}"
+                               placeholder="Address list"/>
+                        {% include "pools/widgets/errormsg.html" with field=form.addresses %}
+                    </div>
+                    <div class="col-sm-1 col-xs-2">
+                        {% include "pools/widgets/QuestionPopover.html" with title="Addresses help" content="Enter the (IPv4 or IPv6) addresses or address ranges of the pool comma separated. Examples: 192.168.1.0/24, 192.168.2.10-192.168.2.15" %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="control-label col-sm-3 col-xs-12">Attribute</label>
+                    <div class="controls col-sm-8 col-xs-10">
+                        <select class="selectpicker" name="attribute">
+                            {% for choice in form.attribute.field.choices %}
+                                <option value="{{choice.0}}"
+                                {% ifequal form.attribute.value choice.0 %}
+                                     selected="selected"
+                                {% endifequal %}>
+                                    {{choice.1}}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% include "pools/widgets/errormsg.html" with field=form.attribute %}
+                    </div>
+                    <div class="col-sm-1 col-xs-2">
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attributes" content="Select an additional attribute. (optional)" %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <label class="control-label col-sm-3 col-xs-12">Attribute values</label>
+                    <div class="controls col-sm-8 col-xs-10">
+                        <input type="text" class="form-control" name="attributevalues" value="{{ form.attributevalues.value }}"
+                               placeholder="Attribute values"/>
+                        {% include "pools/widgets/errormsg.html" with field=form.attributevalues %}
+                    </div>
+                    <div class="col-sm-1 col-xs-2">
+                        {% include "pools/widgets/QuestionPopover.html" with title="Attribute help" content="Enter the address of the additional attribute. This field is required if attribute is set." %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-11 col-xs-12">
+                        <button type="submit" class="btn btn-default pull-right">
+                            <span class="glyphicon glyphicon-floppy-disk"></span> Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            $(document).popover({
+                selector: '[data-toggle=popover]',
+                trigger: 'focus',
+                container: 'body'
+            });
+          });
+    </script>
+</div>

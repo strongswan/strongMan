@@ -1,0 +1,48 @@
+<div id="pool_picker">
+    <div class="row picker">
+        <label class="control-label col-sm-3 col-xs-12">{{ pool.label }}</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <select class="selectpicker" data-live-search="true"
+                    name="{{ pool.name }}"
+                    id="id_{{ pool.name }}" data-show-subtext="True">
+
+                <option value="">{{ fields.pool.empty_label }}</option>
+                {% for choice in pool.field.queryset %}
+                    <option value="{{ choice.id }}"
+                            {% if pool.value|slugify == choice.id|slugify %}
+                            selected="selected"{% endif %}>{{ choice }}</option>
+                {% endfor %}
+            </select>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=pool %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Pools help" content="Select an IP pool to allocate virtual IP addresses and other configuration attributes." %}
+        </div>
+        <div class="col-sm-11 col-xs-10">
+            <div class="pull-right">
+                <a data-toggle="modal" data-target="#AddPoolModal">Create new Pool</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="AddPoolModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Create Pool</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <iframe src="{% url "pools:add_form" %}" frameborder="0"
+                            style="width: 100%; height: 600px;"></iframe>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Finish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var picker = new PoolPicker("pool_picker", "{% url "server_connections:poolpicker" %}", "{{ csrf_token }}");
+    </script>
+</div>

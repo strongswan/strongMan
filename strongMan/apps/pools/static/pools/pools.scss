@@ -1,0 +1,75 @@
+#pools-overview {
+  #header {
+    margin-bottom: 20px;
+  }
+  #search {
+    margin-bottom: 10px;
+    margin-top: 30px;
+    .input-group {
+      margin-left: 13px;
+    }
+  }
+  #header #add-btn {
+    padding-right: 15px;
+  }
+
+  .pagination-form {
+    display: inline-block;
+  }
+  .pagination li {
+    display: inline-block;
+  }
+  .editremove-cell {
+    width: 120px;
+  }
+  td a {
+    display: block;
+    padding: 2px;
+  }
+  th:last-child, td:last-child {
+    width: 16.66666667%;
+  }
+  th:first-child, td:first-child {
+    width: 5%;
+  }
+}
+
+#pools-add {
+  .row {
+    margin-bottom: 10px;
+  }
+  .form-row {
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }
+  #upload-area {
+    padding-top: 25px;
+    padding-bottom: 15px;
+    padding-left: 20px;
+    padding-right: 10px;
+  }
+  #upload-panel {
+    margin-top: 20px;
+  }
+}
+
+#pools-added {
+  #nav-btn {
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+}
+
+.pools-widget h3 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.collapsepool .accordion-toggle:after {
+    font-family: 'Glyphicons Halflings';
+    content: "\e114";
+    float: left;
+    color: grey;
+}
+.collapsepool .accordion-toggle.collapsed:after {
+    content: "\e080";
+}

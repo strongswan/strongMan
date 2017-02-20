@@ -1,5 +1,5 @@
 $black: #333;
-$nav-font-color-hover: #bababa;
+$nav-font-color-hover: #BABABA;
 $nav-font-color: #EDEDED;
 
 @font-face {
@@ -10,65 +10,66 @@ $nav-font-color: #EDEDED;
   url('../../static/fonts/Ubuntu-Regular.ttf') format('truetype'), /* Safari, Android, iOS */
   url('../../static/fonts/Ubuntu-Regular.svg#svgFontName') format('svg'); /* Legacy iOS */
 }
-
 html {
-  height: 100%;
+  position: relative;
+  min-height: 100%;
   body {
-    padding-top: 20px;
-    height: 100%;
+    margin-bottom: 200px;
     font-family: 'strongUbuntu', sans-serif;
-    .container {
-      height: 100%;
-    }
-  }
-
-}
-
-#base {
-  .min-height {
-    min-height: 90%;
-  }
-
-  .title-area hr {
-    margin-top: 10px;
-    margin-bottom: 30px;
   }
 }
 
-#base-footer {
-  $padding: 20px;
-  $border-radius: 4px;
-  margin-top: 50px;
+.container {
+  height: 100%;
+}
+
+.content {
+  padding-bottom: 60px;
+  h1 {
+    padding-top: 30px;
+    padding-bottom: 12px;
+  }
+}
+
+.title-area hr {
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
   width: 100%;
-  height: 200px;
-  background-color: #101010;
-  border-top-right-radius: $border-radius;
-  border-top-left-radius: $border-radius;
-
-  .footer-content {
-    height: 100%;
-    position: relative;
-    padding: 40px $padding $padding 40px;
-    p, h1, h2, h3, h4, h5, span {
-      color: $nav-font-color;
-    }
-    .logo {
+  padding-top: 40px;
+  padding-bottom: 20px;
+  min-height: 200px;
+  color: #9D9D9D;
+  background-color: #222529;
+  vertical-align: middle;
+  margin-top: 50px;
+  a {
+    color: #9D9D9D;
+  }
+  a:hover {
+    color: #FFF;
+  }
+  .logo {
       display: inline-block;
-      text-align: center;
-      .fa {
-        font-size: 3em;
-        color: $nav-font-color;
-        margin-right: 25px;
-      }
-      .fa:hover {
-        color: $nav-font-color-hover;
-      }
+    .fa {
+      font-size: 3em;
+      color: #EDEDED;
+      color: #9D9D9D;
+      margin-right: 12px;
+      margin-left: 12px;
     }
-    .copyright {
-      margin-top: 50px;
+    .fa:hover {
+      color: #BABABA;
+      color: #FFF;
     }
   }
-
+  .copyright {
+    margin-top: 50px;
+  }
 }
 
 #login {
@@ -88,7 +89,6 @@ html {
       width: 70%;
     }
   }
-
 }
 
 .table-container {
@@ -101,11 +101,9 @@ html {
   h3 {
     margin-top: 10px;
   }
-
   input {
     margin-bottom: 3px;
   }
-
   #old_password {
     margin-bottom: 10px;
   }
@@ -122,13 +120,20 @@ html {
   padding-bottom: 20px;
 }
 
+.navbar {
+  margin-bottom: 0px;
+}
+
 .navbar-inverse {
-  margin-bottom: 20px;
+  background-color: #222529;
   .navbar-brand {
     color: $nav-font-color;
   }
   .navbar-brand:hover {
     color: $nav-font-color-hover;
+  }
+  .navbar-brand > img {
+    display: inline-block;
   }
   .navbar-nav > li > a {
     color: $nav-font-color;
@@ -169,6 +174,11 @@ html {
   display: inline-block
 }
 
+.add_button {
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
 #logout_button {
   float: right;
 }
@@ -185,4 +195,16 @@ html {
     padding: 10px;
     margin-bottom: 40px;
   }
+}
+
+.visible-mode {
+  display:block !important;
+}
+
+.invisible-mode {
+  display:none !important;
+}
+
+.hide-after-switch {
+  display: None;
 }

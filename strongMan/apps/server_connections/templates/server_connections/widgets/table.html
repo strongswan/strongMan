@@ -1,0 +1,147 @@
+{% load django_tables2 %}
+{% load i18n %}
+<div class="old table-container">
+    {% block table %}
+        <div class="well" style="margin-top: 24px">
+            <input type="hidden" id="filter-active-status" name="filter-active" value="0">
+            <table class="table-hover table-condensed table-responsive" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Remote host</th>
+                        <th>Remote ID</th>
+                        <th>Remote ts</th>
+                        <th>Local ts</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input id="remoteHostFilter" class="form-control input-sm" type="text" placeholder="Remote host"></td>
+                        <td><input id="remoteIdFilter" class="form-control input-sm" type="text" placeholder="Remote ID"></td>
+                        <td><input id="remoteTsFilter" class="form-control input-sm" type="text" placeholder="Remote ts"></td>
+                        <td><input id="localTsFilter" class="form-control input-sm" type="text" placeholder="Local ts"></td>
+                        <td><button type="button" class="btn btn-default" id="filter-clear">Clear</button></td>
+                        <td><button type="button" class="btn btn-default" id="filter-btn">Search</button></td>
+                        <td>
+                            {% include "server_connections/widgets/QuestionPopover.html" with title="Filter help" content="Filterterm = 'Remote Host' AND 'Remote ID' AND 'Remote TS' AND 'Local TS'. Note: Data will not refresh aslong filter is activ" %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <table id="connections-table" {% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+            {% block table.thead %}
+                {% if table.show_header %}
+                    <thead>
+                    <tr>
+                        {% for column in table.columns %}
+                            {% if column.orderable %}
+                                <th {{ column.attrs.th.as_html }}><a
+                                        href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">{{ column.header }}</a>
+                                </th>
+                            {% else %}
+                                <th {{ column.attrs.th.as_html }}>{{ column.header }}</th>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                {% endif %}
+            {% endblock table.thead %}
+            {% block table.tbody %}
+                <tbody>
+                {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
+                    {% block table.tbody.row %}
+                        <tr class="{% cycle 'even' 'odd' %} connection-row" id="connection-row-{{ row.record.id }}">
+                            {% for column, cell in row.items %}
+                                <td {{ column.attrs.td.as_html }}>
+                                    {% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}
+                                        {{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr id="connection-info-row-{{ row.record.id }}" class="connection-info-row {{ cyclename }} collapsed"
+                            style="display: none;">
+                            <td colspan="7" class="connection-info-span">
+                                <div class="sa-scroll">
+                                    <div class="panel panel-default connection-info">
+                                        <div class="panel-body">
+                                            <table class="table-hover table-condensed table-responsive sa-table" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Remote host</th>
+                                                        <th>Remote ID</th>
+                                                        <th class="col-xs-1">Terminate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="connection-{{ row.record.id }}-sas"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endblock table.tbody.row %}
+                    {% empty %}
+                    {% if table.empty_text %}
+                        {% block table.tbody.empty_text %}
+                            <tr>
+                                <td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td>
+                            </tr>
+                        {% endblock table.tbody.empty_text %}
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            {% endblock table.tbody %}
+            {% block table.tfoot %}
+                <tfoot></tfoot>
+            {% endblock table.tfoot %}
+
+        </table>
+    {% endblock table %}
+
+    {% if table.page %}
+        {% with table.page.paginator.count as total %}
+            {% with table.page.object_list|length as count %}
+                {% block pagination %}
+                    <div class="text-center">
+                        {% if table.page.has_previous %}
+                                {% block pagination.previous %}
+                                    <a class="btn btn-default" name="next"
+                                       href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">
+                                        <span class="glyphicon glyphicon-chevron-left"></span> Previous
+                                    </a>
+                                {% endblock pagination.previous %}
+                        {% endif %}
+                        {% if table.page.has_previous or table.page.has_next %}
+                            {% block pagination.current %}
+                                <span class="current">
+                                    {% blocktrans with table.page.number as current and table.paginator.num_pages as total %}
+                                        Page {{ current }} of {{ total }}
+                                    {% endblocktrans %}
+                                </span>
+                            {% endblock pagination.current %}
+                        {% endif %}
+                        {% if table.page.has_next %}
+                            {% block pagination.next %}
+                                <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                                   class="btn btn-default" name="next">
+                                    Next <span class="glyphicon glyphicon-chevron-right"></span>
+                                </a>
+                            {% endblock pagination.next %}
+                        {% endif %}
+                        {% block pagination.cardinality %}
+                            <div class="cardinality">
+                                {% if total != count %}{% blocktrans %}{{ count }} of {{ total }}
+                                {% endblocktrans %}{% else %}{{ total }}{% endif %}
+                                {% if total == 1 %}{{ table.data.verbose_name }}{% else %}
+                                    {{ table.data.verbose_name_plural }}{% endif %}
+                            </div>
+                        {% endblock pagination.cardinality %}
+                    </div>
+                {% endblock pagination %}
+            {% endwith %}
+        {% endwith %}
+    {% endif %}
+</div>

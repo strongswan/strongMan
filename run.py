@@ -9,6 +9,6 @@ if __name__ == "__main__":
     print(os.getcwd())
     print("Press CTRL + C to stop strongMan")
     print()
-    cmd = DJANGO_DIR + "/env/bin/gunicorn --workers 6  --bind 0.0.0.0:" + str(PORT) + " --env DJANGO_SETTINGS_MODULE=strongMan.settings.deployment strongMan.wsgi:application"
+    cmd = DJANGO_DIR + "/env/bin/gunicorn --workers 6  --bind 0.0.0.0:" + str(PORT) + " --env DJANGO_SETTINGS_MODULE=strongMan.settings.local strongMan.wsgi:application"
     process = subprocess.check_output(cmd.split())
 

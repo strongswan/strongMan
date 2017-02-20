@@ -1,0 +1,46 @@
+{% extends "server_connections/forms/ConnectionForm.html" %}
+{% load connections_extras %}
+{% block form_content %}
+    <div class="row">
+        <p class="col-xs-12">Local certificates</p>
+        <div class="col-xs-12">
+            <p>Choose the certificate which authenticates the server. Only certificates with private key's are shown.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CertificatePicker.html" with certificate=form.certificate identity=form.identity %}
+
+    <hr>
+
+    <div class="row">
+        <p class="col-xs-12">Remote certificates</p>
+        <div class="col-xs-12">
+            <p>Choose a certification authority (CA) certificate or a peer certificate.</p>
+        </div>
+    </div>
+    {% include "server_connections/forms/CaPicker.html" with form=form %}
+
+    <div class="row picker">
+        <p class="col-xs-12">Remote settings</p>
+        <label class="control-label col-sm-3 col-xs-12">Remote authentication</label>
+        <div class="controls col-sm-8 col-xs-10">
+            <select class="selectpicker" name="remote_auth">
+                {% if form.remote_auth.value == None or form.remote_auth.value == '-1' %}
+                    <option value="-1" selected="selected">Nothing selected</option>
+                {% endif %}
+                {% for key, value in form.remote_auth.field.choices %}
+                    <option value="{{ key }}"
+                        {% if form.remote_auth.value|slugify == key|slugify %}
+                            selected="selected"
+                        {% endif %}>
+                    {{ value }}</option>
+                {% endfor %}
+            </select>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_auth %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Remote authentication help" content="Select how the remote peer should be authenticated." %}
+        </div>
+    </div>
+
+    <hr>
+{% endblock form_content %}

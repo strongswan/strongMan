@@ -1,7 +1,8 @@
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver, Signal
-from strongMan.apps.encryption import fields
+
+from strongMan.helper_apps.encryption import fields
 from .core import CertificateException, CertificateModel, DjangoAbstractBase
 from .identities import TextIdentity, DnIdentity
 from ..container_reader import X509Reader
@@ -23,6 +24,14 @@ class KeyContainer(CertificateModel, models.Model):
     @classmethod
     def by_reader(cls, reader):
         raise NotImplementedError()
+
+    def get_algorithm_type(self):
+        if self.algorithm == 'ec':
+            return 'ECDSA'
+        elif self.algorithm == 'rsa':
+            return 'RSA'
+        else:
+            raise Exception('Algorithm of key is not supported!')
 
 
 class PrivateKey(KeyContainer):

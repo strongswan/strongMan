@@ -144,7 +144,6 @@ class ServerIdentityForm(forms.Form):
     Manages the server identity field.
     Containes a checkbox to take the gateway field as identity and a field to fill a own identity.
     Either the checkbox is checked or a own identity is field in the textbox.
-
     """
     identity_ca = forms.CharField(max_length=200, label="Server identity", required=False, initial="")
     is_server_identity = forms.BooleanField(initial=True, required=False)

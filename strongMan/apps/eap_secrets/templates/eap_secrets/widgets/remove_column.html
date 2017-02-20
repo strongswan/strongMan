@@ -1,0 +1,23 @@
+<form action="{% url "eap_secrets:edit" name %}" method="POST" class="inline-form"
+      onsubmit="return removeBtnClicked(this)" id="{{ name }}">
+    {% csrf_token %}
+                    <span title="Remove">
+                        <button type="submit" class="btn btn-default remove-btn btn-sm"
+                                id="removebtn-{{ name }}" name="remove_secret">
+                            <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text"></span>
+                        </button>
+                    </span>
+</form>
+<script>
+    function removeBtnClicked(form) {
+        btn = $("#removebtn-" + form.id)
+        if (btn.hasClass('btn-default')) {
+            btn.removeClass('btn-default').addClass('btn-danger');
+            btn.children('.removebtn-text').text('Remove');
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+</script>

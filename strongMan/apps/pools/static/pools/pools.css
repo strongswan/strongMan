@@ -1,0 +1,54 @@
+#pools-overview #header {
+  margin-bottom: 20px; }
+#pools-overview #search {
+  margin-bottom: 10px;
+  margin-top: 30px; }
+  #pools-overview #search .input-group {
+    margin-left: 13px; }
+#pools-overview #header #add-btn {
+  padding-right: 15px; }
+#pools-overview .pagination-form {
+  display: inline-block; }
+#pools-overview .pagination li {
+  display: inline-block; }
+#pools-overview .editremove-cell {
+  width: 120px; }
+#pools-overview td a {
+  display: block;
+  padding: 2px; }
+#pools-overview th:last-child, #pools-overview td:last-child {
+  width: 16.66666667%; }
+#pools-overview th:first-child, #pools-overview td:first-child {
+  width: 5%; }
+
+#pools-add .row {
+  margin-bottom: 10px; }
+#pools-add .form-row {
+  margin-bottom: 10px;
+  margin-top: 5px; }
+#pools-add #upload-area {
+  padding-top: 25px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  padding-right: 10px; }
+#pools-add #upload-panel {
+  margin-top: 20px; }
+
+#pools-added #nav-btn {
+  margin-top: 20px;
+  margin-bottom: 30px; }
+
+.pools-widget h3 {
+  margin-top: 10px;
+  margin-bottom: 20px; }
+
+.collapsepool .accordion-toggle:after {
+  font-family: 'Glyphicons Halflings';
+  content: "\e114";
+  float: left;
+  color: grey; }
+
+.collapsepool .accordion-toggle.collapsed:after {
+  content: "\e080"; }
+
+/*# sourceMappingURL=pools.css.map */

@@ -13,9 +13,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'strongMan.apps.vici',
+    'strongMan.helper_apps.vici',
     'strongMan.apps.connections',
     'strongMan.apps.certificates',
+    'strongMan.apps.eap_secrets',
+    'strongMan.apps.server_connections',
+    'strongMan.apps.pools',
     'django_tables2',
     'dj_static',
 ]

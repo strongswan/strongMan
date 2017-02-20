@@ -1,0 +1,20 @@
+{% load connections_extras %}
+<div id="TypeChoose-form">
+    <p>Select the authentication method.</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <label class="control-label col-sm-2 col-xs-12" for="label_form_name">Method</label>
+        <div class="controls col-sm-9 col-xs-10">
+            <select class="selectpicker" name="form_name" id="select_form_name" onchange="this.form.submit()">
+                <option>Choose your authentication method</option>
+                {% for key, value in form.fields.form_name.choices %}
+                    <option value={{ key }}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Method help" content="The authentication method has to be used by the peers." %}
+        </div>
+    </form>
+</div>

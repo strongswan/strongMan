@@ -1,0 +1,236 @@
+{% load connections_extras %}
+<div id="ConnectionForm">
+    <div class="row">
+        <p class="col-xs-12">Your chosen authentication method.</p>
+        <label class="control-label col-sm-3 col-xs-12" for="label_form_name">Method</label>
+        {% if connection %}
+            <div class="controls col-sm-8 col-xs-9">
+        {% else %}
+            <div class="controls col-sm-6 col-xs-8">
+        {% endif %}
+            <select class="form-control" name="form_name" id="select_form_name" disabled="True">
+                <option>{{ form.model.choice_name }}</option>
+            </select>
+        </div>
+        <div class="col-sm-2 col-xs-2">
+            {% if not connection %}
+                <span title="Change authentication method">
+                    <a class="btn btn-default" onclick="on_change_method_btn_click()" id="change_method_btn">
+                        <i class="fa fa-pencil" aria-hidden="true"></i><span> Change</span>
+                    </a>
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <label class="control-label col-sm-3 col-xs-12" for="label_connection_type">Connection Type</label>
+        <div class="col-sm-9 col-xs-12">
+            <p name="connection_type" id="connection_type">
+                {% ifequal form.connection_type 'site_to_site' %}Site to Site{% endifequal %}
+                {% ifequal form.connection_type 'remote_access' %}Remote Access{% endifequal %}
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="connection_type" value="{{ form.connection_type }}"/>
+        <input type="hidden" name="current_form" value="{{ form|classname }}"/>
+        <input type="hidden" name="refresh_choices" value="False" id="refresh_choices"/>
+        <div class="row">
+            <p class="col-xs-12">Name your connection so you can recognize it.</p>
+            <label class="control-label col-sm-3 col-xs-12">Name</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="profile" value="{{ form.profile.value }}"
+                       placeholder="Name your connection"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.profile %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Name help" content="This is the name of the connection. The name appears as the main identifier in strongMan and also in strongSwan." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">IKE Version</label>
+            <div class="controls col-sm-8 col-xs-10" name="version">
+                {% for choice in form.version.field.choices %}
+                  <label class="radio-inline">
+                    <input type="radio" name="version" value="{{choice.0}}"
+                      {% ifequal form.version.value choice.0 %}
+                         checked="checked"
+                      {% endifequal %}/>
+                    {{choice.1}}
+                  </label>
+                {% endfor %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="IKE help" content="Choose the IKE Version which should be used by the server." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Server Address</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="local_addrs" value="{{ form.local_addrs.value }}"
+                       placeholder="Server Hostname or IP" id="local_addrs"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_addrs %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Server address help" content="Local address to use for IKE communication. Takes single IPv4/IPv6 addresses, DNS names, CIDR subnets or IP address ranges. Use keyword %any or leave field empty for any ethernet interface." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Remote Address</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="remote_addrs" value="{{ form.remote_addrs.value }}"
+                       placeholder="Remote Hostname or IP" id="remote_addrs"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_addrs %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote address help" content="Remote address to use for IKE communication. Takes single IPv4/IPv6 addresses, DNS names, CIDR subnets or IP address ranges. Use keyword %any or leave field empty for any ethernet interface." %}
+            </div>
+        </div>
+
+        {% if form.connection_type == 'remote_access' or connection.connection_type == 'remote_access' %}
+            {% include "server_connections/forms/PoolPicker.html" with pool=form.pool%}
+        {% endif %}
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Send Certificate Request</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="send_certreq" {% if form.send_certreq.value == True %}
+                             checked="checked"
+                        {% endif %}>Send certificate request
+                </label>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.send_certreq %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Certificate request help" content="Send certificate request payloads to offer trusted root CA certificates to the peer. Disabling certificate requests can be useful if too many trusted root CA certificates are installed, as each certificate request increases the size of the initial IKE packets." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Start Action</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <select class="selectpicker" name="start_action">
+                    {% for choice in form.start_action.field.choices %}
+                        <option value="{{choice.0}}"
+                            {% ifequal form.start_action.value|slugify choice.0|slugify %}selected="selected"{% endifequal %}>
+                            {{choice.1}}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.start_action %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Start Action" content="Action to perform after loading the configuration. The default of none loads the connection only, which then can be manually initiated or used as a responder configuration. The value trap installs a trap policy, which triggers the tunnel as soon as matching traffic has been detected. The value start initiates the connection actively." %}
+            </div>
+        </div>
+
+        {% if form.connection_type == 'site_to_site' or connection.connection_type == 'site_to_site' %}
+            <div class="row">
+                <label class="control-label col-sm-3 col-xs-12">Active initiator</label>
+                <div class="controls col-sm-8 col-xs-10">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="initiate" {% if form.initiate.value == True %}
+                                 checked="checked"
+                            {% endif %}>Initiate connection
+                    </label>
+                    {% include "server_connections/forms/../widgets/errormsg.html" with field=form.initiate %}
+                </div>
+                <div class="col-sm-1 col-xs-2">
+                    {% include "server_connections/widgets/QuestionPopover.html" with title="Initiate help" content="Select if connection should be initiated after loading into strongSwan." %}
+                </div>
+            </div>
+        {% endif %}
+
+        <hr>
+
+        {% block form_content %}{% endblock form_content %}
+
+        <div class="row">
+            <p class="col-xs-12">Traffic selectors</p>
+            <label class="control-label col-sm-3 col-xs-12">Local traffic selector</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="local_ts" value="{{ form.local_ts.value }}"
+                       placeholder="Local traffic selector" id="local_ts"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.local_ts %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="Local traffic selectors to include in CHILD_SA. Each selector is a CIDR subnet definition, followed by an optional proto/port selector. The special value dynamic may be used instead of a subnet definition, which gets replaced by the tunnel outer address or the virtual IP, if negotiated. This is the default." %}
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="control-label col-sm-3 col-xs-12">Remote traffic selector</label>
+            <div class="controls col-sm-8 col-xs-10">
+                <input type="text" class="form-control" name="remote_ts" value="{{ form.remote_ts.value }}"
+                       placeholder="Remote traffic selector" id="remote_ts"/>
+                {% include "server_connections/forms/../widgets/errormsg.html" with field=form.remote_ts %}
+            </div>
+            <div class="col-sm-1 col-xs-2">
+                {% include "server_connections/widgets/QuestionPopover.html" with title="help" content="Remote traffic selectors to include in CHILD_SA. Each selector is a CIDR subnet definition, followed by an optional proto/port selector. The special value dynamic may be used instead of a subnet definition, which gets replaced by the tunnel outer address or the virtual IP, if negotiated. This is the default." %}
+            </div>
+        </div>
+
+        <div class="pull-right">
+            {% if connection %}
+                {% if connection.state == 'DOWN' or connection.state == 'UNLOADED' %}
+                    <span title="Remove connection">
+                    <a href="{% url 'server_connections:delete' connection.id %}"
+                       id="delete-{{ connection.id }}"
+                       class="btn btn-default white-background black remove-btn">
+                        <span class="glyphicon glyphicon-remove"></span> <span
+                            class="removebtn-text">Remove</span>
+                    </a>
+                </span>
+                {% endif %}
+            {% endif %}
+
+            {% if connection and connection.state == 'DOWN' or connection and connection.state == 'UNLOADED' or not connection %}
+                <button type="submit" name="save" id="configuration"
+                        class="btn btn-primary">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> Save
+                </button>
+            {% endif %}
+
+            {% if connection and connection.state == 'UP' or connection and connection.state == 'LOADED' or not connection %}
+                <button type="submit" name="save_and_reload" id="configuration_reload"
+                        class="btn btn-primary">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> Save and update
+                </button>
+            {% endif %}
+        </div>
+    </form>
+    <script>
+        $(function () {
+            $(document).popover({
+                selector: '[data-toggle=popover]',
+                trigger: 'focus',
+                container: 'body'
+            });
+        });
+
+        $(".remove-btn").click(function () {
+            btn = $(this);
+            if (btn.hasClass('btn-default')) {
+                btn.removeClass('btn-default').addClass('btn-danger');
+                btn.children('.removebtn-text').text('Remove connection');
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        on_change_method_btn_click = function () {
+            if (confirm('Are you sure you want to change the authentication method? All inputs will be lost.')) {
+                window.location.replace("");
+            }
+        }
+    </script>
+</div>

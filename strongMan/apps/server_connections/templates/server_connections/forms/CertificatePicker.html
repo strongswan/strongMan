@@ -1,0 +1,72 @@
+<div id="certificateident_picker_{{ certificate.name }}">
+    <div class="row certificate_picker">
+        <label class="control-label col-sm-3 col-xs-12">{{ certificate.label }}</label>
+        <div class="col-sm-8 col-xs-10">
+            <select class="selectpicker certificateselect" data-live-search="true"
+                    name="{{ certificate.name }}"
+                    id="id_{{ certificate.name }}" data-show-subtext="True">
+                <option value="">{{ form.fields.certificate.empty_label }}</option>
+                {% for choise in certificate.field.queryset %}
+                    <option value="{{ choise.id }}"
+                            {% if certificate.value|slugify == choise.id|slugify %}
+                            selected{% endif %}
+                            data-subtext="{{ choise }}">{{ choise.subject.cname }}</option>
+                {% endfor %}
+            </select>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=certificate %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Server certificate help" content="Select a certificate which authenticates the server. Only certificate with a private key are shown." %}
+        </div>
+        <div class="col-sm-11 col-xs-10">
+            <div class="pull-right cert_upload">
+                <a data-toggle="modal" data-target="#AddCertificateModal">Upload new certificate</a>
+            </div>
+        </div>
+    </div>
+    <div class="row identity_picker">
+        <label class="control-label col-sm-3 col-xs-12">{{ identity.label }}</label>
+        <div class="col-sm-8 col-xs-10">
+            <select class="selectpicker identityselect" data-live-search="true" name="{{ identity.name }}"
+                    id="id_{{ identity.name }}" data-show-subtext="True"
+                    {% if identity.field.choices|length == 0 %}disabled="True"{% endif %}>
+                {% for value, identity_choice in identity.field.choices %}
+                    <option value="{{ value }}"
+                            {% if identity.value|slugify == value|slugify %}selected="selected"{% endif %}
+                                    data-subtext="{{ identity_choice.type }}"
+                            {% if not identity.value and identity_choice.type == 'distinguishedName' %}
+                            selected="selected"
+                            {% endif %}>{{ identity_choice }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% include "server_connections/forms/../widgets/errormsg.html" with field=identity %}
+        </div>
+        <div class="col-sm-1 col-xs-2">
+            {% include "server_connections/widgets/QuestionPopover.html" with title="Server identity help" content="Select one of the available identities for the server. Use the distinguished name in doubt. This field will be enabled as soon as the certificate is selected." %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="AddCertificateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Upload certificate</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Upload a certificate first followed by the associated private key.</p>
+                    <iframe src="{% url "certificates:add_form" %}" frameborder="0"
+                            style="width: 100%; height: 600px;"></iframe>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Finish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var picker = new CertificatePicker("certificateident_picker_{{ certificate.name }}", "{% url "server_connections:certificatepicker" %}", "{{ csrf_token }}");
+    </script>
+</div>

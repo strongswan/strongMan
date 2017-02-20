@@ -1,0 +1,53 @@
+<span title="Turn connection on / off" xmlns="http://www.w3.org/1999/html">
+    <div id="alert_{{ record.id }}">
+        <div style="white-space: nowrap; margin-right: 20px;">
+            <form id="toggle_connection{{ record.id }}" action="{% url 'server_connections:toggle' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ record.id }}">
+                <input type="hidden" name="connection_type" value="{{ record.subclass.get_typ }}">
+                <div id="button_div{{ record.id }}">
+                    <input id="toggle_input{{ record.id }}" type="checkbox" data-toggle="toggle"
+                           data-offstyle="default"
+                           data-onstyle="success"
+                           {% if record.subclass.is_remote_access %}
+                                data-on="Loaded" data-off="Unloaded"
+                           {% elif record.subclass.is_site_to_site %}
+                                {% if record.subclass.initiate %}
+                                    data-on="On" data-off="Off"
+                                {% else %}
+                                    data-on="Loaded" data-off="Unloaded"
+                                {% endif %}
+                           {% endif %}
+                           {% if record.state == 'ESTABLISHED' or record.state == 'LOADED' %}checked{% endif %}>
+                </div>
+            </form>
+        </div>
+    </div>
+</span>
+
+{% if record.state == 'CONNECTING' %}
+    <script type="text/javascript"> $(function () {
+        getState({{ record.id }}, '{{ csrf_token }}');
+    });</script>
+{% endif %}
+{% if record.state == 'ESTABLISHED' %}
+    <script type="text/javascript"> $(function () {
+        showConnectionInfoRow({{ record.id }}, '{{ csrf_token }}');
+    });</script>
+{% endif %}
+{% if record.state == 'DOWN' %}
+    <script type="text/javascript"> $(function () {
+        hideConnectionInfoRow({{ record.id }});
+    });</script>
+{% endif %}
+{% if record.state == 'LOADED' %}
+    <script type="text/javascript"> $(function () {
+        showConnectionInfoRow({{ record.id }}, '{{ csrf_token }}');
+    });</script>
+{% endif %}
+{% if record.state == 'UNLOADED' %}
+    <script type="text/javascript"> $(function () {
+        hideConnectionInfoRow({{ record.id }});
+    });</script>
+{% endif %}
+

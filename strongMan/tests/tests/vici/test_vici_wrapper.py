@@ -1,8 +1,9 @@
 from django.test import TestCase
+from strongMan.helper_apps.vici.wrapper.exception import ViciPathNotASocketException
+
 from strongMan.apps.connections.models.authentication import Authentication
 from strongMan.apps.connections.models.connections import Connection
-from strongMan.apps.vici.wrapper.exception import ViciPathNotASocketException
-from strongMan.apps.vici.wrapper.wrapper import ViciWrapper
+from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
 class ViciWrapperTest(TestCase):

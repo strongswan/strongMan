@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% comment %}
+    Input:
+    :param publics: list of certificates
+    :type publics: [models.Certifacte]
+    :param view: indicates which filter has been applied
+    :type view: "all" | "root" | "entities"
+    :param search_pattern: the search pattern, that the user has typed in
+    :type search_pattern: String
+    :param readonly: Indicates if the view is readonly
+    :type readonly: boolean
+{% endcomment %}
+{% block title %}EAP Secrets{% endblock title %}
+{% block small-title %}Overview{% endblock small-title %}
+{% block html-head %}
+    <link href="{% static 'eap_secrets/eap_secrets.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "django_tables2/themes/paleblue/css/screen.css" %}" />
+{% endblock %} html-header %}
+{% block content %}
+    <div id="eap_secrets-overview" class="row col-xs-12 col-md-10 col-md-offset-1">
+        <div class="row" id="header">
+            <div class="pull-right" id="add-btn">
+                <span title="Add a new key container">
+                    <a href="{% url "eap_secrets:add" %}" type="button" class="btn btn-primary btn-sm"
+                       aria-label="Left Align">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                    </a>
+                </span>
+            </div>
+        </div>
+        <div class="row" id="search">
+            <form action="" method="POST" >
+                {% csrf_token %}
+                <input type="hidden" name="page" value="1">
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <input class="form-control" type="text" name="search_text" value="{{ search_pattern }}"
+                               placeholder="Filter your EAP Secrets by Name">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default" type="button" name="search" {% if not table %}disabled="True"{% endif %}><span
+                                    class="glyphicon glyphicon-search"></span> Search
+                            </button>
+                            <a href="" class="btn btn-default" {% if search_pattern == "" %}disabled="True"{% endif %}
+                               name="clear">
+                                <span class="glyphicon glyphicon-remove"></span> Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    {% if table %}
+        <div class="col-xs-12">
+        {% render_table table 'eap_secrets/widgets/table.html' %}
+        </div>
+    {% else %}
+        <h3 id="no_certs_to_show">No EAP Secrets to show</h3>
+        <p>Feel free to add a EAP Secret with the blue Add button on the right side.</p>
+    {% endif %}
+    </div>
+{% endblock content %}

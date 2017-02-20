@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block title %}EAP Secrets{% endblock title %}
+{% block small-title %}Edit a Secret{% endblock small-title %}
+{% block html-head %}
+    <link href="{% static 'eap_secrets/eap_secrets.css' %}" rel="stylesheet">
+{% endblock html-head %}
+{% block content %}
+    <div class="container" id="eap_secrets-add">
+        <div class="panel panel-default col-md-8 col-md-offset-2 col-xs-12" id="upload-panel">
+            <div class="panel-body" id="upload-area">
+                <form method="post" action="{% url "eap_secrets:edit" form.username.value %}">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <label class="control-label col-sm-3 col-xs-12">Username</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="text" class="form-control" name="username" value="{{ form.username.value }}"
+                                   placeholder="Your username" readonly/>
+                            {% include "eap_secrets/widgets/errormsg.html" with field=form.username %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "eap_secrets/widgets/QuestionPopover.html" with title="Username help" content="Enter the username that authenticates the user." %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="control-label col-sm-3 col-xs-12">Password</label>
+                        <div class="controls col-sm-8 col-xs-10">
+                            <input type="password" class="form-control" name="password" value="{{ form.password.value }}"
+                                   placeholder="Your password" />
+                            {% include "eap_secrets/widgets/errormsg.html" with field=form.password %}
+                        </div>
+                        <div class="col-sm-1 col-xs-2">
+                            {% include "eap_secrets/widgets/QuestionPopover.html" with title="Password help" content="Enter the corresponding password. Use a safe and strong password." %}
+                        </div>
+                    </div>
+
+                    <div class="row form-row">
+                        <div class="col-md-11 col-xs-12">
+                            <button type="submit" class="btn btn-default pull-right add_button">
+                                <span class="glyphicon glyphicon-floppy-disk"></span> Change
+                            </button>
+                            <button type="button" name="password-visibility" class="btn btn-default pull-right">Show password</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            $(function () {
+                $(document).popover({
+                    selector: '[data-toggle=popover]',
+                    trigger: 'focus',
+                    container: 'body'
+                });
+                $("button[name='password-visibility']").click(function() {
+                    if ($( "input[name='password']" ).attr('type') == 'password'){
+                        $( "input[name='password']" ).attr('type', 'text');
+                        $(this).html('Hide password');
+                    }
+                    else {
+                        $( "input[name='password']" ).attr('type', 'password');
+                        $(this).html('Show password');
+                    }
+                });
+            });
+        </script>
+    </div>
+{% endblock content %}
