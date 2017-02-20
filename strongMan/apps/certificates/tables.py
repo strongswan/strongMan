@@ -30,5 +30,5 @@ class UserCertificateTable(tables.Table):
         return render_to_string('certificates/widgets/remove_column.html',
                                 {'id': record.id, "is_vici": is_vici}, request=self.request)
 
-    class Meta:
+    class Meta(object):
         attrs = {"class": "table table-striped"}

@@ -3,7 +3,7 @@ import os
 from strongMan.tests.utils.certificates import CertificateLoader
 
 
-class TestCertificates:
+class TestCertificates(object):
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "certs")
     loader = CertificateLoader(path)
     X509_rsa_ca = loader.create("ca.crt")

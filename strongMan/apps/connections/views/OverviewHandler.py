@@ -7,7 +7,7 @@ from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from ..tables import ConnectionTable
 
 
-class OverviewHandler:
+class OverviewHandler(object):
     def __init__(self, request):
         self.request = request
         self.ENTRIES_PER_PAGE = 10

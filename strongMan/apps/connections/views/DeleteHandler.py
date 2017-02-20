@@ -7,7 +7,7 @@ from strongMan.apps.connections.models.connections import Connection
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class DeleteHandler:
+class DeleteHandler(object):
     def __init__(self, request, id):
         self.request = request
         self.id = id

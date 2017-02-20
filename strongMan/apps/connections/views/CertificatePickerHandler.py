@@ -4,7 +4,7 @@ from ...certificates.models import UserCertificate
 from django.shortcuts import get_object_or_404
 
 
-class CertificatePickerHandler:
+class CertificatePickerHandler(object):
     def __init__(self, request):
         self.request = request
 

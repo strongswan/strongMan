@@ -2,7 +2,7 @@ from django.shortcuts import render
 from strongMan.apps.server_connections.forms.SubForms import PoolForm
 
 
-class PoolPickerHandler:
+class PoolPickerHandler(object):
     def __init__(self, request):
         self.request = request
 

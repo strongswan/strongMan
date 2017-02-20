@@ -21,5 +21,5 @@ class ConnectionTable(tables.Table):
         return render_to_string('connections/widgets/state_column.html', {'record': record},
                                 request=self.request)
 
-    class Meta:
+    class Meta(object):
         attrs = {"class": "table"}

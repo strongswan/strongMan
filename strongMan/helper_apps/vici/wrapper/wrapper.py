@@ -7,7 +7,7 @@ from .exception import ViciSocketException, ViciTerminateException, ViciLoadExce
     ViciInitiateException, ViciPathNotASocketException
 
 
-class ViciWrapper:
+class ViciWrapper(object):
     def __init__(self, socket_path="/var/run/charon.vici"):
         self.socket_path = socket_path
         if not os.path.exists(self.socket_path):

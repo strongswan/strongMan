@@ -7,7 +7,7 @@ from ..tables import EapSecretsTable
 from ..models import Secret
 
 
-class OverviewHandler:
+class OverviewHandler(object):
     def __init__(self):
         self.request = None
         self.ENTRIES_PER_PAGE = 10

@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from strongMan.apps.server_connections.models.connections import Connection
 
 
-class StateHandler:
+class StateHandler(object):
     def __init__(self, request, id):
         self.request = request
         self.id = id

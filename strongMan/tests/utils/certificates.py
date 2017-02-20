@@ -3,7 +3,7 @@ import os
 from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
 
 
-class CertificateLoader:
+class CertificateLoader(object):
     def __init__(self, path, name=None):
         self.path = path
         self.name = name

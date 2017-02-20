@@ -70,7 +70,7 @@ class TestUserCertificateManager(TestCase):
         self.assertEqual(count(strongMan.apps.certificates.models.certificates.UserCertificate), 1)
 
 
-class SerializedDict:
+class SerializedDict(object):
     def __init__(self, path):
         self.path = path
         self.folder = os.path.dirname(os.path.realpath(__file__)) + "/vici_certdict/"
@@ -80,7 +80,7 @@ class SerializedDict:
             return pickle.load(f)
 
 
-class ViciDict:
+class ViciDict(object):
     cert = SerializedDict('cert.dict')
     cert_with_private = SerializedDict('certwithprivate.dict')
 

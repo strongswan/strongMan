@@ -14,7 +14,7 @@ class KeyContainer(CertificateModel, models.Model):
     algorithm = models.CharField(max_length=3)
     public_key_hash = models.TextField()
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
     @classmethod
@@ -187,7 +187,7 @@ class ViciCertificate(Certificate):
     has_private_key = models.BooleanField(default=False)
 
 
-class CertificateFactory:
+class CertificateFactory(object):
     @classmethod
     def distinguishedName_factory(cls, asn1_object):
         dict = asn1_object.native

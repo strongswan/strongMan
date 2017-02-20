@@ -5,7 +5,7 @@ from strongMan.apps.certificates.forms import AddForm
 from ..services import UserCertificateManager
 
 
-class AddHandler:
+class AddHandler(object):
     def __init__(self, is_add_form=False):
         self.form = None
         self.request = None

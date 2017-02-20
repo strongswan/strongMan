@@ -10,7 +10,7 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
 
 
-class EditHandler:
+class EditHandler(object):
     def __init__(self, request, secret):
         self.request = request
         self.secret = secret

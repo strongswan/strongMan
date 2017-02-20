@@ -7,7 +7,7 @@ from django.contrib import messages
 from .ToggleHandler import ToggleHandler
 
 
-class UpdateHandler:
+class UpdateHandler(object):
     def __init__(self, request, id):
         self.request = request
         self.id = id

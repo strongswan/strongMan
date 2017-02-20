@@ -7,7 +7,7 @@ from .. import tables
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class OverviewHandler:
+class OverviewHandler(object):
     def __init__(self, request):
         self.request = request
         self.ENTRIES_PER_PAGE = 50

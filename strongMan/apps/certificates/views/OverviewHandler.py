@@ -10,7 +10,7 @@ from ..services import ViciCertificateManager
 from ..tables import UserCertificateTable
 
 
-class AbstractOverviewHandler:
+class AbstractOverviewHandler(object):
     def __init__(self):
         self.request = None
         self.ENTRIES_PER_PAGE = 10

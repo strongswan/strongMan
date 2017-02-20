@@ -9,7 +9,7 @@ from strongMan.apps.forms import PasswordChangeForm
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class AboutHandler:
+class AboutHandler(object):
     def __init__(self, request):
         self.request = request
 
@@ -33,7 +33,7 @@ class AboutHandler:
             return self._render_page()
 
 
-class PwChangeHandler:
+class PwChangeHandler(object):
     def __init__(self, request):
         self.request = request
 

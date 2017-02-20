@@ -13,7 +13,7 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from strongMan.tests.utils.certificates import CertificateLoader
 
 
-class TestCertificates:
+class TestCertificates(object):
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "certs")
     loader = CertificateLoader(path)
     carol_cert = loader.create("carolCert.pem")

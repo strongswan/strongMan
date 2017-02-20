@@ -5,7 +5,7 @@ from strongMan.apps.server_connections.models.connections import Connection
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
 
 
-class ToggleHandler:
+class ToggleHandler(object):
     def __init__(self, request):
         self.request = request
 

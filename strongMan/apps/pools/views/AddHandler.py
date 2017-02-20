@@ -9,7 +9,7 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from django.shortcuts import render
 
 
-class AddHandler:
+class AddHandler(object):
     def __init__(self, is_add_form=False):
         self.form = None
         self.request = None

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from ..forms import Ike2CertificateForm
 
 
-class CaPickerHandler:
+class CaPickerHandler(object):
     def __init__(self, request):
         self.request = request
 

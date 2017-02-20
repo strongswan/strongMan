@@ -22,7 +22,7 @@ class InstallerException(Exception):
     pass
 
 
-class BaseInstaller:
+class BaseInstaller(object):
     PRODUCTION_SETTINGS = "strongMan.settings.production"
     LOCAL_SETTINGS = "strongMan.settings.local"
     mute = True

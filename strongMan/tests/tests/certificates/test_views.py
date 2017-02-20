@@ -9,7 +9,7 @@ from strongMan.apps.certificates.views import AddHandler
 from .certificates import TestCertificates
 
 
-class CreateRequest:
+class CreateRequest(object):
     '''
     This class is a with object. __enter__ opens a file and __exit__ closes the file.
     with CreateRequest(page, testcert) as request:

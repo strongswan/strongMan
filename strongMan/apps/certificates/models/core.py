@@ -1,4 +1,4 @@
-class DjangoAbstractBase:
+class DjangoAbstractBase(object):
     @classmethod
     def all_subclasses(cls):
         '''
@@ -35,7 +35,7 @@ class DjangoAbstractBase:
     def subclass(self):
         '''
         Tries to convert this class to it's subclass
-        :return: subclass object
+        (object):return: subclass object
         '''
         for klass in type(self).all_subclasses():
             try:
@@ -45,8 +45,8 @@ class DjangoAbstractBase:
         raise CertificateException("Can't find subclass object")
 
 
-class CertificateModel:
-    class Meta:
+class CertificateModel(object):
+    class Meta(object):
         app_label = 'certificates'
 
 
@@ -71,7 +71,7 @@ class CertificateDoNotDelete(CertificateException):
         return self.message_obj.html
 
 
-class MessageObj:
+class MessageObj(object):
     @property
     def has_html(self):
         return False

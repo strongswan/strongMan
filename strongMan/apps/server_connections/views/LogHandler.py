@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from strongMan.apps.server_connections.models.specific import LogMessage
 
 
-class LogHandler:
+class LogHandler(object):
     def __init__(self, request):
         self.newest_log = None
         self.id = int(request.POST.get('id'))

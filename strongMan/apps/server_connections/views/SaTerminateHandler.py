@@ -8,7 +8,7 @@ from strongMan.apps.server_connections.models.specific import LogMessage
 from strongMan.apps.server_connections.models import Connection
 
 
-class SaTerminateHandler:
+class SaTerminateHandler(object):
     def __init__(self, request):
         self.request = request
         if 'sa_id' in self.request.POST:

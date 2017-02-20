@@ -35,5 +35,5 @@ class ConnectionTable(tables.Table):
         return render_to_string('server_connections/widgets/state_column.html', {'record': record},
                                 request=self.request)
 
-    class Meta:
+    class Meta(object):
         attrs = {"class": "table"}

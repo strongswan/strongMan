@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.contrib import messages
 
 
-class UpdateHandler:
+class UpdateHandler(object):
     def __init__(self, request, id):
         self.request = request
         self.id = id

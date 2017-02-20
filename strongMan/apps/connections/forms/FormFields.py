@@ -8,7 +8,7 @@ class CertificateChoice(forms.ModelChoiceField):
         return True
 
 
-class IdentityChoiceValue:
+class IdentityChoiceValue(object):
     def __init__(self, identity):
         self.identity = identity
 

@@ -19,5 +19,5 @@ class EapSecretsTable(tables.Table):
         return render_to_string('eap_secrets/widgets/remove_column.html', {'name': record.username},
                                 request=self.request)
 
-    class Meta:
+    class Meta(object):
         attrs = {"class": "table"}

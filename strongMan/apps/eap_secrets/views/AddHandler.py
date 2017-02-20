@@ -9,7 +9,7 @@ from ..models import Secret
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class AddHandler:
+class AddHandler(object):
     def __init__(self):
         self.form = None
         self.request = None

@@ -6,7 +6,7 @@ from ..models import UserCertificate, ViciCertificate, CertificateDoNotDelete
 from ..forms import ChangeNicknameForm
 
 
-class DetailsHandler:
+class DetailsHandler(object):
     def __init__(self, request, certificate_object):
         self.request = request
         self.certificate = certificate_object

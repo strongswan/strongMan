@@ -3,7 +3,7 @@ from .models.certificates import PrivateKey, CertificateFactory, UserCertificate
 from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader, ContainerDetector
 
 
-class UserCertificateManager:
+class UserCertificateManager(object):
     @classmethod
     def _check_if_parsed(cls, reader):
         if not reader.is_parsed():
@@ -111,7 +111,7 @@ class UserCertificateManager:
             return None
 
 
-class ViciCertificateManager:
+class ViciCertificateManager(object):
     @classmethod
     def reload_certs(cls):
         '''
@@ -145,7 +145,7 @@ class CertificateManagerException(Exception):
     pass
 
 
-class AddKeyContainerResult:
+class AddKeyContainerResult(object):
     def __init__(self, success, certificate=None, privatekey=None, further_certificates=None,
                  exceptions=None):
         self.success = success

@@ -8,7 +8,7 @@ from django.contrib import messages
 from .. import forms
 
 
-class AddHandler:
+class AddHandler(object):
     def __init__(self, request, connection_type):
         self.request = request
         self.connection_type = connection_type

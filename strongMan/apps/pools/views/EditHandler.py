@@ -9,7 +9,7 @@ from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from django.db.models import ProtectedError
 
 
-class EditHandler:
+class EditHandler(object):
     def __init__(self, request, poolname):
         self.form = None
         self.request = request

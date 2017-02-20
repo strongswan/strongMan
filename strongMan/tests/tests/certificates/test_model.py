@@ -12,7 +12,7 @@ from strongMan.apps.certificates.views import AddHandler
 from .certificates import TestCertificates
 
 
-class CreateRequest:
+class CreateRequest(object):
     '''
     This class is a with object. __enter__ opens a file and __exit__ closes the file.
     with CreateRequest(page, testcert) as request:
@@ -197,7 +197,7 @@ class UserCertificateTest(TestCase):
             self.assertEqual(count, 505)
 
 
-class SerializedDict:
+class SerializedDict(object):
     def __init__(self, path):
         self.path = path
         self.folder = os.path.dirname(os.path.realpath(__file__)) + "/vici_certdict/"
@@ -207,7 +207,7 @@ class SerializedDict:
             return pickle.load(f)
 
 
-class ViciDict:
+class ViciDict(object):
     cert = SerializedDict('cert.dict')
     cert_with_private = SerializedDict('certwithprivate.dict')
 

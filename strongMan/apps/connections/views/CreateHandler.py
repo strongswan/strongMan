@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from .. import forms
 
 
-class AddHandler:
+class AddHandler(object):
     def __init__(self, request):
         self.request = request
 

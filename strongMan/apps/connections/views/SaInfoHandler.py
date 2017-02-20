@@ -5,7 +5,7 @@ from strongMan.apps.connections.models.connections import Connection
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class SaInfoHandler:
+class SaInfoHandler(object):
     def __init__(self, request):
         self.request = request
         self.id = int(request.POST.get('id'))

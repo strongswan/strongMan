@@ -15,7 +15,7 @@ class ContainerTypes(Enum):
     Undefined = None
 
 
-class ContainerDetector:
+class ContainerDetector(object):
     @classmethod
     def detect_type(cls, container_bytes, password=None):
         '''
@@ -51,7 +51,7 @@ class ContainerDetector:
         raise ContainerReaderException("Can't detect a supported ASN1 type.")
 
 
-class AbstractContainerReader:
+class AbstractContainerReader(object):
     def __init__(self):
         self.bytes = None
         self.type = None

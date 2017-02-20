@@ -4,7 +4,7 @@ from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 
 
-class PoolRefreshHandler:
+class PoolRefreshHandler(object):
     def __init__(self, request):
         self.request = request
         self.ENTRIES_PER_PAGE = 50
