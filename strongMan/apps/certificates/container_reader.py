@@ -1,6 +1,7 @@
 import binascii
 import hashlib
 import re as regex
+from collections import OrderedDict
 from enum import Enum
 
 from asn1crypto import keys
@@ -15,42 +16,6 @@ class ContainerTypes(Enum):
     Undefined = None
 
 
-class ContainerDetector(object):
-    @classmethod
-    def detect_type(cls, container_bytes, password=None):
-        '''
-        Detects the type of a ASN1 container
-        :param container_bytes: bytes of the container in PEM or DER
-        :param password: password of the container if encrypted
-        :type password: bytearray like b"mystring"
-        :return: Type of the container
-        :rtype ContainerTypes
-        '''
-        if PKCS12Reader.is_type(container_bytes, password=password):
-            return ContainerTypes.PKCS12
-        elif PKCS8Reader.is_type(container_bytes, password=password):
-            return ContainerTypes.PKCS8
-        elif PKCS1Reader.is_type(container_bytes, password=password):
-            return ContainerTypes.PKCS1
-        elif X509Reader.is_type(container_bytes, password=password):
-            return ContainerTypes.X509
-        else:
-            return ContainerTypes.Undefined
-
-    @classmethod
-    def factory(cls, container_bytes, password=None):
-        type = cls.detect_type(container_bytes, password)
-        if type == ContainerTypes.PKCS1:
-            return PKCS1Reader.by_bytes(container_bytes, password)
-        if type == ContainerTypes.PKCS8:
-            return PKCS8Reader.by_bytes(container_bytes, password)
-        if type == ContainerTypes.PKCS12:
-            return PKCS12Reader.by_bytes(container_bytes, password)
-        if type == ContainerTypes.X509:
-            return X509Reader.by_bytes(container_bytes, password)
-        raise ContainerReaderException("Can't detect a supported ASN1 type.")
-
-
 class AbstractContainerReader(object):
     def __init__(self):
         self.bytes = None
@@ -60,10 +25,10 @@ class AbstractContainerReader(object):
         self._is_parsed = False
 
     @classmethod
-    def by_bytes(cls, bytes, password=None):
+    def by_bytes(cls, container_bytes, password=None):
         container = cls()
-        container.bytes = bytes
-        container.type = ContainerDetector.detect_type(bytes, password=password)
+        container.bytes = container_bytes
+        container.type = ContainerDetector.detect_type(container_bytes, password=password)
         container.password = password
         return container
 
@@ -350,3 +315,40 @@ class X509Reader(AbstractContainerReader):
 
 class ContainerReaderException(Exception):
     pass
+
+
+class ContainerDetector(object):
+    _readers = OrderedDict([
+        (ContainerTypes.X509, X509Reader),
+        (ContainerTypes.PKCS12, PKCS12Reader),
+        (ContainerTypes.PKCS8, PKCS8Reader),
+        (ContainerTypes.PKCS1, PKCS1Reader),
+    ])
+
+    @classmethod
+    def detect_type(cls, container_bytes, password=None):
+        '''
+        Detects the type of an ASN.1 container
+        :param container_bytes: bytes of the container in PEM or DER
+        :param password: password of the container if encrypted
+        :return: Type of the container
+        :rtype ContainerTypes
+        '''
+        for ct, reader in cls._readers.items():
+            if reader.is_type(container_bytes, password=password):
+                return ct
+        return ContainerTypes.Undefined
+
+    @classmethod
+    def factory(cls, container_bytes, password=None):
+        '''
+        Creates an instance of an ASN.1 container reader
+        :param container_bytes: bytes of the container in PEM or DER
+        :param password: password of the container if encrypted
+        :return: container reader
+        :rtype object derived of AbstractContainerReader
+        '''
+        reader = cls._readers[cls.detect_type(container_bytes, password)]
+        if reader:
+            return reader.by_bytes(container_bytes, password)
+        raise ContainerReaderException("Can't detect a supported ASN.1 type.")
