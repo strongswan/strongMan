@@ -61,7 +61,7 @@ class ViciWrapper(object):
         try:
             self.session.load_shared(secret)
         except Exception as e:
-            raise ViciLoadException("Secret cannot be loaded!")
+            raise ViciLoadException("Secret cannot be loaded! " + str(e))
 
     def load_key(self, key):
         '''
@@ -70,7 +70,7 @@ class ViciWrapper(object):
         try:
             self.session.load_key(key)
         except Exception as e:
-            raise ViciLoadException("Private key cannot be loaded!")
+            raise ViciLoadException("Private key cannot be loaded! " + str(e))
 
     def load_certificate(self, certificate):
         '''
@@ -80,7 +80,7 @@ class ViciWrapper(object):
         try:
             self.session.load_cert(certificate)
         except Exception as e:
-            raise ViciLoadException("Certificate cannot be loaded!")
+            raise ViciLoadException("Certificate cannot be loaded! " + str(e))
 
     def get_connections_names(self):
         '''
@@ -124,13 +124,13 @@ class ViciWrapper(object):
         '''
         try:
             return self.session.version()
-        except Exception as e:
+        except Exception:
             raise ViciLoadException("Version information cannot be loaded!")
 
     def get_status(self):
         try:
             return self.session.stats()
-        except Exception as e:
+        except Exception:
             raise ViciLoadException("Status information cannot be loaded!")
 
     def get_plugins(self):
@@ -181,7 +181,7 @@ class ViciWrapper(object):
                 message = log['msg'].decode('ascii')
                 yield OrderedDict(message=message)
         except Exception as e:
-            raise ViciTerminateException("Can't terminate connection " + connection_name + "!")
+            raise ViciTerminateException("Can't terminate connection " + connection_name + "! " + str(e))
 
     def terminate_ike_sa(self, unique_sa_id):
         '''
@@ -196,7 +196,7 @@ class ViciWrapper(object):
                 message = log['msg'].decode('ascii')
                 yield OrderedDict(message=message)
         except Exception as e:
-            raise ViciTerminateException("Can't terminate Ike SA!")
+            raise ViciTerminateException("Can't terminate IKE SA! " + str(e))
 
     def terminate_child_sa(self, reqid):
         '''
@@ -211,7 +211,7 @@ class ViciWrapper(object):
                 message = log['msg'].decode('ascii')
                 yield OrderedDict(message=message)
         except Exception as e:
-            raise ViciTerminateException("Can't terminate Child SA!")
+            raise ViciTerminateException("Can't terminate Child SA! " + str(e))
 
     def get_connection_state(self, connection_name):
         default_state = 'DOWN'
@@ -223,7 +223,7 @@ class ViciWrapper(object):
                 return state.decode('ascii')
             else:
                 return default_state
-        except Exception as e:
+        except Exception:
             return default_state
 
     def get_pools(self, include_leases):
@@ -241,11 +241,11 @@ class ViciWrapper(object):
     def clear_creds(self):
         try:
             self.session.clear_creds()
-        except Exception:
-            raise ViciLoadException("Credentials cannot be cleared!")
+        except Exception as e:
+            raise ViciLoadException("Credentials cannot be cleared! " + str(e))
 
     def load_pool(self, pool):
         try:
             self.session.load_pool(pool)
-        except Exception:
-            raise ViciLoadException("Pool could not be loaded.!")
+        except Exception as e:
+            raise ViciLoadException("Pool could not be loaded! " + str(e))

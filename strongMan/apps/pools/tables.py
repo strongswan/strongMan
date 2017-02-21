@@ -22,8 +22,8 @@ class PoolsTable(tables.Table):
                                 request=self.request)
 
     def render_detail_collapse_column(self, record):
-            return render_to_string('pools/widgets/detail_collapse_column.html', {'record': record},
-                                    request=self.request)
+        return render_to_string('pools/widgets/detail_collapse_column.html', {'record': record},
+                                request=self.request)
 
     class Meta(object):
         attrs = {"class": "table"}

@@ -1,8 +1,8 @@
-from ..forms.ConnectionForms import AbstractConnectionForm
-from strongMan.apps.connections.forms.ConnectionForms import AbstractDynamicForm
-from strongMan.apps.connections.models.connections import Connection
 from django.shortcuts import render
 from django.contrib import messages
+
+from ..forms.ConnectionForms import AbstractConnectionForm, AbstractDynamicForm
+from ..models.connections import Connection
 
 
 class UpdateHandler(object):

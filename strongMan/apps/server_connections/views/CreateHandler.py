@@ -1,11 +1,9 @@
-from ..forms.SubForms import HeaderForm
-from strongMan.apps.server_connections.forms.ConnectionForms import AbstractDynamicForm
-from ..forms import ChooseTypeForm
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from .. import forms
+from ..forms.ConnectionForms import AbstractDynamicForm, ChooseTypeForm
+from ..forms.SubForms import HeaderForm
 
 
 class AddHandler(object):
@@ -41,7 +39,7 @@ class AddHandler(object):
             if not form.is_valid():
                 return self._render(form)
 
-            if form_class == forms.ChooseTypeForm:
+            if form_class == ChooseTypeForm:
                 return self._render(form=form.selected_form_class())
 
             if isinstance(form, HeaderForm):

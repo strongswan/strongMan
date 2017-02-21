@@ -112,7 +112,7 @@ class PKCS1Reader(AbstractContainerReader):
 
             cert.native
             return True
-        except Exception as e:
+        except Exception:
             return False
 
     def parse(self):
@@ -158,7 +158,7 @@ class PKCS8Reader(AbstractContainerReader):
                 cert = k.parse_private(container_bytes, password=password)
 
             cert.native
-        except Exception as e:
+        except Exception:
             return False
 
         try:
@@ -209,7 +209,7 @@ class PKCS12Reader(AbstractContainerReader):
             else:
                 k.parse_pkcs12(container_bytes, password=password)
             return True
-        except Exception as e:
+        except Exception:
             return False
 
     def parse(self):
@@ -236,8 +236,8 @@ class PKCS12Reader(AbstractContainerReader):
         :return: the main X509 cert in this container
         :rtype X509Container
         '''
-        bytes = self.cert.dump()
-        container = X509Reader.by_bytes(bytes)
+        data = self.cert.dump()
+        container = X509Reader.by_bytes(data)
         container.parse()
         return container
 
@@ -246,8 +246,8 @@ class PKCS12Reader(AbstractContainerReader):
         :return: The private key in this container
         :rtype PKCS8Container
         '''
-        bytes = self.privatekey.dump()
-        container = PKCS8Reader.by_bytes(bytes)
+        data = self.privatekey.dump()
+        container = PKCS8Reader.by_bytes(data)
         container.parse()
         return container
 
@@ -258,8 +258,8 @@ class PKCS12Reader(AbstractContainerReader):
         '''
         others = []
         for cer in self.certs:
-            bytes = cer.dump()
-            x509 = X509Reader.by_bytes(bytes)
+            data = cer.dump()
+            x509 = X509Reader.by_bytes(data)
             x509.parse()
             others.append(x509)
         return others
@@ -272,7 +272,7 @@ class X509Reader(AbstractContainerReader):
             cert = k.parse_certificate(container_bytes)
             cert.native
             return True
-        except Exception as e:
+        except Exception:
             return False
 
     def parse(self):

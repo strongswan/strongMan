@@ -111,7 +111,7 @@ class ViciOverviewHandler(AbstractOverviewHandler):
     def all_certificates(self):
         try:
             ViciCertificateManager.reload_certs()
-        except ViciSocketException as e:
+        except ViciSocketException:
             return []
         return models.certificates.ViciCertificate.objects.all()
 

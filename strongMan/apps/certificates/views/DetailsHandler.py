@@ -50,7 +50,7 @@ class DetailsHandler(object):
     def _certificate_subclass(self, classe):
         try:
             return classe.objects.get(id=self.certificate.id)
-        except Exception as e:
+        except Exception:
             return None
 
     def _is_vicicert(self):

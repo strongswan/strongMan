@@ -1,7 +1,7 @@
-from django.shortcuts import render
-from ..forms import Ike2CertificateForm
+from django.shortcuts import render, get_object_or_404
+
+from ..forms.ConnectionForms import Ike2CertificateForm
 from ...certificates.models import UserCertificate
-from django.shortcuts import get_object_or_404
 
 
 class CertificatePickerHandler(object):
@@ -14,12 +14,12 @@ class CertificatePickerHandler(object):
                       {"certificate": form['certificate'], "identity": form['identity']})
 
     def handle(self):
-        id = self._certificate_id()
+        cert = self._certificate_id()
 
-        if id is None:
+        if cert is None:
             form = Ike2CertificateForm()
         else:
-            form = Ike2CertificateForm(initial={'certificate': id})
+            form = Ike2CertificateForm(initial={'certificate': cert})
 
         form.update_certificates()
         return self._render(form)
@@ -28,9 +28,9 @@ class CertificatePickerHandler(object):
         if "certififcate_id" not in self.request.POST:
             return None
 
-        id = self.request.POST["certififcate_id"]
-        if id == "-1" or id == '':
+        cert = self.request.POST["certififcate_id"]
+        if cert == "-1" or cert == '':
             return None
 
-        get_object_or_404(UserCertificate, pk=id)
-        return id
+        get_object_or_404(UserCertificate, pk=cert)
+        return cert

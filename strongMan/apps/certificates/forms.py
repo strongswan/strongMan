@@ -16,8 +16,7 @@ class AddForm(forms.Form):
         valid = super(AddForm, self).is_valid()
         if not valid:
             return False
-        type = self.container_type()
-        return not type == ContainerTypes.Undefined
+        return self.container_type() != ContainerTypes.Undefined
 
     def container_type(self):
         '''

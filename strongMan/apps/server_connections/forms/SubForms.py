@@ -2,8 +2,7 @@ from django import forms
 from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 from strongMan.apps.server_connections.models import Connection, Child, Address, Proposal, \
     AutoCaAuthentication, CaCertificateAuthentication, CertificateAuthentication, EapAuthentication, \
-    EapCertificateAuthentication, EapTlsAuthentication, IKEv2Certificate, IKEv2EapTls, IKEv2CertificateEAP, \
-    IKEv2EAP
+    EapCertificateAuthentication, EapTlsAuthentication, IKEv2Certificate, IKEv2CertificateEAP
 from .FormFields import CertificateChoice, IdentityChoice, PoolChoice
 from strongMan.apps.pools.models import Pool
 

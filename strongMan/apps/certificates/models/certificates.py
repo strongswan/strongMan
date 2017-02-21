@@ -190,28 +190,28 @@ class ViciCertificate(Certificate):
 class CertificateFactory(object):
     @classmethod
     def distinguishedName_factory(cls, asn1_object):
-        dict = asn1_object.native
+        dic = asn1_object.native
 
         subject = DistinguishedName()
         subject.blob = asn1_object.contents
-        subject.location = cls._try_to_get_value(dict, ["locality_name"], default="")
-        subject.cname = cls._try_to_get_value(dict, ["common_name"], default="")
-        subject.country = cls._try_to_get_value(dict, ["country_name"], default="")
-        subject.email = cls._try_to_get_value(dict, ["email_address"], default="")
-        subject.organization = cls._try_to_get_value(dict, ["organization_name"], default="")
-        subject.unit = cls._try_to_get_value(dict, ["organizational_unit_name"], default="")
-        subject.province = cls._try_to_get_value(dict, ["state_or_province_name"], default="")
+        subject.location = cls._try_to_get_value(dic, ["locality_name"], default="")
+        subject.cname = cls._try_to_get_value(dic, ["common_name"], default="")
+        subject.country = cls._try_to_get_value(dic, ["country_name"], default="")
+        subject.email = cls._try_to_get_value(dic, ["email_address"], default="")
+        subject.organization = cls._try_to_get_value(dic, ["organization_name"], default="")
+        subject.unit = cls._try_to_get_value(dic, ["organizational_unit_name"], default="")
+        subject.province = cls._try_to_get_value(dic, ["state_or_province_name"], default="")
         subject.save()
         return subject
 
     @classmethod
-    def _try_to_get_value(cls, dict, key_path, default=None):
+    def _try_to_get_value(cls, dic, key_path, default=None):
         try:
-            temp_dict = dict
+            temp_dic = dic
             for key in key_path:
-                temp_dict = temp_dict[key]
+                temp_dic = temp_dic[key]
 
-            return temp_dict
+            return temp_dic
         except:
             return default
 

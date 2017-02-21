@@ -20,8 +20,8 @@ class ConnectionTable(tables.Table):
         super(ConnectionTable, self).__init__(*args, **kwargs)
 
     def render_detail_collapse_column(self, record):
-            return render_to_string('server_connections/widgets/detail_collapse_column.html',
-                                    {'record': record}, request=self.request)
+        return render_to_string('server_connections/widgets/detail_collapse_column.html',
+                                {'record': record}, request=self.request)
 
     def render_readonly(self, record):
         return render_to_string('server_connections/widgets/readonly_column.html', {'record': record},

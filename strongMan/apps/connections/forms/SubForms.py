@@ -12,9 +12,9 @@ class HeaderForm(forms.Form):
 
     def clean_profile(self):
         profile = self.cleaned_data['profile']
-        id = self.cleaned_data['connection_id']
-        if id is not None:
-            if Connection.objects.filter(profile=profile).exclude(pk=id).exists():
+        conn = self.cleaned_data['connection_id']
+        if conn is not None:
+            if Connection.objects.filter(profile=profile).exclude(pk=conn).exists():
                 raise forms.ValidationError("Connection with same name already exists!")
         elif Connection.objects.filter(profile=profile).exists():
             raise forms.ValidationError("Connection with same name already exists!")

@@ -19,8 +19,8 @@ class DjangoAbstractBase(object):
         :return: subclass object
         '''
         id_list = []
-        for dict in queryset.values('pk'):
-            id_list.append(dict['pk'])
+        for dic in queryset.values('pk'):
+            id_list.append(dic['pk'])
 
         subclasses = []
         for klass in cls.all_subclasses():

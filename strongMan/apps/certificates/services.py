@@ -121,10 +121,10 @@ class ViciCertificateManager(object):
         ViciCertificate.objects.all().delete()
         wrapper = ViciWrapper()
         vici_certs = wrapper.get_certificates()
-        for dict in vici_certs:
+        for dic in vici_certs:
             try:
-                cls._add_x509(dict)
-            except CertificateManagerException as e:
+                cls._add_x509(dic)
+            except CertificateManagerException:
                 pass
 
     @classmethod
