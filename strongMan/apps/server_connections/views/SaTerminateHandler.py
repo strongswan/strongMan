@@ -36,5 +36,5 @@ class SaTerminateHandler(object):
                 messages.info(self.request, "Child SA terminated.")
         except ViciException as e:
             messages.warning(self.request, str(e))
-        finally:
-            return HttpResponseRedirect(reverse("server_connections:index"))
+
+        return HttpResponseRedirect(reverse("server_connections:index"))

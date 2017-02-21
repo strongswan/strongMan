@@ -20,8 +20,8 @@ class DeleteHandler(object):
                 vici_wrapper.unload_connection(connection.profile)
         except ViciException as e:
             messages.warning(self.request, str(e))
-        finally:
-            profilname = connection.profile
-            connection.delete()
-            messages.info(self.request, "Connection " + profilname + " deleted.")
-            return HttpResponseRedirect(reverse("server_connections:index"))
+
+        profilname = connection.profile
+        connection.delete()
+        messages.info(self.request, "Connection " + profilname + " deleted.")
+        return HttpResponseRedirect(reverse("server_connections:index"))

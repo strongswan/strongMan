@@ -26,12 +26,11 @@ class ToggleHandler(object):
                 connection.unload()
             response['success'] = True
         except ViciException as e:
-            print(e)
             response['message'] = str(e)
         except Exception as e:
             print(e)
-        finally:
-            return JsonResponse(response)
+
+        return JsonResponse(response)
 
     def unload(self, id):
         connection = Connection.objects.get(id=id)
@@ -44,12 +43,11 @@ class ToggleHandler(object):
                 connection.unload()
             response['success'] = True
         except ViciException as e:
-            print(e)
             response['message'] = str(e)
         except Exception as e:
             print(e)
-        finally:
-            return JsonResponse(response)
+
+        return JsonResponse(response)
 
     def load(self, id):
         connection = Connection.objects.get(id=id)
@@ -62,9 +60,8 @@ class ToggleHandler(object):
                 connection.load()
             response['success'] = True
         except ViciException as e:
-            print(e)
             response['message'] = str(e)
         except Exception as e:
             print(e)
-        finally:
-            return JsonResponse(response)
+
+        return JsonResponse(response)

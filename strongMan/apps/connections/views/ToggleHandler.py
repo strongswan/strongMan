@@ -22,9 +22,8 @@ class ToggleHandler(object):
                 connection.stop()
             response['success'] = True
         except ViciException as e:
-            print(e)
             response['message'] = str(e)
         except Exception as e:
             print(e)
-        finally:
-            return JsonResponse(response)
+
+        return JsonResponse(response)

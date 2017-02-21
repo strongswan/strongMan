@@ -33,8 +33,8 @@ class SaInfoHandler(object):
             response['message'] = str(e)
         except Exception as e:
             print(e)
-        finally:
-            return JsonResponse(response)
+
+        return JsonResponse(response)
 
 
 class IkeSA(object):
