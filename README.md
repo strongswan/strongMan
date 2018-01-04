@@ -36,7 +36,7 @@ in "/etc/strongswan.d/strongMan.conf". Replace ’pathTostrongMan’ with the pa
 installed strongMan.
 ```
 charon {
-  start -scripts {
+  start-scripts {
     strongman = /pathTostrongMan/configloader.py
   }
 }
