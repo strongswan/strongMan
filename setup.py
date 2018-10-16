@@ -251,7 +251,7 @@ if __name__ == "__main__":
             install.check_preconditions()
 
             print("Start strongMan installation")
-            print("\t- Virualenv")
+            print("\t- Virtualenv")
             install.install_virtualenv(interpreter)
             print("\t- Requirements")
             install.install_requirements()
