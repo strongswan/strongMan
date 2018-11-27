@@ -16,45 +16,44 @@ class ContainerDetectorTest(TestCase):
         bytes = TestCertificates.X509_rsa_ca.read()
         self.assertIsNotNone(bytes)
 
-    def check_type(self, testcert, type, password=None):
+    def get_type(self, testcert, password=None):
         '''
-        Check if the testcert has the specific type
+        Return the detected type of the testcert
         :param testcert: CertificateLoader
-        :param type: a string ["PKCS1" | "PKCS8" | "PKCS12" | "X509" | None]
-        :return: True or False if the type is right
+        :return: a string ["PKCS1" | "PKCS8" | "PKCS12" | "X509" | None]
         '''
         bytes = testcert.read()
         if password is None:
             format = ContainerDetector.detect_type(bytes)
         else:
             format = ContainerDetector.detect_type(bytes, password=password)
-        return format.value == type
+        return format.value
 
     def test_X509_type(self):
-        self.assertTrue(self.check_type(TestCertificates.X509_rsa_ca, "X509"))
-        self.assertTrue(self.check_type(TestCertificates.X509_rsa_ca_der, "X509"))
-        self.assertTrue(self.check_type(TestCertificates.X509_ec, "X509"))
-        self.assertTrue(self.check_type(TestCertificates.X509_rsa, "X509"))
+        self.assertEqual(self.get_type(TestCertificates.X509_rsa_ca), "X509")
+        self.assertEqual(self.get_type(TestCertificates.X509_rsa_ca_der), "X509")
+        self.assertEqual(self.get_type(TestCertificates.X509_ec), "X509")
+        self.assertEqual(self.get_type(TestCertificates.X509_rsa), "X509")
 
     def test_privatekey_type(self):
-        self.assertTrue(self.check_type(TestCertificates.PKCS1_rsa_ca, "PKCS1"))
-        self.assertTrue(self.check_type(TestCertificates.PKCS8_rsa_ca, "PKCS8"))
-        self.assertTrue(self.check_type(TestCertificates.PKCS1_ec, "PKCS1"))
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca), "PKCS1")
+        self.assertEqual(self.get_type(TestCertificates.PKCS8_rsa_ca), "PKCS8")
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_ec), "PKCS1")
 
     def test_pkcs1_encrypted_type(self):
-        self.assertTrue(self.check_type(TestCertificates.PKCS1_rsa_ca_encrypted, "PKCS1", b"strongman"))
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca_encrypted, b"strongman"), "PKCS1")
 
     def test_pkcs1_encrypted_type_without_pw(self):
-        self.check_type(TestCertificates.PKCS1_rsa_ca_encrypted, None)
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca_encrypted, None), None)
 
     def test_pkcs12_type(self):
-        self.assertTrue(self.check_type(TestCertificates.PKCS12_rsa, "PKCS12"))
+        self.assertEqual(self.get_type(TestCertificates.PKCS12_rsa), "PKCS12")
 
     def test_pkcs12_type_encrypted(self):
-        self.assertTrue(self.check_type(TestCertificates.PKCS12_rsa_encrypted, "PKCS12", b"strongman"))
+        self.assertEqual(self.get_type(TestCertificates.PKCS12_rsa_encrypted, b"strongman"), "PKCS12")
 
     def test_pkcs12_type_encrypted_without_pw(self):
-        self.assertTrue(self.check_type(TestCertificates.PKCS12_rsa_encrypted, None))
+        self.assertEqual(self.get_type(TestCertificates.PKCS12_rsa_encrypted, None), None)
 
 
 class AbstractContainerTest(TestCase):
