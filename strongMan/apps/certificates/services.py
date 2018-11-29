@@ -1,6 +1,6 @@
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
 from .models.certificates import PrivateKey, CertificateFactory, UserCertificate, ViciCertificate
-from .container_reader import X509Reader, PKCS1Reader, PKCS8Reader, PKCS12Reader, ContainerDetector
+from .container_reader import X509Reader, PrivateReader, PKCS12Reader, ContainerDetector
 
 
 class UserCertificateManager(object):
@@ -18,7 +18,7 @@ class UserCertificateManager(object):
         try:
             reader = ContainerDetector.factory(container_bytes, password)
             reader.parse()
-            if isinstance(reader, (PKCS1Reader, PKCS8Reader)):
+            if isinstance(reader, PrivateReader):
                 return cls._add_privatekey(reader)
             if isinstance(reader, X509Reader):
                 return cls._add_x509(reader)

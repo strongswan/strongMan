@@ -5,7 +5,7 @@ import os
 import strongMan.apps.certificates.models.certificates
 from strongMan.apps.certificates.services import UserCertificateManager, ViciCertificateManager, \
     CertificateManagerException
-from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+from strongMan.apps.certificates.container_reader import X509Reader
 from strongMan.apps.certificates import models
 
 from .certificates import TestCertificates

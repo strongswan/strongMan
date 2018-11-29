@@ -3,7 +3,7 @@ import os
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
-from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+from strongMan.apps.certificates.container_reader import X509Reader
 from strongMan.apps.certificates.models.certificates import Certificate
 from strongMan.apps.certificates.services import UserCertificateManager
 from strongMan.apps.connections.models.connections import Connection

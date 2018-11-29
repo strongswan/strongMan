@@ -1,6 +1,6 @@
 import os
 
-from strongMan.apps.certificates.container_reader import X509Reader, PKCS1Reader
+from strongMan.apps.certificates.container_reader import X509Reader
 
 
 class CertificateLoader(object):
@@ -24,11 +24,5 @@ class CertificateLoader(object):
     def read_x509(self, password=None):
         bytes = self.read()
         reader = X509Reader.by_bytes(bytes, password)
-        reader.parse()
-        return reader
-
-    def read_pkcs1(self, password=None):
-        bytes = self.read()
-        reader = PKCS1Reader.by_bytes(bytes, password)
         reader.parse()
         return reader

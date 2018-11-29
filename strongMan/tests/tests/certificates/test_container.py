@@ -6,7 +6,7 @@ import strongMan.apps.certificates.models.certificates
 import strongMan.apps.certificates.models as models
 from strongMan.apps.certificates import container_reader
 from strongMan.apps.certificates.container_reader import ContainerTypes, ContainerDetector, AbstractContainerReader, \
-    X509Reader, PKCS12Reader, PKCS1Reader, PKCS8Reader
+    X509Reader, PKCS12Reader, PrivateReader
 
 from .certificates import TestCertificates
 
@@ -20,7 +20,7 @@ class ContainerDetectorTest(TestCase):
         '''
         Return the detected type of the testcert
         :param testcert: CertificateLoader
-        :return: a string ["PKCS1" | "PKCS8" | "PKCS12" | "X509" | None]
+        :return: a string ["Private" | "PKCS12" | "X509" | None]
         '''
         bytes = testcert.read()
         if password is None:
@@ -36,12 +36,12 @@ class ContainerDetectorTest(TestCase):
         self.assertEqual(self.get_type(TestCertificates.X509_rsa), "X509")
 
     def test_privatekey_type(self):
-        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca), "PKCS1")
-        self.assertEqual(self.get_type(TestCertificates.PKCS8_rsa_ca), "PKCS8")
-        self.assertEqual(self.get_type(TestCertificates.PKCS1_ec), "PKCS1")
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca), "Private")
+        self.assertEqual(self.get_type(TestCertificates.PKCS8_rsa_ca), "Private")
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_ec), "Private")
 
     def test_pkcs1_encrypted_type(self):
-        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca_encrypted, b"strongman"), "PKCS1")
+        self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca_encrypted, b"strongman"), "Private")
 
     def test_pkcs1_encrypted_type_without_pw(self):
         self.assertEqual(self.get_type(TestCertificates.PKCS1_rsa_ca_encrypted, None), None)
@@ -68,40 +68,40 @@ class AbstractContainerTest(TestCase):
         self.assertEqual(container.type, ContainerTypes.X509)
 
 
-class PCKS1ContainerTest(TestCase):
+class PCKS1Test(TestCase):
     def test_parse(self):
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.asn1)
 
     def test_algorithm_rsa(self):
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertEqual(container.algorithm(), "rsa")
 
     def test_algorithm_ec(self):
         bytes = TestCertificates.PKCS1_ec.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertEqual(container.algorithm(), "ec")
 
     def test_dump_rsa(self):
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.der_dump())
 
     def test_dump_rsa(self):
         bytes = TestCertificates.PKCS1_ec.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.der_dump())
 
     def test_identifier_rsa(self):
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         should = "FA:CC:60:F4:20:6B:25:C7:A4:AD:1D:FE:37:C4:76:09:73:07:BE:35:E9:50:2B:28:1A:10:6A:30:2C:09:D4:A9"
         ident = str(container.public_key_hash())
@@ -109,7 +109,7 @@ class PCKS1ContainerTest(TestCase):
 
     def test_identifier_ec(self):
         bytes = TestCertificates.PKCS1_ec.read()
-        container = PKCS1Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         should = "7D:83:F3:D5:9F:B1:CC:36:2B:50:E7:FD:7A:45:A1:60:63:48:FB:58:B7:AA:31:7A:A1:C4:B5:D4:C1:59:82:CE"
         ident = container.public_key_hash()
@@ -117,13 +117,13 @@ class PCKS1ContainerTest(TestCase):
 
     def test_decryption(self):
         bytes = TestCertificates.PKCS1_rsa_ca_encrypted.read()
-        container = PKCS1Reader.by_bytes(bytes, password=b"strongman")
+        container = PrivateReader.by_bytes(bytes, password=b"strongman")
         container.parse()
         self.assertEqual(container.algorithm(), "rsa")
 
     def test_to_private_key(self):
         bytes = TestCertificates.PKCS1_ec.read()
-        priv = PKCS1Reader.by_bytes(bytes)
+        priv = PrivateReader.by_bytes(bytes)
         priv.parse()
         privatekey = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(priv)
         self.assertIsNotNone(privatekey)
@@ -132,45 +132,45 @@ class PCKS1ContainerTest(TestCase):
 
     def test_dsa(self):
         bytes = TestCertificates.PKCS1_dsa.read()
-        x509 = PKCS1Reader.by_bytes(bytes)
+        x509 = PrivateReader.by_bytes(bytes)
         with self.assertRaises(Exception):
             x509.parse()
 
 
-class PCKS8ContainerTest(TestCase):
+class PCKS8Test(TestCase):
     def test_parse(self):
         bytes = TestCertificates.PKCS8_rsa_ca.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.asn1)
 
     def test_algorithm_rsa(self):
         bytes = TestCertificates.PKCS8_rsa_ca.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertEqual(container.algorithm(), "rsa")
 
     def test_algorithm_ec(self):
         bytes = TestCertificates.PKCS8_ec.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertEqual(container.algorithm(), "ec")
 
     def test_dump_rsa(self):
         bytes = TestCertificates.PKCS8_rsa_ca.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.der_dump())
 
     def test_dump_rsa(self):
         bytes = TestCertificates.PKCS8_ec.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         self.assertIsNotNone(container.der_dump())
 
     def test_identifier_rsa(self):
         bytes = TestCertificates.PKCS8_rsa_ca.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         should = "FA:CC:60:F4:20:6B:25:C7:A4:AD:1D:FE:37:C4:76:09:73:07:BE:35:E9:50:2B:28:1A:10:6A:30:2C:09:D4:A9"
         ident = str(container.public_key_hash())
@@ -178,7 +178,7 @@ class PCKS8ContainerTest(TestCase):
 
     def test_identifier_ec(self):
         bytes = TestCertificates.PKCS8_ec.read()
-        container = PKCS8Reader.by_bytes(bytes)
+        container = PrivateReader.by_bytes(bytes)
         container.parse()
         should = "7D:83:F3:D5:9F:B1:CC:36:2B:50:E7:FD:7A:45:A1:60:63:48:FB:58:B7:AA:31:7A:A1:C4:B5:D4:C1:59:82:CE"
         ident = container.public_key_hash()
@@ -186,13 +186,13 @@ class PCKS8ContainerTest(TestCase):
 
     def test_decryption(self):
         bytes = TestCertificates.PKCS8_rsa_ca_encrypted.read()
-        container = PKCS8Reader.by_bytes(bytes, password=b"strongman")
+        container = PrivateReader.by_bytes(bytes, password=b"strongman")
         container.parse()
         self.assertEqual(container.algorithm(), "rsa")
 
     def test_to_private_key(self):
         bytes = TestCertificates.PKCS8_ec.read()
-        x509 = PKCS8Reader.by_bytes(bytes)
+        x509 = PrivateReader.by_bytes(bytes)
         x509.parse()
         public = strongMan.apps.certificates.models.certificates.PrivateKey.by_reader(x509)
         self.assertIsNotNone(public)
@@ -236,7 +236,7 @@ class PCKS12ContainerTest(TestCase):
         containe = PKCS12Reader.by_bytes(bytes)
         containe.parse()
         key = containe.private_key()
-        self.assertIsInstance(key, container_reader.PKCS8Reader)
+        self.assertIsInstance(key, container_reader.PrivateReader)
 
     def test_other_x509(self):
         bytes = TestCertificates.PKCS12_rsa.read()
@@ -309,7 +309,7 @@ class X509ContainerTest(TestCase):
         x509.parse()
 
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        key = PKCS1Reader.by_bytes(bytes)
+        key = PrivateReader.by_bytes(bytes)
         key.parse()
         self.assertTrue(x509.is_cert_of(key))
 
@@ -319,7 +319,7 @@ class X509ContainerTest(TestCase):
         x509.parse()
 
         bytes = TestCertificates.PKCS1_rsa_ca.read()
-        key = PKCS1Reader.by_bytes(bytes)
+        key = PrivateReader.by_bytes(bytes)
         key.parse()
         self.assertFalse(x509.is_cert_of(key))
 

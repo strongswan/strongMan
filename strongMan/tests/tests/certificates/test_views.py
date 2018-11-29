@@ -239,7 +239,7 @@ class DetailsViewTest(TestCase):
         self.assertEqual(self.count(Certificate), 2)
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
         self.assertContains(response, 'hsr.ch')
-        self.assertContains(response, 'PKCS1')
+        self.assertContains(response, '<td>Private</td>')
 
     def test_details_remove_privatekey(self):
         self.add_keycontainer(TestCertificates.X509_rsa_ca)
@@ -249,7 +249,7 @@ class DetailsViewTest(TestCase):
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}),
                                     {"remove_privatekey": "remove_privatekey"})
         self.assertContains(response, 'hsr.ch')
-        self.assertNotContains(response, 'PKCS1')
+        self.assertNotContains(response, '<td>Private</td>')
 
     def test_details_remove_cert(self):
         self.add_keycontainer(TestCertificates.X509_rsa_ca)
@@ -279,12 +279,12 @@ class DetailsViewTest(TestCase):
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
         self.assertContains(response, 'hsr.ch')
         self.assertContains(response, 'IT')
-        self.assertContains(response, 'PKCS1')
+        self.assertContains(response, '<td>Private</td>')
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
         self.assertContains(response, 'hsr.ch')
         self.assertContains(response, 'Informatik')
-        self.assertContains(response, 'PKCS1')
+        self.assertContains(response, '<td>Private</td>')
 
     def test_delete_privatekey_same_publickey_different_serialnumber(self):
         self.add_keycontainer(TestCertificates.X509_rsa_ca)
@@ -298,10 +298,10 @@ class DetailsViewTest(TestCase):
         self.assertEqual(self.count(PrivateKey), 1)
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
-        self.assertNotContains(response, 'PKCS1')
+        self.assertNotContains(response, '<td>Private</td>')
 
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
-        self.assertContains(response, 'PKCS1')
+        self.assertContains(response, '<td>Private</td>')
 
     def test_delete_cert_same_publickey_different_serialnumber(self):
         self.add_keycontainer(TestCertificates.X509_rsa_ca)
@@ -316,8 +316,8 @@ class DetailsViewTest(TestCase):
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "1"}), {})
         self.assertEqual(response.status_code, 404)
         response = self.client.post(reverse('certificates:details', kwargs={'certificate_id': "2"}), {})
-        self.assertContains(response, 'PKCS1')
         self.assertContains(response, 'hsr.ch')
+        self.assertContains(response, '<td>Private</td>')
 
     def test_cert_search(self):
         self.add_keycontainer(TestCertificates.X509_rsa)

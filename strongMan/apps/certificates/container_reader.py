@@ -9,8 +9,7 @@ from oscrypto import keys as k
 
 
 class ContainerTypes(Enum):
-    PKCS1 = "PKCS1"
-    PKCS8 = "PKCS8"
+    Private = "Private"
     PKCS12 = "PKCS12"
     X509 = "X509"
     Undefined = None
@@ -99,55 +98,7 @@ class AbstractContainerReader(object):
         raise NotImplementedError()
 
 
-class PKCS1Reader(AbstractContainerReader):
-    @classmethod
-    def is_type(cls, container_bytes, password=None):
-        if PKCS8Reader.is_type(bytes, password=password):
-            return False
-        try:
-            if password is None:
-                cert = k.parse_private(container_bytes)
-            else:
-                cert = k.parse_private(container_bytes, password=password)
-
-            cert.native
-            return True
-        except Exception:
-            return False
-
-    def parse(self):
-        assert self.type == ContainerTypes.PKCS1
-        if self.password is None:
-            self.asn1 = k.parse_private(self.bytes)
-        else:
-            self.asn1 = k.parse_private(self.bytes, password=self.password)
-        self.asn1.native
-        self._raise_if_wrong_algorithm()
-        self._is_parsed = True
-
-    def der_dump(self):
-        return self.asn1.dump()
-
-    def public_key_hash(self):
-        if self.algorithm() == "rsa":
-            ident = self._pubkey_rsa()
-        elif self.algorithm() == "ec":
-            ident = self._pubkey_ec()
-        return self._sha256(str(ident))
-
-    def algorithm(self):
-        return self.asn1.algorithm
-
-    def _pubkey_rsa(self):
-        private = keys.RSAPrivateKey.load(self.asn1.native["private_key"])
-        return private.native["modulus"]
-
-    def _pubkey_ec(self):
-        private = keys.ECPrivateKey.load(self.asn1.native["private_key"])
-        return private.native["public_key"]
-
-
-class PKCS8Reader(AbstractContainerReader):
+class PrivateReader(AbstractContainerReader):
     @classmethod
     def is_type(cls, container_bytes, password=None):
         cert = None
@@ -176,7 +127,7 @@ class PKCS8Reader(AbstractContainerReader):
         return False
 
     def parse(self):
-        assert self.type == ContainerTypes.PKCS8
+        assert self.type == ContainerTypes.Private
         if self.password is None:
             self.asn1 = k.parse_private(self.bytes)
         else:
@@ -244,10 +195,10 @@ class PKCS12Reader(AbstractContainerReader):
     def private_key(self):
         '''
         :return: The private key in this container
-        :rtype PKCS8Container
+        :rtype PrivateContainer
         '''
         data = self.privatekey.dump()
-        container = PKCS8Reader.by_bytes(data)
+        container = PrivateReader.by_bytes(data)
         container.parse()
         return container
 
@@ -321,8 +272,7 @@ class ContainerDetector(object):
     _readers = OrderedDict([
         (ContainerTypes.X509, X509Reader),
         (ContainerTypes.PKCS12, PKCS12Reader),
-        (ContainerTypes.PKCS8, PKCS8Reader),
-        (ContainerTypes.PKCS1, PKCS1Reader),
+        (ContainerTypes.Private, PrivateReader),
     ])
 
     @classmethod
