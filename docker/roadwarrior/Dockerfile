@@ -4,7 +4,7 @@ ARG BRANCH
 ARG COMMIT
 ARG REPO_SLUG
 
-ENV STRONGSWAN_VERSION 5.4.0
+ENV STRONGSWAN_VERSION 5.8.2
 
 RUN mkdir /opt/strongSwan \
 && apt-get update \
@@ -37,4 +37,3 @@ RUN cd strongMan \
 && pip install -r requirements-tests.txt
 
 ADD strongswan.conf /etc/strongswan.conf
-

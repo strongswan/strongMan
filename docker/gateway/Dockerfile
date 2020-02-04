@@ -4,7 +4,7 @@ ARG BRANCH
 ARG COMMIT
 ARG REPO_SLUG
 
-ENV STRONGSWAN_VERSION 5.4.0
+ENV STRONGSWAN_VERSION 5.8.2
 
 RUN mkdir /opt/strongSwan \
 && apt-get update \
@@ -33,11 +33,5 @@ RUN mkdir /opt/strongSwan \
 && git checkout -qf ${COMMIT} \
 && pip install -r requirements.txt
 
-RUN cp -rf /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/swanctl/* /etc/swanctl/ \
-&& cp /strongswan-$STRONGSWAN_VERSION/testing/hosts/moon/etc/ipsec.secrets /etc/
-
-ADD swanctl.conf /etc/swanctl/swanctl.conf
+ADD swanctl /etc/swanctl/
 ADD strongswan.conf /etc/strongswan.conf
-
-
-
