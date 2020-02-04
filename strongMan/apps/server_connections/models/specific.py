@@ -10,8 +10,8 @@ from .common import CertConDoNotDeleteMessage, KeyConDoNotDeleteMessage
 @receiver(UserCertificate.should_prevent_delete_signal, sender=UserCertificate)
 def prevent_cert_delete_if_cert_is_in_use(sender, **kwargs):
     cert = kwargs['instance']
-    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in
-                                                                           cert.identities] + \
+    authentications = [ident.server_tls_identity for ident in cert.identities] + \
+                      [ident.server_cert_identity for ident in cert.identities] + \
                       [cert.server_ca_cert_authentication]
 
     for auth in authentications:
@@ -23,8 +23,8 @@ def prevent_cert_delete_if_cert_is_in_use(sender, **kwargs):
 @receiver(PrivateKey.should_prevent_delete_signal, sender=PrivateKey)
 def prevent_key_delete_if_cert_is_in_use(sender, **kwargs):
     cert = kwargs['usercertificate']
-    authentications = [ident.tls_identity for ident in cert.identities] + [ident.cert_identity for ident in
-                                                                           cert.identities]
+    authentications = [ident.server_tls_identity for ident in cert.identities] + \
+                      [ident.server_cert_identity for ident in cert.identities]
     for auth in authentications:
         if auth.count() > 0:
             raise CertificateDoNotDelete(KeyConDoNotDeleteMessage(auth.first().connection))
