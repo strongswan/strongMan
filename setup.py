@@ -99,7 +99,7 @@ class Migrator(BaseInstaller):
 
 class Installer(BaseInstaller):
     def install_virtualenv(self, python_interpreter):
-        self._run_bash("virtualenv -p " + python_interpreter + " --no-site-packages " + self.env)
+        self._run_bash("virtualenv -p " + python_interpreter + " " + self.env)
 
     def install_requirements(self):
         self._run_bash(self.env + "/bin/pip install -r requirements.txt")
