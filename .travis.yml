@@ -1,4 +1,4 @@
-sudo: required
+os: linux
 
 services:
   - docker
@@ -7,6 +7,7 @@ language: python
 python:
   - "3.4"
   - "3.5"
+  - "3.6"
 
 env:
   DOCKER_COMPOSE_VERSION: 1.11.1
