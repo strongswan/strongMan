@@ -1,6 +1,6 @@
 import os
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, RequestFactory, Client
 
 from strongMan.apps.certificates.models.certificates import PrivateKey, Certificate

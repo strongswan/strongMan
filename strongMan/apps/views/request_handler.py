@@ -23,7 +23,7 @@ class AboutHandler(object):
             context['plugins'] = plugins
         except ViciLoadException as e:
             messages.warning(self.request, str(e))
-        except ViciSocketException as e:
+        except ViciSocketException:
             pass
         context["pw_form"] = form
         return render(self.request, 'about.html', context)

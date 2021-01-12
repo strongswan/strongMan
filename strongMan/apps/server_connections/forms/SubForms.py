@@ -35,7 +35,7 @@ class HeaderForm(forms.Form):
 
     def clean_remote_addrs(self):
         remote_addrs = self.cleaned_data['remote_addrs']
-        if remote_addrs is '':
+        if remote_addrs == '':
             if 'initiate' in self.data:
                 raise forms.ValidationError("This field is required.")
         return remote_addrs
@@ -137,7 +137,7 @@ class RemoteCertificateForm(forms.Form):
     @property
     def chosen_certificate(self):
         pk = self.cleaned_data["certificate_ca"]
-        if pk is None or pk is '':
+        if pk is None or pk == '':
             return None
         return UserCertificate.objects.get(pk=pk)
 

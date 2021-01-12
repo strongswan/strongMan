@@ -57,7 +57,7 @@ class AddHandler(object):
 
             return self._render_added_page(result)
 
-        except (ValueError, TypeError, AsymmetricKeyError, OSError) as e:
+        except (ValueError, TypeError, AsymmetricKeyError, OSError):
             messages.add_message(self.request, messages.ERROR,
                                  "Error reading file. Maybe your file is corrupt?")
             return self._render_upload_page(form=self.form)

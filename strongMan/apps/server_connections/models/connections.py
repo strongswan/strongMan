@@ -1,6 +1,6 @@
 import json
 import sys
-from collections import Iterable
+from collections.abc import Iterable
 from collections import OrderedDict
 
 from django.db import models
@@ -28,10 +28,10 @@ class Connection(models.Model):
     version = models.CharField(max_length=1, choices=VERSION_CHOICES, default=None)
     pool = models.ForeignKey(Pool, null=True, blank=True, default=None, related_name='server_pool',
                              on_delete=PROTECT)
-    send_certreq = models.NullBooleanField(null=True, blank=True, default=None)
+    send_certreq = models.BooleanField(null=True, blank=True, default=None)
     enabled = models.BooleanField(default=False)
     connection_type = models.TextField()
-    initiate = models.NullBooleanField(null=True, blank=True, default=None)
+    initiate = models.BooleanField(null=True, blank=True, default=None)
 
     def dict(self):
         children = OrderedDict()
@@ -42,10 +42,10 @@ class Connection(models.Model):
         if self.pool is not None:
             ike_sa['pools'] = [self.pool.poolname]
         local_address = [local_address.value for local_address in self.server_local_addresses.all()]
-        if local_address[0] is not '':
+        if local_address[0] != '':
             ike_sa['local_addrs'] = local_address
         remote_address = [remote_address.value for remote_address in self.server_remote_addresses.all()]
-        if remote_address[0] is not '':
+        if remote_address[0] != '':
             ike_sa['remote_addrs'] = remote_address
         ike_sa['version'] = self.version
         ike_sa['proposals'] = [proposal.type for proposal in self.server_proposals.all()]
@@ -152,7 +152,7 @@ class Connection(models.Model):
                     return State.LOADED.value
                 else:
                     return State.UNLOADED.value
-            except:
+            except Exception:
                 return State.UNLOADED.value
         else:
             try:
@@ -163,7 +163,7 @@ class Connection(models.Model):
                     return State.ESTABLISHED.value
                 elif state == State.CONNECTING.value:
                     return State.CONNECTING.value
-            except:
+            except Exception:
                 return State.DOWN.value
 
     @property

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from ..forms.ConnectionForms import AbstractDynamicForm, ChooseTypeForm
 from ..forms.SubForms import HeaderForm

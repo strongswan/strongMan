@@ -35,7 +35,8 @@ class KeyContainer(CertificateModel, models.Model):
 
 
 class PrivateKey(KeyContainer):
-    should_prevent_delete_signal = Signal(providing_args=["instance"])
+    # Arguments: "instance"
+    should_prevent_delete_signal = Signal()
 
     @classmethod
     def by_reader(cls, reader):
@@ -126,7 +127,8 @@ class UserCertificate(Certificate):
                                     related_name="certificates")
     _nickname = models.TextField()
 
-    should_prevent_delete_signal = Signal(providing_args=["usercertificate", "private_key"])
+    # Arguments: "usercertificate", "private_key"
+    should_prevent_delete_signal = Signal()
 
     def set_privatekey_if_exists(self):
         """
@@ -212,7 +214,7 @@ class CertificateFactory(object):
                 temp_dic = temp_dic[key]
 
             return temp_dic
-        except:
+        except Exception:
             return default
 
     @classmethod
@@ -240,12 +242,12 @@ class CertificateFactory(object):
             try:
                 for san in cls.extract_subject_alt_names(reader):
                     TextIdentity.by_san(san, public)
-            except CertificateException as e:
+            except CertificateException:
                 pass  # No subject_alt_name extension found
 
             try:
                 public.nickname = public.subject.cname
-            except:
+            except Exception:
                 pass
             public.save()
             return public

@@ -4,7 +4,8 @@ from .core import DjangoAbstractBase, CertificateModel
 
 
 class AbstractIdentity(DjangoAbstractBase, CertificateModel, models.Model):
-    certificate = models.ForeignKey('certificates.Certificate', related_name="ident_%(app_label)s_%(class)s")
+    certificate = models.ForeignKey('certificates.Certificate', related_name="ident_%(app_label)s_%(class)s",
+                                    on_delete=models.CASCADE)
 
     def __str__(self):
         return str(super(AbstractIdentity, self))

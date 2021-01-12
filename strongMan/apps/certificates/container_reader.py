@@ -4,7 +4,6 @@ import re as regex
 from collections import OrderedDict
 from enum import Enum
 
-from asn1crypto import keys
 from oscrypto import keys as k
 
 
@@ -115,13 +114,13 @@ class PrivateReader(AbstractContainerReader):
         try:
             if cert.native["private_key"]["modulus"] is not None:
                 return True
-        except:
+        except Exception:
             pass
 
         try:
             if cert.native["private_key"]["public_key"] is not None:
                 return True
-        except:
+        except Exception:
             pass
 
         return False

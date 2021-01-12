@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render
 from django.db.models import ProtectedError
 
@@ -24,7 +24,7 @@ class EditHandler(object):
             self.secret.delete()
             self.reload_secrets()
             messages.add_message(self.request, messages.SUCCESS, 'Successfully deleted EAP Secret')
-        except ProtectedError as e:
+        except ProtectedError:
             messages.add_message(self.request, messages.ERROR,
                                  'Secret not deleted! Secret is referenced by a Connection')
         except ViciException as e:

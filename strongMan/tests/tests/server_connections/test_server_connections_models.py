@@ -41,43 +41,43 @@ class ServerConnectionModelTest(TestCase):
                                   local=connection).save()
 
     def test_child_added(self):
-        self.assertEquals(2, Child.objects.count())
+        self.assertEqual(2, Child.objects.count())
 
     def test_address_added(self):
-        self.assertEquals(2, Address.objects.count())
+        self.assertEqual(2, Address.objects.count())
 
     def test_connection_added(self):
-        self.assertEquals(1, Connection.objects.count())
+        self.assertEqual(1, Connection.objects.count())
 
     def test_proposal_added(self):
-        self.assertEquals(2, Proposal.objects.count())
+        self.assertEqual(2, Proposal.objects.count())
 
     def test_authentication_added(self):
-        self.assertEquals(3, Authentication.objects.count())
+        self.assertEqual(3, Authentication.objects.count())
 
     def test_delete_all_connections(self):
         connection = Connection.objects.first()
 
-        self.assertEquals(2, Child.objects.count())
-        self.assertEquals(3, Authentication.objects.count())
+        self.assertEqual(2, Child.objects.count())
+        self.assertEqual(3, Authentication.objects.count())
 
         connection.delete()
-        self.assertEquals(0, Authentication.objects.count())
-        self.assertEquals(0, Child.objects.count())
+        self.assertEqual(0, Authentication.objects.count())
+        self.assertEqual(0, Child.objects.count())
 
     def test_delete_all_connections_subclass(self):
         connection = IKEv2EAP(profile='rw2', version='1', send_certreq=False, enabled=True)
         connection.save()
         Child(name='all', mode='TUNNEL', connection=connection).save()
 
-        self.assertEquals(1, IKEv2EAP.objects.count())
-        self.assertEquals(3, Child.objects.count())
-        self.assertEquals(2, Connection.objects.count())
+        self.assertEqual(1, IKEv2EAP.objects.count())
+        self.assertEqual(3, Child.objects.count())
+        self.assertEqual(2, Connection.objects.count())
 
         connection.delete()
-        self.assertEquals(0, IKEv2EAP.objects.count())
-        self.assertEquals(2, Child.objects.count())
-        self.assertEquals(1, Connection.objects.count())
+        self.assertEqual(0, IKEv2EAP.objects.count())
+        self.assertEqual(2, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
 
     def test_prevent_certificate_delete(self):
         cert = UserCertificate.objects.first()

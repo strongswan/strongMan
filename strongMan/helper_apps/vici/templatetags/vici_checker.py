@@ -5,8 +5,8 @@ from ..wrapper.wrapper import ViciWrapper, ViciSocketException
 register = template.Library()
 
 
-@register.assignment_tag(takes_context=True, name="vici_reachable")
-def vici_reachable(context):
+@register.simple_tag(name="vici_reachable")
+def vici_reachable():
     try:
         ViciWrapper()
 
@@ -15,11 +15,10 @@ def vici_reachable(context):
         return {'reachable': False, 'message': str(e)}
 
 
-@register.assignment_tag(takes_context=True, name="vici_version_supported")
-def vici_version_supported(context):
+@register.simple_tag(name="vici_version_supported")
+def vici_version_supported():
     '''
     Check if strongSwan has the version 5.4.0 at least
-    :param context:
     :return: True or False
     '''
     vici_wrapper = ViciWrapper()

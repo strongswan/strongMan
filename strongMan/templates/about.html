@@ -4,22 +4,22 @@
 {% block title %}About{% endblock title %}
 {% block content %}
     <div id="about">
-        {% vici_reachable as reachable %}
-        {% if reachable %}
+        {% vici_reachable as result %}
+        {% if result.reachable %}
             <div id="daemon_info" class="row">
                 <div class="col-xs-12">
-                    Daemon: {{ daemon }} <br>
-                    Version: {{ version }} <br>
-                    System name: {{ sysname }} <br>
-                    Release: {{ release }} <br>
-                    Machine: {{ machine }} <br>
+                    Daemon: {{ daemon.decode }} <br>
+                    Version: {{ version.decode }} <br>
+                    System name: {{ sysname.decode }} <br>
+                    Release: {{ release.decode }} <br>
+                    Machine: {{ machine.decode }} <br>
                     <h2>Installed plugins</h2>
 
                     <div class="" id="plugins">
                         <div class="row">
                             {% for plugin in plugins %}
                                 <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                                    {{ plugin }}
+                                    {{ plugin.decode }}
                                 </div>
                             {% endfor %}
                         </div>

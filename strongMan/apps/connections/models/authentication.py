@@ -8,9 +8,9 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 
 class Authentication(models.Model):
     local = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                              related_name='local')
+                              related_name='local', on_delete=models.CASCADE)
     remote = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                               related_name='remote')
+                               related_name='remote', on_delete=models.CASCADE)
     name = models.TextField()  # starts with remote-* or local-*
     auth = models.TextField()
     round = models.IntegerField(default=1)
@@ -63,7 +63,7 @@ class Authentication(models.Model):
 
 class CaCertificateAuthentication(Authentication):
     ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None,
-                                related_name='ca_cert_authentication')
+                                related_name='ca_cert_authentication', on_delete=models.CASCADE)
     ca_identity = models.TextField()
 
     def dict(self):
@@ -97,7 +97,7 @@ class EapAuthentication(Authentication):
 
 class CertificateAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
-                                 related_name='cert_identity')
+                                 related_name='cert_identity', on_delete=models.CASCADE)
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
@@ -119,7 +119,7 @@ class CertificateAuthentication(Authentication):
 class EapTlsAuthentication(Authentication):
     eap_id = models.TextField()
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
-                                 related_name='tls_identity')
+                                 related_name='tls_identity', on_delete=models.CASCADE)
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()

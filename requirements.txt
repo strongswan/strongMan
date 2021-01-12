@@ -1,8 +1,8 @@
-Django==1.9.6
-oscrypto==0.19.1
-asn1crypto==0.24.0
-pyaes==1.3.0
-django-tables2==1.2.1
-vici==5.4.1dev3
-gunicorn==19.5.0
+Django==3.1.5
+oscrypto==1.2.1
+asn1crypto==1.4.0
+pyaes==1.6.1
+django-tables2==2.3.4
+vici==5.8.4
+gunicorn==20.0.4
 dj_static==0.0.6

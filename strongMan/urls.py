@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import re_path, include
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .apps import views
@@ -11,17 +11,17 @@ from .apps.pools import urls as pools
 from .apps.views import index
 
 urlpatterns = [
-    url(r'^$', index, name='index'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^connections/', include(connections_urls)),
-    url(r'^server_connections/', include(server_connections_urls)),
-    url(r'^pools/', include(pools)),
-    url(r'^certificates/', include(certificates_url)),
-    url(r'^eap_secrets/', include(eap_secrets_url)),
-    url(r'^login/?$', views.login, name='login'),
-    url(r'^logout/?$', views.logout, name='logout'),
-    url(r'change_pw$', views.pw_change, name='pw_change'),
-    url(r'^about/?$', views.about, name='about'),
+    re_path(r'^$', index, name='index'),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^connections/', include(connections_urls)),
+    re_path(r'^server_connections/', include(server_connections_urls)),
+    re_path(r'^pools/', include(pools)),
+    re_path(r'^certificates/', include(certificates_url)),
+    re_path(r'^eap_secrets/', include(eap_secrets_url)),
+    re_path(r'^login/?$', views.login, name='login'),
+    re_path(r'^logout/?$', views.logout, name='logout'),
+    re_path(r'change_pw$', views.pw_change, name='pw_change'),
+    re_path(r'^about/?$', views.about, name='about'),
 ]
 
 handler400 = 'strongMan.apps.views.bad_request'

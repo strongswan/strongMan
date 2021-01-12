@@ -13,4 +13,4 @@ class AboutViewsTests(TestCase):
     def test_about_get(self):
         url = '/about/'
         response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)

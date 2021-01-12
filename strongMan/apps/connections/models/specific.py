@@ -37,7 +37,7 @@ class Child(models.Model):
     name = models.TextField()
     mode = models.TextField()
     connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                                   related_name='children')
+                                   related_name='children', on_delete=models.CASCADE)
 
     def dict(self):
         child = OrderedDict()
@@ -48,28 +48,31 @@ class Child(models.Model):
 
 class Address(models.Model):
     value = models.TextField()
-    local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='local_ts')
-    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts')
+    local_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='local_ts',
+                                 on_delete=models.CASCADE)
+    remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='remote_ts',
+                                  on_delete=models.CASCADE)
     remote_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                                         related_name='remote_addresses')
+                                         related_name='remote_addresses', on_delete=models.CASCADE)
     local_addresses = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                                        related_name='local_addresses')
+                                        related_name='local_addresses', on_delete=models.CASCADE)
     vips = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                             related_name='vips')
+                             related_name='vips', on_delete=models.CASCADE)
 
 
 class Proposal(models.Model):
     type = models.TextField()
-    child = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='esp_proposals')
+    child = models.ForeignKey(Child, null=True, blank=True, default=None, related_name='esp_proposals',
+                              on_delete=models.CASCADE)
     connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
-                                   related_name='proposals')
+                                   related_name='proposals', on_delete=models.CASCADE)
 
 
 class Secret(models.Model):
     type = models.TextField()
     data = fields.EncryptedCharField(max_length=50)
     authentication = models.ForeignKey(Authentication, null=True, blank=True, default=None,
-                                       related_name='authentication')
+                                       related_name='authentication', on_delete=models.CASCADE)
 
     def dict(self):
         eap_id = self.authentication.subclass().eap_id
@@ -78,6 +81,7 @@ class Secret(models.Model):
 
 
 class LogMessage(models.Model):
-    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None)
+    connection = models.ForeignKey("connections.Connection", null=True, blank=True, default=None,
+                                   on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     message = models.TextField()

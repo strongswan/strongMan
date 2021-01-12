@@ -28,7 +28,7 @@ class DjangoAbstractBase(object):
                 results = klass.objects.filter(pk__in=id_list)
                 for value in results:
                     subclasses.append(value)
-            except:
+            except Exception:
                 pass
         return subclasses
 
@@ -40,7 +40,7 @@ class DjangoAbstractBase(object):
         for klass in type(self).all_subclasses():
             try:
                 return klass.objects.get(pk=self.pk)
-            except:
+            except Exception:
                 pass
         raise CertificateException("Can't find subclass object")
 

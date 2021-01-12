@@ -4,7 +4,7 @@ from .models import ViciCertificate
 
 
 class UserCertificateTable(tables.Table):
-    name = tables.Column(accessor="subject.cname", verbose_name='Name')
+    name = tables.Column(accessor="subject__cname", verbose_name='Name')
     subject = tables.Column(verbose_name="DistinguishedName",
                             attrs={'th': {'class': "hidden-sm hidden-xs"},
                                    'td': {'class': "hidden-sm hidden-xs"}})

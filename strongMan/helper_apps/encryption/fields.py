@@ -4,7 +4,7 @@ https://github.com/orcasgit/django-fernet-fields
 from django.conf import settings
 from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.db import models
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 from pyaes import aes as aeslib
 
@@ -80,13 +80,13 @@ class EncryptedField(models.Field):
                 % (self.__class__.__name__, self.name)
             )
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, context=None):
         if value is not None:
             value = bytes(value)
             decrypted = self.decrypt(value)
             try:
-                return self.to_python(force_text(decrypted))
-            except:
+                return self.to_python(force_str(decrypted))
+            except Exception:
                 return self.to_python(decrypted)
 
     @cached_property

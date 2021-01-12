@@ -43,18 +43,18 @@ class Child(models.Model):
     start_action = models.CharField(max_length=5, choices=START_ACTION_CHOICES, null=True, blank=True,
                                     default=None)
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                                   related_name='server_children')
+                                   related_name='server_children', on_delete=models.CASCADE)
 
     def dict(self):
         child = OrderedDict()
         local_ts = [local_t.value for local_t in self.server_local_ts.all()]
-        if local_ts[0] is not '':
+        if local_ts[0] != '':
             child['local_ts'] = local_ts
         remote_ts = [remote_t.value for remote_t in self.server_remote_ts.all()]
-        if remote_ts[0] is not '':
+        if remote_ts[0] != '':
             child['remote_ts'] = remote_ts
         child['esp_proposals'] = [esp_proposal.type for esp_proposal in self.server_esp_proposals.all()]
-        if self.start_action is not '':
+        if self.start_action != '':
             child['start_action'] = self.start_action
         return child
 
@@ -62,24 +62,27 @@ class Child(models.Model):
 class Address(models.Model):
     value = models.TextField()
     local_ts = models.ForeignKey(Child, null=True, blank=True, default=None,
-                                 related_name='server_local_ts')
+                                 related_name='server_local_ts', on_delete=models.CASCADE)
     remote_ts = models.ForeignKey(Child, null=True, blank=True, default=None,
-                                  related_name='server_remote_ts')
+                                  related_name='server_remote_ts', on_delete=models.CASCADE)
     remote_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True,
-                                         default=None, related_name='server_remote_addresses')
+                                         default=None, related_name='server_remote_addresses',
+                                         on_delete=models.CASCADE)
     local_addresses = models.ForeignKey("server_connections.Connection", null=True, blank=True,
-                                        default=None, related_name='server_local_addresses')
+                                        default=None, related_name='server_local_addresses',
+                                        on_delete=models.CASCADE)
 
 
 class Proposal(models.Model):
     type = models.TextField()
     child = models.ForeignKey(Child, null=True, blank=True, default=None,
-                              related_name='server_esp_proposals')
+                              related_name='server_esp_proposals', on_delete=models.CASCADE)
     connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                                   related_name='server_proposals')
+                                   related_name='server_proposals', on_delete=models.CASCADE)
 
 
 class LogMessage(models.Model):
-    connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None)
+    connection = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
+                                   on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     message = models.TextField()

@@ -1,6 +1,6 @@
 import json
 import sys
-from collections import Iterable
+from collections.abc import Iterable
 from collections import OrderedDict
 
 from django.db import models
@@ -105,7 +105,7 @@ class Connection(models.Model):
                 return State.ESTABLISHED.value
             elif state == State.CONNECTING.value:
                 return State.CONNECTING.value
-        except:
+        except Exception:
             return State.DOWN.value
 
     @property

@@ -8,9 +8,9 @@ from strongMan.apps.certificates.models import UserCertificate, AbstractIdentity
 
 class Authentication(models.Model):
     local = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                              related_name='server_local')
+                              related_name='server_local', on_delete=models.CASCADE)
     remote = models.ForeignKey("server_connections.Connection", null=True, blank=True, default=None,
-                               related_name='server_remote')
+                               related_name='server_remote', on_delete=models.CASCADE)
     name = models.TextField()  # starts with remote-* or local-*
     auth = models.CharField(max_length=56)
     round = models.IntegerField(default=1)
@@ -55,7 +55,7 @@ class Authentication(models.Model):
 
 class CaCertificateAuthentication(Authentication):
     ca_cert = models.ForeignKey(UserCertificate, null=True, blank=True, default=None,
-                                related_name='server_ca_cert_authentication')
+                                related_name='server_ca_cert_authentication', on_delete=models.CASCADE)
     ca_identity = models.TextField()
 
     def dict(self):
@@ -66,7 +66,7 @@ class CaCertificateAuthentication(Authentication):
                 parameters['cacerts'] = [self.ca_cert.der_container]
             else:
                 parameters['certs'] = [self.ca_cert.der_container]
-        if self.ca_identity is not '':
+        if self.ca_identity != '':
             parameters['id'] = self.ca_identity
         return auth
 
@@ -92,7 +92,7 @@ class EapAuthentication(Authentication):
     )
     Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
-                                 related_name='server_eap_identity')
+                                 related_name='server_eap_identity', on_delete=models.CASCADE)
 
     def dict(self):
         auth = super(EapAuthentication, self).dict()
@@ -127,7 +127,7 @@ class EapCertificateAuthentication(Authentication):
 
 class CertificateAuthentication(Authentication):
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
-                                 related_name='server_cert_identity')
+                                 related_name='server_cert_identity', on_delete=models.CASCADE)
 
     def dict(self):
         auth = super(CertificateAuthentication, self).dict()
@@ -153,7 +153,7 @@ class EapTlsAuthentication(Authentication):
     )
     Authentication.auth = models.CharField(max_length=56, choices=AUTH_CHOICES, default='0')
     identity = models.ForeignKey(AbstractIdentity, null=True, blank=True, default=None,
-                                 related_name='server_tls_identity')
+                                 related_name='server_tls_identity', on_delete=models.CASCADE)
 
     def dict(self):
         auth = super(EapTlsAuthentication, self).dict()

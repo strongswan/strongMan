@@ -13,8 +13,8 @@ The strongMan application implements a persistent connection and asymmetric key 
 
 ## Run it directly from git repository
 Requirements:
-- strongSwan with vici plugin (v5.4.0) <img src="https://www.strongswan.org/images/strongswan.png" width="30">
-- python3/pip3 or python3.5/pip3.5
+- strongSwan with vici plugin <img src="https://www.strongswan.org/images/strongswan.png" width="30">
+- python3/pip3
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
 

@@ -4,8 +4,9 @@ from django.template.loader import render_to_string
 
 class ConnectionTable(tables.Table):
     name = tables.Column(accessor="profile", verbose_name='Name')
-    gateway = tables.Column(accessor="remote_addresses.first.value", verbose_name="Server", orderable=False)
-    typ = tables.Column(accessor="subclass.choice_name", verbose_name="Typ", orderable=False)
+    gateway = tables.Column(accessor="remote_addresses__first__value", verbose_name="Server",
+                            orderable=False)
+    typ = tables.Column(accessor="subclass__choice_name", verbose_name="Typ", orderable=False)
     state = tables.Column(accessor="state", verbose_name="State", orderable=False,
                           attrs={'th': {'class': "text-right"}, 'td': {'class': "text-right"}})
 

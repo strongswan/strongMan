@@ -59,8 +59,8 @@ class IntegrationTest(TestCase):
                                                  'username': "eap-test", 'password': "test"})
 
         print(response.content.decode('utf-8'))
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
         toggle_url = '/connections/toggle/'
@@ -78,8 +78,8 @@ class IntegrationTest(TestCase):
                                                  'username': "eap-test", 'password': "test"})
 
         print(response.content.decode('utf-8'))
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
         toggle_url = '/connections/toggle/'
@@ -97,8 +97,8 @@ class IntegrationTest(TestCase):
                                       'certificate': self.carol_cert.pk, 'identity': self.carol_ident.pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2CertificateForm'})
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
 
@@ -118,8 +118,8 @@ class IntegrationTest(TestCase):
                                       'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapCertificateForm'})
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
 
@@ -138,8 +138,8 @@ class IntegrationTest(TestCase):
                                       'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapTlsForm'})
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
         toggle_url = '/connections/toggle/'
@@ -191,8 +191,8 @@ class IntegrationTest(TestCase):
                                       'identity': self.carol_cert.identities.first().pk,
                                       'certificate_ca': self.ca_cert.pk, 'identity_ca': "moon.strongswan.org",
                                       'current_form': 'Ike2EapTlsForm'})
-        self.assertEquals(1, Connection.objects.count())
-        self.assertEquals(1, Child.objects.count())
+        self.assertEqual(1, Connection.objects.count())
+        self.assertEqual(1, Child.objects.count())
 
         connection = Connection.objects.first().subclass()
         toggle_url = '/connections/toggle/'

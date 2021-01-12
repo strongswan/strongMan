@@ -23,7 +23,7 @@ class ViciWrapper(object):
         try:
             self.socket.shutdown(2)
             self.socket.close()
-        except:
+        except Exception:
             pass
 
     def _connect_socket(self):
@@ -229,7 +229,7 @@ class ViciWrapper(object):
     def get_pools(self, include_leases):
         try:
             return self.session.get_pools(include_leases)
-        except:
+        except Exception:
             return self.session.get_pools()
 
     def unload_pool(self, pool_name):

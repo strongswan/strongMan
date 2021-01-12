@@ -6,9 +6,9 @@ class ConnectionTable(tables.Table):
     detail_collapse_column = tables.Column(accessor="id", verbose_name="", orderable=False)
     readonly = tables.Column(accessor='id', verbose_name='')
     name = tables.Column(accessor="profile", verbose_name='Name')
-    remote_addrs = tables.Column(accessor="server_local_addresses.first.value", verbose_name="Server",
+    remote_addrs = tables.Column(accessor="server_local_addresses__first__value", verbose_name="Server",
                                  orderable=False)
-    type = tables.Column(accessor="subclass.choice_name", verbose_name="Authentication Type",
+    type = tables.Column(accessor="subclass__choice_name", verbose_name="Authentication Type",
                          orderable=False)
     connection_type = tables.Column(accessor='get_connection_type', verbose_name="Connection Type",
                                     orderable=False)

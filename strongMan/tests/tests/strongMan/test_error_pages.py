@@ -14,16 +14,16 @@ class ErrorPageViewsTests(TestCase):
 
     def test_400(self):
         response = views.bad_request(self.request)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_403(self):
         response = views.permission_denied(self.request)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_404(self):
         response = views.page_not_found(self.request)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_500(self):
         response = views.server_error(self.request)
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)

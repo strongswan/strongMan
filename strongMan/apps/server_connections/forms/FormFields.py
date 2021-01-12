@@ -55,7 +55,7 @@ class IdentityChoice(forms.ChoiceField):
         if certificate_field_name not in data_source:
             return
         cert_id = data_source[certificate_field_name]
-        if cert_id is not "":
+        if cert_id != "":
             cert = UserCertificate.objects.filter(pk=cert_id).first()
             identity = form.fields[identity_field_name]
             if not identity.certificate == cert and cert is not None:
