@@ -4,16 +4,13 @@ services:
   gateway:
     command: "ipsec start --nofork"
     build:
-      context: ./docker/gateway/
-      args:
-        BRANCH: ${TRAVIS_BRANCH:-master}
-        COMMIT: ${TRAVIS_COMMIT:-HEAD}
-        REPO_SLUG: ${TRAVIS_REPO_SLUG:-strongswan/strongMan}
+      dockerfile: ./docker/gateway/Dockerfile
+      context: .
     privileged: true
 
   roadwarrior:
     extends: gateway
     build:
-      context: ./docker/roadwarrior/
+      dockerfile: ./docker/roadwarrior/Dockerfile
     links:
      - "gateway"

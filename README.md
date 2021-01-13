@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/strongswan/strongMan.svg?branch=master)](https://travis-ci.org/strongswan/strongMan)
+[![Build Status](https://github.com/strongswan/strongMan/workflows/CI/badge.svg)](https://github.com/strongswan/strongMan/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/strongswan/strongMan/badge.svg?branch=master)](https://coveralls.io/github/strongswan/strongMan?branch=master)
 
 

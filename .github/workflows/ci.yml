@@ -1,0 +1,51 @@
+name: CI
+
+on: [push,pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-tests.txt
+    - name: Run unit tests
+      run: ./runtests.py --no-cov --no-vici
+
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip coveralls
+        echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+    - name: Build Docker images and start containers
+      run: |
+        docker-compose build
+        docker-compose up -d
+        sleep 5
+    - name: Run unit tests, collect coverage
+      run: docker-compose exec -T roadwarrior /bin/sh -c "cd /strongMan; ./runtests.py"
+    - name: Run integration tests
+      run: docker-compose exec -T roadwarrior /bin/sh -c "cd /strongMan; python manage.py test strongMan.tests.integration_tests --settings=strongMan.settings.local;"
+    - name: Submit coverage
+      if: ${{ success() }}
+      run: |
+        docker-compose exec -T roadwarrior cat /strongMan/.coverage > .coverage
+        coveralls --service=github

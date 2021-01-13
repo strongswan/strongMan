@@ -1,0 +1,7 @@
+.*
+!.coveragerc
+__pycache__
+Dockerfile
+env
+strongMan/staticfiles
+*.sqlite3
