@@ -13,6 +13,11 @@ if __name__ == '__main__':
         measure_coverage = False
         sys.argv.remove('--no-cov')
 
+    def_args = ['strongMan/apps', 'strongMan/helper_apps', 'strongMan/tests/tests']
+    if '--no-vici' in sys.argv:
+        def_args.append('--ignore=strongMan/tests/tests/vici/')
+        sys.argv.remove('--no-vici')
+
     # Start coverage tracking
     if measure_coverage:
         cov = coverage.coverage()
@@ -22,7 +27,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         code = pytest.main(sys.argv)
     else:
-        code = pytest.main(['strongMan/apps','strongMan/helper_apps','strongMan/tests/tests'])
+        code = pytest.main(def_args)
 
     # Show coverage report
     if measure_coverage:
