@@ -26,8 +26,7 @@ class AddOrEditForm(forms.Form):
     @property
     def my_salted_password(self):
         password = self.my_salt + self.cleaned_data["password"]
-        password_bytes = str.encode(password)
-        return password_bytes
+        return password
 
     @my_salted_password.setter
     def my_salted_password(self, value):
@@ -47,8 +46,7 @@ class AddOrEditForm(forms.Form):
         password = self.cleaned_data["password"]
         if password == "":
             return None
-        password_bytes = str.encode(password)
-        return password_bytes
+        return password
 
     @my_password.setter
     def my_password(self, value):
