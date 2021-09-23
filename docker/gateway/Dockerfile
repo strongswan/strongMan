@@ -1,12 +1,12 @@
 FROM python:latest
 
-ENV STRONGSWAN_VERSION 5.8.2
+ENV STRONGSWAN_VERSION 5.9.3
 
 RUN apt-get -y update \
 && apt-get -y install libssl-dev wget bzip2 make build-essential vim \
 && apt-get -y clean
 
-RUN wget http://download.strongswan.org/strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
+RUN wget https://download.strongswan.org/strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && tar xjvf strongswan-$STRONGSWAN_VERSION.tar.bz2 > /dev/null 2>&1 \
 && cd strongswan-$STRONGSWAN_VERSION \
 && ./configure --prefix=/usr --sysconfdir=/etc \
