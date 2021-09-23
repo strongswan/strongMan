@@ -1,4 +1,4 @@
-Django==3.1.12
+Django==3.1.13
 oscrypto==1.2.1
 asn1crypto==1.4.0
 pyaes==1.6.1
