@@ -13,7 +13,7 @@ class TestCertificates(object):
     PKCS1_rsa_ca_encrypted = loader.create("ca.key")
     PKCS8_rsa_ca = loader.create("ca2.pkcs8")
     PKCS8_ec = loader.create("ec.pkcs8")
-    PKCS8_rsa_ca_encrypted = loader.create("ca_enrypted.pkcs8")
+    PKCS8_rsa_ca_encrypted = loader.create("ca_encrypted.pkcs8")
     X509_rsa_ca_der = loader.create("cacert.der")
     X509_ec = loader.create("ec.crt")
     PKCS1_ec = loader.create("ec2.key")
