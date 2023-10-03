@@ -1,4 +1,5 @@
-FROM python:latest
+ARG python_version=latest
+FROM python:${python_version}
 
 ENV STRONGSWAN_VERSION 5.9.3
 

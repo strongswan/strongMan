@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_PYTHON_VERSION: 3.11
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
