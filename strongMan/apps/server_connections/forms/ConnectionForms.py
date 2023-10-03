@@ -111,7 +111,7 @@ class AbstractConnectionForm(AbstractDynamicForm):
     def subclass(self, connection):
         typ = type(connection)
         for model, form_name in self.get_models():
-            if type(model) == typ:
+            if type(model) is typ:
                 form_class = getattr(sys.modules[__name__], form_name)
                 return form_class()
         return self

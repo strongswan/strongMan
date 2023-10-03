@@ -1,5 +1,5 @@
 -r requirements.txt
+flake8
 pytest==7.4.2
 pytest-django==4.1.0
-pytest-flake8==1.0.7
 coverage==5.3.1
