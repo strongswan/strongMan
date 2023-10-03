@@ -1,6 +1,6 @@
 Django==3.1.13
-oscrypto==1.2.1
-asn1crypto==1.4.0
+oscrypto==1.3.0
+asn1crypto==1.5.1
 pyaes==1.6.1
 django-tables2==2.3.4
 vici==5.8.4
