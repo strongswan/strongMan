@@ -102,7 +102,8 @@ def create_read_key(file_path):
     '''
     SECRET_FILE = file_path
     try:
-        return open(SECRET_FILE).read().strip()
+        with open(SECRET_FILE) as f:
+            return f.read().strip()
     except IOError:
         try:
             import random
