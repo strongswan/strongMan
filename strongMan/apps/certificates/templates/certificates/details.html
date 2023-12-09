@@ -6,6 +6,8 @@
 {% block html-head %}
     <script src="{% static 'certificates/details.js' %}"></script>
     <link href="{% static 'certificates/certificates.css' %}" rel="stylesheet">
+    <script src="{% static 'certificates/bootstrap-select.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'certificates/bootstrap-select.min.css' %}">
 {% endblock html-head %}
 {% block content %}
 
@@ -169,20 +171,36 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-12">
-                {% if not readonly %}
-                    <div class="row text-center">
-                        <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
-                            {% csrf_token %}
-                            <span title="Remove">
-                                <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
-                                        id="remove_cert-btn">
-                                    <span class="glyphicon glyphicon-remove"></span> <span
-                                        class="removebtn-text">Remove</span>
-                                </button>
-                            </span>
-                        </form>
+            <div class="col-sm-3 col-sm-offset-3">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="export_cert">
+                    <div class="input-group">
+                        <select class="selectpicker" name="format">
+                          <option selected>Choose the format...</option>
+                          <option value="der">DER</option>
+                          <option value="pem">PEM</option>
+                        </select>
+                        <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-download"></span> Download
+                        </button>
+                        </div>
                     </div>
+                </form>
+            </div>
+            <div class="col-sm-2 col-sm-offset-1">
+                {% if not readonly %}
+                    <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
+                        {% csrf_token %}
+                        <span title="Remove">
+                            <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
+                                    id="remove_cert-btn">
+                                <span class="glyphicon glyphicon-remove"></span> <span
+                                    class="removebtn-text">Remove</span>
+                            </button>
+                        </span>
+                    </form>
                 {% endif %}
             </div>
         </div>
@@ -217,12 +235,12 @@
                 <div class="text-center">
                     <form action="" method="POST" onsubmit="return removeBtnClicked(this)">
                         {% csrf_token %}
-                                <span title="Remove private key">
-                                    <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
-                                            id="remove_privatekey-btn">
-                                        <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove private key</span>
-                                    </button>
-                                </span>
+                            <span title="Remove private key">
+                                <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
+                                        id="remove_privatekey-btn">
+                                    <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove private key</span>
+                                </button>
+                            </span>
                     </form>
                 </div>
             </div>

@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from ..models import UserCertificate, ViciCertificate, CertificateDoNotDelete
-from ..forms import ChangeNicknameForm
+from ..forms import ChangeNicknameForm, ExportCertificateForm
 
+import oscrypto.asymmetric
 
 class DetailsHandler(object):
     def __init__(self, request, certificate_object):
@@ -33,6 +34,13 @@ class DetailsHandler(object):
         if self.request.method == "GET":
             return self._render_user_details()
         elif self.request.method == "POST":
+            if "export_cert" in self.request.POST:
+                form = ExportCertificateForm(self.request.POST)
+                if form.is_valid():
+                    return self._export_certificate(form.cleaned_data["format"])
+                else:
+                    messages.add_message(self.request, messages.ERROR, "Please choose a format")
+                    return self._render_user_details()
             if "remove_cert" in self.request.POST:
                 return self._delete_cert()
             elif "remove_privatekey" in self.request.POST:
@@ -78,3 +86,37 @@ class DetailsHandler(object):
             messages.add_message(self.request, messages.ERROR, "Can't delete private key. " + str(e))
 
         return self._render_user_details()
+
+    def _export_certificate(self, format):
+
+        try:
+
+            filename = self._usercert.nickname + '.' + format
+
+            if format == "pem":
+
+                # Load DER-encoded certificate
+                cert = oscrypto.asymmetric.load_certificate(self.certificate.der_container)
+
+                # Export the certificate to PEM format
+                pem_bytes = oscrypto.asymmetric.dump_certificate(cert)
+                
+                mimetype = "application/x-pem-file"
+
+                # Create an HttpResponse with the PEM formatted certificate
+                response = HttpResponse(pem_bytes, content_type=mimetype)
+
+            else:
+                mimetype = "application/x-x509-cert"
+
+                # Create an HttpResponse with the DER formatted certificate
+                response = HttpResponse(self.certificate.der_container, content_type=mimetype)
+
+            # Set the Content-Disposition header for the browser to prompt the user to download the file
+            response['Content-Disposition'] = "attachment; filename=%s" % filename
+
+            return response
+
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, "Couldn't export the cert. " + str(e))
+            return self._render_user_details()
