@@ -1,6 +1,9 @@
+import oscrypto.asymmetric
+from urllib.parse import quote
+
 from django.contrib import messages
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from ..models import UserCertificate, ViciCertificate, CertificateDoNotDelete
 from ..forms import ChangeNicknameForm
@@ -28,11 +31,15 @@ class DetailsHandler(object):
 
     def handle(self):
         if self._is_vicicert():
+            if self.request.method == "POST" and "export_cert" in self.request.POST:
+                return self._export_certificate()
             return self._render_vici_details()
 
         if self.request.method == "GET":
             return self._render_user_details()
         elif self.request.method == "POST":
+            if "export_cert" in self.request.POST:
+                return self._export_certificate()
             if "remove_cert" in self.request.POST:
                 return self._delete_cert()
             elif "remove_privatekey" in self.request.POST:
@@ -78,3 +85,17 @@ class DetailsHandler(object):
             messages.add_message(self.request, messages.ERROR, "Can't delete private key. " + str(e))
 
         return self._render_user_details()
+
+    def _export_certificate(self):
+        try:
+            cert = oscrypto.asymmetric.load_certificate(self.certificate.der_container)
+            pem_bytes = oscrypto.asymmetric.dump_certificate(cert)
+
+            filename = quote(self._vicicert.nickname if self._is_vicicert() else self._usercert.nickname)
+
+            response = HttpResponse(pem_bytes, content_type="application/x-pem-file")
+            response['Content-Disposition'] = "attachment; filename*=utf-8''%s.pem" % filename
+            return response
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, "Couldn't export the cert. " + str(e))
+            return self._render_user_details()

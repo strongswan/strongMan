@@ -169,21 +169,23 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-12">
-                {% if not readonly %}
-                    <div class="row text-center">
-                        <form action="" method="POST">
-                            {% csrf_token %}
-                            <span title="Remove">
-                                <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
-                                        id="remove_cert-btn">
-                                    <span class="glyphicon glyphicon-remove"></span> <span
-                                        class="removebtn-text">Remove</span>
-                                </button>
-                            </span>
-                        </form>
+            <div class="col-xs-12 text-center">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="btn-group" role="group" aria-label="Certificate operations">
+                        <button type="submit" class="btn btn-default" name="export_cert"
+                                id="export_cert-btn" title="Download certificate in PEM format">
+                            <span class="glyphicon glyphicon-download"></span> <span>Download</span>
+                        </button>
+                    {% if not readonly %}
+                        <button type="submit" class="btn btn-default remove-btn" name="remove_cert"
+                                id="remove_cert-btn" title="Remove certificate">
+                            <span class="glyphicon glyphicon-remove"></span> <span
+                                class="removebtn-text">Remove</span>
+                        </button>
+                    {% endif %}
                     </div>
-                {% endif %}
+                </form>
             </div>
         </div>
 
@@ -214,15 +216,15 @@
                 </div>
             </div>
             <div class="row">
-                <div class="text-center">
+                <div class="col-xs-12 text-center">
                     <form action="" method="POST">
                         {% csrf_token %}
-                                <span title="Remove private key">
-                                    <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
-                                            id="remove_privatekey-btn">
-                                        <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove private key</span>
-                                    </button>
-                                </span>
+                        <span title="Remove private key">
+                            <button type="submit" class="btn btn-default remove-btn" name="remove_privatekey"
+                                    id="remove_privatekey-btn">
+                                <span class="glyphicon glyphicon-remove"></span> <span class="removebtn-text">Remove private key</span>
+                            </button>
+                        </span>
                     </form>
                 </div>
             </div>
