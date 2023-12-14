@@ -31,7 +31,7 @@ class Pool(models.Model):
         elif self.attribute is None:
             pools = {self.poolname: {'addrs': self.addresses}}
         else:
-            pools = {self.poolname: {'addrs': self.addresses, self.attribute: [self.attributevalues]}}
+            pools = {self.poolname: {'addrs': self.addresses, self.attribute: self.attributevalues.split(',')}}
         return pools
 
     def __str__(self):

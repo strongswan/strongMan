@@ -45,7 +45,6 @@ class AddHandler(object):
                                          'Can\'t add pool: Attribute values unclear for Attribute "None"')
                     return self._render(self.form)
                 pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses)
-                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
             else:
                 if self.form.my_attributevalues == "":
                     messages.add_message(self.request, messages.ERROR,
@@ -55,13 +54,11 @@ class AddHandler(object):
                 pool = Pool(poolname=self.form.my_poolname, addresses=self.form.my_addresses,
                             attribute=attr,
                             attributevalues=self.form.my_attributevalues)
-                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses,
-                                                     attr: [self.form.my_attributevalues]}}
         try:
             pool.clean()
-            pool.save()
             vici = ViciWrapper()
-            vici.load_pool(vici_pool)
+            vici.load_pool(pool.dict())
+            pool.save()
 
         except ViciException as e:
             messages.add_message(self.request, messages.ERROR, str(e))

@@ -26,7 +26,6 @@ class AddOrEditForm(forms.Form):
         else:
             pool.attribute = self.cleaned_data['attribute']
             pool.attributevalues = self.cleaned_data['attributevalues']
-        pool.save()
 
     def is_valid(self):
         valid = super(AddOrEditForm, self).is_valid()

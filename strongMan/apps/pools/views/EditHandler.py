@@ -42,20 +42,17 @@ class EditHandler(object):
                     messages.add_message(self.request, messages.ERROR,
                                          'Won\'t update: Attribute values unclear for Attribute "None"')
                     return render(self.request, 'pools/edit.html', {"form": self.form})
-                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses}}
-
             else:
                 if self.form.my_attributevalues == "":
                     messages.add_message(self.request, messages.ERROR,
                                          'Won\'t update: Attribute values mandatory if attribute is set.')
                     return render(self.request, 'pools/edit.html', {"form": self.form})
-                vici_pool = {self.form.my_poolname: {'addrs': self.form.my_addresses,
-                                                     self.form.my_attribute: [self.form.my_attributevalues]}}
             msg = 'Successfully updated pool'
 
             try:
-                vici.load_pool(vici_pool)
                 self.form.update_pool(self.pool)
+                self.pool.clean()
+                vici.load_pool(self.pool.dict())
                 self.pool.save()
                 messages.add_message(self.request, messages.SUCCESS, msg)
             except ViciException as e:
