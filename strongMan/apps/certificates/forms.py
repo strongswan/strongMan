@@ -43,12 +43,3 @@ class AddForm(forms.Form):
 
 class ChangeNicknameForm(forms.Form):
     nickname = forms.CharField(max_length=100, required=True)
-
-EXPORT_FORMATS = (
-    ("pem", "PEM"),
-    ("der", "DER"),
-)
-
-class ExportCertificateForm(forms.Form):
-    format = forms.ChoiceField(choices=EXPORT_FORMATS, required=True)
-
