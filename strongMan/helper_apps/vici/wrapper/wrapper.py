@@ -102,7 +102,7 @@ class ViciWrapper(object):
          :rtype: list
         '''
         certificates = []
-        for certificate in self.session.list_certs():
+        for certificate in self.session.list_certs({"type": "X509"}):
             certificates.append(certificate)
         return certificates
 
