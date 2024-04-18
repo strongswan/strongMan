@@ -13,13 +13,13 @@
                 {% if 'leases' in val %}
                     <tr><td><b>Leases in {{ key }}:</b> </td>
                     <td>
-                        {% ifequal val.leases|length 0 %}
+                        {% if val.leases|length == 0 %}
                             No leases.
                         {% else %}
                             {%  for k, v in  val.leases.items %}
                                 <tr><td>{{ v.identity }}</td><td>{{ v.address }}, {{ v.status }} </td></tr>
                             {% endfor %}
-                        {% endifequal %}
+                        {% endif %}
                     </td></tr>
                 {% endif %}
             </tbody>
