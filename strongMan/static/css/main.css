@@ -111,8 +111,8 @@ html {
   background-color: #333; }
 
 .white-background {
-  background-color: white;
-  border-color: linear-gradient(90deg, rgba(9, 53, 102, 1) 0%, rgba(19, 146, 151, 1) 100%); }
+  background-color: linear-gradient(90deg, rgba(9, 53, 102, 1) 0%, rgba(19, 146, 151, 1) 100%);
+  border-color: black; }
 
 .white {
   color: #ffffff; }
