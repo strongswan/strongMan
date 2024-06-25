@@ -112,7 +112,7 @@ html {
 
 .white-background {
   background-color: white;
-  border-color: black; }
+  border-color: linear-gradient(90deg, rgba(9, 53, 102, 1) 0%, rgba(19, 146, 151, 1) 100%); }
 
 .white {
   color: #ffffff; }
