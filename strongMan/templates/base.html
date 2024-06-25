@@ -9,7 +9,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="strongManServer">
     <meta name="author" content="">
-    <link rel="icon" type="image/x-icon" href="{% static 'img/swanicon.png' %}">
+    {% comment %} <link rel="icon" type="image/x-icon" href="{% static 'img/swanicon.png' %}"> {% endcomment %}
     <title>strongMan</title>
 
     <!-- Bootstrap core CSS -->
@@ -44,9 +44,9 @@
                     <span class="icon-bar"></span>
                 </button>
 
-                <a class="navbar-brand" href="{% url 'index' %}">
+                {% comment %} <a class="navbar-brand" href="{% url 'index' %}">
                     <img alt="strongMan" src="{% static 'img/swanicon.png' %}"> strongMan
-                </a>
+                </a> {% endcomment %}
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -55,14 +55,14 @@
                         <li><a href="{% url "certificates:overview" %}">Certificates</a></li>
                         <li class="server-mode" ><a href="{% url "eap_secrets:overview" %}">EAP Secrets</a></li>
                         <li class="server-mode" ><a href="{% url "pools:index" %}">Pools</a></li>
-                        <li><a href="{% url "about" %}">About</a></li>
+                        {% comment %} <li><a href="{% url "about" %}">About</a></li> {% endcomment %}
                     </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
 
                         <li><a id="mode-switcher" href="#" onclick="toggle_navbar_visibility();">Switch to Client mode</a></li>
 
-                        <li class="dropdown">
+                        {% comment %} <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                 <span class="glyphicon glyphicon-user"></span> {{ user.username }}
                                 <span class="caret"></span>
@@ -77,11 +77,11 @@
                                     <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> {% endcomment %}
                     {% else %}
-                        <li>
+                        {% comment %} <li>
                             <a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a>
-                        </li>
+                        </li> {% endcomment %}
                     {% endif %}
                 </ul>
             </div>
@@ -110,7 +110,7 @@
     </div>
 
     <footer class="footer">
-        <div class="container">
+        {% comment %} <div class="container">
             <div class="text-center">
                 <div class="logo">
                     <a href="https://twitter.com/strongswan" target="_blank" title="Follow us on Twitter">
@@ -131,7 +131,7 @@
             <div class="text-center copyright">
                 <p>Copyright &copy; 2016 strongSwan</p>
             </div>
-        </div>
+        </div> {% endcomment %}
     </footer>
 
     <!-- Modal -->
