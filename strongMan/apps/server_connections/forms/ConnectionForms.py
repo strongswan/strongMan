@@ -4,7 +4,7 @@ from django import forms
 from strongMan.apps.server_connections.forms.SubForms import HeaderForm, RemoteCertificateForm, \
     RemoteIdentityForm, ServerCertificateForm, EapForm, EapCertificateForm, EapTlsForm, PoolForm
 from strongMan.apps.server_connections.models.connections import IKEv2Certificate, IKEv2EAP, \
-    IKEv2CertificateEAP, IKEv2EapTls
+    IKEv2CertificateEAP, IKEv2EapTls, psk
 
 
 class AbstractDynamicForm(forms.Form):
@@ -169,6 +169,21 @@ class Ike2EapTlsForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, 
     @property
     def template(self):
         return "server_connections/forms/Ike2EapTls.html"
+
+    def update_certs(self):
+        self.update_certificates()
+
+
+
+class pskForm(AbstractConnectionForm, HeaderForm, RemoteCertificateForm, RemoteIdentityForm,
+                     EapTlsForm, PoolForm):
+    @property
+    def model(self):
+        return psk
+
+    @property
+    def template(self):
+        return "server_connections/forms/psk.html"
 
     def update_certs(self):
         self.update_certificates()

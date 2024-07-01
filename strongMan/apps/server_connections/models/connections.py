@@ -215,6 +215,16 @@ class IKEv2EapTls(Connection):
     @classmethod
     def choice_name(cls):
         return "IKEv2 EAP-TLS (Certificate)"
+    
+
+
+class psk(Connection):
+
+    @classmethod
+    def choice_name(cls):
+        return "PSK"    
+    
+
 
     @receiver(pre_delete, sender=Connection)
     def delete_all_connected_models(sender, instance, **kwargs):
