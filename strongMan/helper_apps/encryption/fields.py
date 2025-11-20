@@ -1,11 +1,16 @@
 '''
 https://github.com/orcasgit/django-fernet-fields
 '''
+import os
+
 from django.conf import settings
 from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.db import models
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from pyaes import aes as aeslib
 
 __all__ = [
@@ -20,7 +25,7 @@ __all__ = [
 
 
 class EncryptedField(models.Field):
-    """A field that encrypts values using Fernet symmetric encryption."""
+    """A field that encrypts values using AES-GCM-SIV symmetric encryption."""
     _internal_type = 'BinaryField'
 
     def __init__(self, *args, **kwargs):
@@ -42,12 +47,24 @@ class EncryptedField(models.Field):
         super(EncryptedField, self).__init__(*args, **kwargs)
 
     def encrypt(self, value):
-        aes = aeslib.AESModeOfOperationCTR(self.key)
-        return aes.encrypt(value)
+        # we use a random nonce for the encryption and to generate an individual encryption key, which is
+        # then concatenated and separated by a : from the ciphertext
+        nonce = os.urandom(12)
+        # leave the salt intentionally blank
+        hkdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=b'', info=nonce + b'EncryptedField')
+        aesgcmsiv = AESGCMSIV(hkdf.derive(self.key))
+        return nonce + b':' + aesgcmsiv.encrypt(nonce, value, None)
 
     def decrypt(self, value):
-        aes = aeslib.AESModeOfOperationCTR(self.key)
-        return aes.decrypt(value)
+        # decrypt unsafe legacy values if we don't find a nonce
+        if len(value) < 13 or value[12] != b':'[0]:
+            aes = aeslib.AESModeOfOperationCTR(self.key)
+            return aes.decrypt(value)
+        # <12-byte nonce>:<ciphertext>
+        nonce = value[:12]
+        hkdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=b'', info=nonce + b'EncryptedField')
+        aesgcmsiv = AESGCMSIV(hkdf.derive(self.key))
+        return aesgcmsiv.decrypt(nonce, value[13:], None)
 
     @cached_property
     def key(self):
