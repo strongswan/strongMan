@@ -72,6 +72,16 @@
                 <dd class="col-sm-8">{{ form.start_action.value }}</dd>
             {% endif %}
         </dl>
+        {% if form.local_auth.value %}
+            <dl class="row">
+                <dt class="col-sm-4">Local Authentication</dt>
+                {% for key, value in form.local_auth.field.choices %}
+                    {% if form.local_auth.value|slugify == key|slugify %}
+                        <dd class="col-sm-8" class="col-sm-8">{{ value }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        {% endif %}
         {% if form.remote_auth.value %}
             <dl class="row">
                 <dt class="col-sm-4">Remote Authentication</dt>
@@ -137,13 +147,19 @@
         {% endif %}
         {% if form.identity_ca.value %}
             <dl class="row">
-                <dt class="col-sm-4">CA Identity</dt>
+                <dt class="col-sm-4">Remote Identity</dt>
                 <dd class="col-sm-8">{{ form.identity_ca.value }}</dd>
             </dl>
         {% elif form.identity and not form.identity_ca.value %}
             <dl class="row">
-                <dt class="col-sm-4">CA Identity</dt>
+                <dt class="col-sm-4">Remote Identity</dt>
                 <dd class="col-sm-8">-</dd>
+            </dl>
+        {% endif %}
+        {% if form.eap_id.value %}
+            <dl class="row">
+                <dt class="col-sm-4">Remote EAP-Identity</dt>
+                <dd class="col-sm-8">{{ form.eap_id.value }}</dd>
             </dl>
         {% endif %}
         <dl class="row">

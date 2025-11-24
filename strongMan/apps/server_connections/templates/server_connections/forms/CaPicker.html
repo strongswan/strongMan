@@ -44,7 +44,7 @@
                     <input type="checkbox" class="is_server_identity" name="{{ is_server_identity.name }}"
                            id="{{ is_server_identity.name }}" placeholder="Hostname or IP"
                            {% if is_server_identity.value %}checked{% endif %}>
-                    Use server value
+                    Use hostname/address value
                 </span>
             </div>
         </div>
@@ -52,12 +52,12 @@
             <label class="control-label col-sm-3"></label>
             <div class="col-sm-8 col-xs-10">
                 <input type="text" class="form-control" name="{{ identity.name }}" id="{{ identity.name }}"
-                       placeholder="Custom server identity" {% if identity.value %}value="{{ identity.value }}"
+                       placeholder="Custom peer identity" {% if identity.value %}value="{{ identity.value }}"
                        {% else %}value=""{% endif %}/>
                 {% include "server_connections/forms/../widgets/errormsg.html" with field=identity %}
             </div>
             <div class="col-sm-1 col-xs-2" id="{{ identity.name }}_questionpopover">
-                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote identity help" content="Enter the peer identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. The CA identity is the same like the server in the most cases. This field will be enabled as soon as the certificate is selected." %}
+                {% include "server_connections/widgets/QuestionPopover.html" with title="Remote identity help" content="Enter the peer's IKE identity either as a domain name like 'vpn.myenterprise.com' or as a IP like '213.56.143.8'. When using EAP, the IKE identity might not be useful (some clients send their IP address), so request and match the EAP-Identity instead." %}
             </div>
         </div>
 
