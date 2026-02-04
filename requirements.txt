@@ -1,4 +1,4 @@
-Django==4.2.27
+Django==4.2.28
 git+https://github.com/wbond/oscrypto.git@1547f535001ba568b239b8797465536759c742a3
 asn1crypto==1.5.1
 pyaes==1.6.1
