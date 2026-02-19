@@ -55,8 +55,22 @@ def load_credentials(vici=ViciWrapper()):
     load_certificates(vici)
 
 
+def cleanup_expired_certificates():
+    from django.utils import timezone
+    expired = Certificate.objects.filter(valid_not_after__lt=timezone.now())
+    count = expired.count()
+    if count > 0:
+        expired.delete()
+        print(f"Cleaned up {count} expired certificate(s)")
+        return True
+    return False
+
+
 def main():
     vici = ViciWrapper()
+    cleaned = cleanup_expired_certificates()
+    if cleaned:
+        vici.clear_creds()
     load_credentials(vici)
     load_pools(vici)
     load_connections()
