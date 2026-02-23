@@ -62,19 +62,28 @@ class EditHandler(object):
             return redirect(reverse("pools:index"))
 
     def delete_pool(self, vici):
-        vici_poolname = {'name': self.poolname}
         try:
-            vici.unload_pool(vici_poolname)
-            self.pool.delete()
-            messages.add_message(self.request, messages.SUCCESS, "Pool deletion successful.")
-
+            vici.unload_pool(self.poolname)
         except ViciException as e:
-            messages.add_message(self.request, messages.ERROR,
-                                 'Unload pool failed: ' + str(e))
-        except ProtectedError:
-            messages.add_message(self.request, messages.ERROR,
-                                 'Pool not deleted. Pool is in use by a connection.')
+            messages.add_message(
+                self.request, messages.ERROR, "Unload pool failed: " + str(e)
+            )
+            return redirect(reverse("pools:index"))
+        try:
+            self.pool.delete()
+            messages.add_message(
+                self.request, messages.SUCCESS, "Pool deletion successful."
+            )
+        except ProtectedError as e:
+            vici.load_pool(self.pool.dict())
+            names = sorted(obj.profile for obj in e.protected_objects)
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                f"Pool not deleted! In use by {len(names)} connection(s): {', '.join(names)}",
+            )
         except Exception as e:
+            vici.load_pool(self.pool.dict())
             messages.add_message(self.request, messages.ERROR, str(e))
         return redirect(reverse("pools:index"))
 
