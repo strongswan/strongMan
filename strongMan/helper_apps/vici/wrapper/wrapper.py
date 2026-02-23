@@ -233,8 +233,11 @@ class ViciWrapper(object):
             return self.session.get_pools()
 
     def unload_pool(self, pool_name):
+        pools = self.session.get_pools({"name": pool_name})
+        if pool_name not in pools:
+            return
         try:
-            self.session.unload_pool(pool_name)
+            self.session.unload_pool({"name": pool_name})
         except Exception as e:
             raise ViciLoadException(str(e))
 
