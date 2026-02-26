@@ -232,9 +232,9 @@ class ViciWrapper(object):
         except Exception:
             return self.session.get_pools()
 
-    def unload_pool(self, pool_name):
+    def unload_pool(self, pool):
         try:
-            self.session.unload_pool(pool_name)
+            self.session.unload_pool(pool)
         except Exception as e:
             raise ViciLoadException(str(e))
 
