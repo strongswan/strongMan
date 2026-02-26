@@ -6,6 +6,7 @@ from ..forms import AddOrEditForm
 from strongMan.apps.pools.models import Pool
 from strongMan.helper_apps.vici.wrapper.exception import ViciException
 from strongMan.helper_apps.vici.wrapper.wrapper import ViciWrapper
+from django.db import transaction
 from django.db.models import ProtectedError
 
 
@@ -62,20 +63,20 @@ class EditHandler(object):
             return redirect(reverse("pools:index"))
 
     def delete_pool(self, vici):
+        vici_poolname = {"name": self.poolname}
         try:
-            vici.unload_pool(self.poolname)
+            with transaction.atomic():
+                self.pool.delete()
+                if self.poolname in vici.get_pools(vici_poolname):
+                    vici.unload_pool(vici_poolname)
+                messages.add_message(
+                    self.request, messages.SUCCESS, "Pool deletion successful."
+                )
         except ViciException as e:
             messages.add_message(
                 self.request, messages.ERROR, "Unload pool failed: " + str(e)
             )
-            return redirect(reverse("pools:index"))
-        try:
-            self.pool.delete()
-            messages.add_message(
-                self.request, messages.SUCCESS, "Pool deletion successful."
-            )
         except ProtectedError as e:
-            vici.load_pool(self.pool.dict())
             names = sorted(obj.profile for obj in e.protected_objects)
             messages.add_message(
                 self.request,
@@ -83,7 +84,6 @@ class EditHandler(object):
                 f"Pool not deleted! In use by {len(names)} connection(s): {', '.join(names)}",
             )
         except Exception as e:
-            vici.load_pool(self.pool.dict())
             messages.add_message(self.request, messages.ERROR, str(e))
         return redirect(reverse("pools:index"))
 
