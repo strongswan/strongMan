@@ -31,10 +31,11 @@ def login(request):
     return render(request, 'login.html')
 
 
-@require_http_methods('GET')
+@require_http_methods(['POST'])
 def logout(request):
     auth_logout(request)
-    return render(request, 'login.html')
+    messages.success(request, "Logged out successfully!")
+    return redirect("login")
 
 
 @login_required

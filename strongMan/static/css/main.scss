@@ -179,8 +179,33 @@ html {
   margin-left: 10px;
 }
 
-#logout_button {
-  float: right;
+.dropdown-menu button[form] {
+  display: block;
+  width: 100%;
+  padding: 3px 20px;
+  clear: both;
+  white-space: nowrap;
+  text-align: left;
+  background: transparent;
+  border: none;
+
+  &:hover,
+  &:focus {
+    color: #262626;
+    background-color: #f5f5f5;
+    outline: none;
+  }
+  @media (max-width: 767px) {
+    & {
+      color: #9d9d9d;
+      padding: 5px 15px 5px 25px;
+    }
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-color: transparent;
+    }
+  }
 }
 
 .question {
