@@ -1,5 +1,5 @@
 -r requirements.txt
 flake8
-pytest==7.4.2
-pytest-django==4.1.0
-coverage==5.3.1
+pytest==9.1.1
+pytest-django==4.14.0
+coverage==7.16.2
