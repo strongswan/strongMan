@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_PYTHON_VERSION: 3.13
+      DOCKER_STRONGSWAN_VERSION: 6.1.0
     steps:
     - uses: actions/checkout@v7
     - name: Build Docker images and start containers

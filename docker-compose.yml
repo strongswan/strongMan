@@ -1,11 +1,12 @@
 services:
   gateway:
-    command: "ipsec start --nofork"
+    command: "/usr/libexec/ipsec/charon"
     build:
       dockerfile: ./docker/gateway/Dockerfile
       context: .
       args:
         python_version: "${DOCKER_PYTHON_VERSION:?}"
+        strongswan_version: "${DOCKER_STRONGSWAN_VERSION:?}"
     privileged: true
 
   roadwarrior:
@@ -14,5 +15,6 @@ services:
       dockerfile: ./docker/roadwarrior/Dockerfile
       args:
         python_version: "${DOCKER_PYTHON_VERSION:?}"
+        strongswan_version: "${DOCKER_STRONGSWAN_VERSION:?}"
     links:
      - "gateway"
