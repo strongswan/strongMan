@@ -74,7 +74,12 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                                    <form id="logout-form" action="{% url 'logout' %}" method="post" hidden>
+                                        {% csrf_token %}
+                                    </form>
+                                    <button type="submit" form="logout-form">
+                                        <span class="glyphicon glyphicon-log-out"></span> Logout
+                                    </button>
                                 </li>
                             </ul>
                         </li>

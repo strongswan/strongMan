@@ -132,8 +132,25 @@ html {
   margin-bottom: 10px;
   margin-left: 10px; }
 
-#logout_button {
-  float: right; }
+.dropdown-menu button[form] {
+  display: block;
+  width: 100%;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer; }
+  .dropdown-menu button[form]:hover,
+  .dropdown-menu button[form]:focus {
+    color: #262626;
+    text-decoration: none;
+    background-color: #f5f5f5;
+    outline: none; }
 
 .question {
   font-size: 1em;
